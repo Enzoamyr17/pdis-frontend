@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export default function Header() {
   return (
-    <header className="bg-gradient-to-r from-blue-light to-blue h-18 flex items-center justify-between px-12">
+    <header className="bg-gradient-to-r from-light-blue to-blue h-18 flex items-center justify-between px-12">
       <div className="flex items-center justify-center">
         <Image src="/assets/pd/colored_wide_text.png" alt="logo" width={300} height={10} />
       </div>
