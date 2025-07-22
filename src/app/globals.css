@@ -138,4 +138,81 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Custom Scrollbar Styles */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-orange);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--muted);
+  }
+
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) var(--muted);
+  }
+
+  /* Dark mode scrollbar adjustments */
+  .dark ::-webkit-scrollbar-track {
+    background: var(--muted);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: var(--border);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  .dark ::-webkit-scrollbar-corner {
+    background: var(--muted);
+  }
+}
+
+/* Scrollbar Left Class for Sidebars */
+.scrollbar-left {
+  direction: rtl;
+}
+
+.scrollbar-left > * {
+  direction: ltr;
+}
+
+.scrollbar-left::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-left::-webkit-scrollbar-track {
+  background: var(--sidebar-border);
+  border-radius: 3px;
+}
+
+.scrollbar-left::-webkit-scrollbar-thumb {
+  background: var(--sidebar-accent);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-left::-webkit-scrollbar-thumb:hover {
+  background: var(--sidebar-accent-foreground);
 }
