@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import { EventClickArg, DateSelectArg, EventChangeArg } from '@fullcalendar/core'
+import { EventClickArg, EventChangeArg } from '@fullcalendar/core'
+import { DateClickArg } from '@fullcalendar/interaction'
 
 interface CalendarEvent {
   title: string
@@ -19,7 +20,7 @@ interface CalendarEvent {
 interface CalendarProps {
   events?: CalendarEvent[]
   onEventClick?: (info: EventClickArg) => void
-  onDateClick?: (info: any) => void
+  onDateClick?: (info: DateClickArg) => void
   className?: string
 }
 
@@ -154,7 +155,7 @@ export default function Calendar({
         eventClick={onEventClick || ((info: EventClickArg) => {
           console.log('Event: ' + info.event.title)
         })}
-        dateClick={onDateClick || ((info) => {
+        dateClick={onDateClick || ((info: DateClickArg) => {
           console.log('Clicked on: ' + info.dateStr)
         })}
       />
