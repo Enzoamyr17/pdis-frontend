@@ -26,6 +26,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import Calendar from '@/components/Calendar';
+import UserProfile from '@/components/UserProfile';
 
 interface Task {
   id: number
@@ -164,8 +165,11 @@ export default function Dashboard() {
         <ResizablePanel defaultSize={23}>
           {/* Widget Bar */}
           <div className="flex flex-col gap-2 h-full overflow-y-auto max-w-full p-2 scrollbar-left">
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-64">
-            <h2 className="text-lg font-semibold mb-2 text-blue">User Profile</h2>
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-3 flex-shrink-0">
+              <h2 className="text-sm font-semibold mb-2 text-blue">User Profile</h2>
+              <div className="overflow-y-auto max-h-80">
+                <UserProfile />
+              </div>
             </div>
             <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden h-96">
               <h2 className="text-lg font-semibold mb-2 text-blue">Calendar</h2>
