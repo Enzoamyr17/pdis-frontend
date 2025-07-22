@@ -162,23 +162,23 @@ export default function Dashboard() {
 
         <ResizablePanel>
           {/* Widget Bar */}
-          <div className="flex flex-col gap-2 h-full overflow-y-auto max-w-full px-3 py-1 scrollbar-left">
-            <div className="bg-blue/20 rounded-xl p-2 min-h-64">
+          <div className="flex flex-col gap-2 h-full overflow-y-auto max-w-full p-2 scrollbar-left">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-64">
               <h1>User Profile</h1>
             </div>
-            <div className="bg-blue/20 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
               <h1>Service Request Tracker</h1>
             </div>
-            <div className="bg-blue/20 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
               <h1>Approval Center</h1>
             </div>
-            <div className="bg-blue/20 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
               <h1>Bulletin Board</h1>
             </div>
-            <div className="bg-blue/20 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
               <h1>Calendar</h1>
             </div>
-            <div className="bg-blue/20 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
               <h1>Advisory Center</h1>
             </div>
           </div>
@@ -187,10 +187,10 @@ export default function Dashboard() {
         <ResizablePanel>
           {/* Main Work Area */}
           <div className="flex flex-col h-full gap-2 p-2">
-            <div className="rounded-xl p-2 h-1/2 border border-zinc-400/20 bg-gradient-to-br from-light-blue/10 to-light-blue/20">
+            <div className="rounded-xl p-2 h-1/2 border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45">
               <h1>Service Request Tracker and Approval Center</h1>
             </div>
-            <div className="rounded-xl p-4 h-1/2 border border-zinc-400/20 bg-gradient-to-br from-light-blue/10 to-light-blue/20 overflow-hidden flex flex-col">
+            <div className="rounded-xl p-4 h-1/2 border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 overflow-hidden flex flex-col">
               <h1 className="text-lg font-semibold mb-4 text-blue">User To do List</h1>
               
               {/* Add New Task Input */}

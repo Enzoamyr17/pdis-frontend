@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   return (
-    <div className="min-h-screen bg-gradient-to-t lg:bg-gradient-to-r from-blue/80 to-orange/20">
+    <div className="min-h-screen bg-gradient-to-t lg:bg-gradient-to-r from-white to-orange/90">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Left Side - Logo */}
         <div className="h-[25vh] lg:h-screen flex lg:w-1/2 items-center justify-center p-4 lg:p-12">
@@ -23,13 +23,13 @@ export default function Home() {
         {/* Right Side - Login Form */}
         <div className="flex w-full lg:w-1/2 items-center justify-center p-6">
           <div className="w-full max-w-md">
-            <div className="bg-blue/20 backdrop-blur-lg border border-orange/20 rounded-2xl p-8 shadow-lg">
+            <div className="bg-gradient-to-br from-white/60 to-white/5 backdrop-blur-sm border border-orange/20 rounded-2xl p-8 shadow-lg">
               {/* Header */}
               <div className="text-center mb-8 text-orange">
                 <h2 className="text-3xl font-bold mb-2">
                   Welcome Back
                 </h2>
-                <p className="text-white/80">
+                <p className="text-black/80">
                   Sign in to your account
                 </p>
               </div>
@@ -38,7 +38,7 @@ export default function Home() {
               <div className="space-y-6">
                 {/* Username Field */}
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium mb-2">
+                  <label htmlFor="username" className="block text-sm font-medium text-black/80 mb-2">
                     Username
                   </label>
                   <div className="relative">
@@ -46,11 +46,11 @@ export default function Home() {
                       type="text"
                       id="username"
                       name="username"
-                      className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg placeholder-zinc-800/50 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent transition-all duration-200"
                       placeholder="Enter your username"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-black/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
@@ -59,7 +59,7 @@ export default function Home() {
 
                 {/* Password Field */}
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-black/80 mb-2">
                     Password
                   </label>
                   <div className="relative">
@@ -67,11 +67,11 @@ export default function Home() {
                       type="password"
                       id="password"
                       name="password"
-                      className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg placeholder-zinc-800/50 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent transition-all duration-200"
                       placeholder="Enter your password"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-black/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
@@ -94,7 +94,7 @@ export default function Home() {
                   <div className="text-sm">
                     <button
                       type="button"
-                      className="font-medium text-white/80 hover:text-orange/80 transition-colors duration-200"
+                      className="font-medium text-black/80 hover:text-orange/80 transition-colors duration-200"
                     >
                       Forgot password?
                     </button>
