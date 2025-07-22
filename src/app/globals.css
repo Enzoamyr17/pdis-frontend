@@ -6,12 +6,16 @@
 @theme {
 
   /* Colors */
-  --color-white: #f0f0f0;
-  --color-light-white: #fafafa;
-  --color-black: #070c1c;
+  --color-dark: #070c1c;
+  --color-light: #f0f0f0;
   --color-orange: #F47A20;
   --color-blue: #1B2E6E;
   --color-blue-light: #99c4ff;
+
+}
+
+@utility shadow-inner-red {
+  box-shadow: inset -2px 0 9px 0 rgba(100, 100, 100, 0.1);
 }
 
 @theme inline {
@@ -60,8 +64,8 @@ body {
 
 :root {
   --radius: 0.625rem;
-  --background: var(--color-white);
-  --foreground: var(--color-black);
+  --background: white;
+  --foreground: black;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
@@ -94,8 +98,8 @@ body {
 }
 
 .dark {
-  --background: var(--color-white);
-  --foreground: var(--color-black);
+  --background: black;
+  --foreground: white;
   --card: oklch(0.208 0.042 265.755);
   --card-foreground: oklch(0.984 0.003 247.858);
   --popover: oklch(0.208 0.042 265.755);
