@@ -25,6 +25,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import Calendar from '@/components/Calendar';
 
 interface Task {
   id: number
@@ -160,25 +161,26 @@ export default function Dashboard() {
     <div className="m-auto w-full h-full">
       <ResizablePanelGroup direction="horizontal">
 
-        <ResizablePanel>
+        <ResizablePanel defaultSize={23}>
           {/* Widget Bar */}
           <div className="flex flex-col gap-2 h-full overflow-y-auto max-w-full p-2 scrollbar-left">
             <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-64">
               <h1>User Profile</h1>
             </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
               <h1>Service Request Tracker</h1>
             </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
               <h1>Approval Center</h1>
             </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
               <h1>Bulletin Board</h1>
             </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
-              <h1>Calendar</h1>
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden h-96">
+              <h2 className="text-lg font-semibold mb-2 text-blue">Calendar</h2>
+              <Calendar />
             </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-54">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
               <h1>Advisory Center</h1>
             </div>
           </div>

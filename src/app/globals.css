@@ -9,6 +9,7 @@
   --color-dark: #070c1c;
   --color-light: #f0f0f0;
   --color-orange: #F47A20;
+  --color-light-orange: #f29855;
   --color-blue: #1B2E6E;
   --color-light-blue: #99c4ff;
 
@@ -95,6 +96,7 @@ body {
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  
 }
 
 .dark {
