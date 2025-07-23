@@ -131,7 +131,7 @@ export default function Dashboard() {
       const newId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1
       setTasks([...tasks, {
         id: newId,
-        text: newTask.trim(),
+        text: newTask,
         completed: false
       }])
       setNewTask("")
@@ -196,11 +196,9 @@ export default function Dashboard() {
               
               {/* Add New Task Input */}
               <div className="flex gap-2 mb-4">
-                <input
-                  type="text"
+                <textarea
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
-                  onKeyPress={handleKeyPress}
                   placeholder="Add new task..."
                   className="flex-1 px-3 py-2 rounded-lg border border-zinc-300 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue/30"
                 />

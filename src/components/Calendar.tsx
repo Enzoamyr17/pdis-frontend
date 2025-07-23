@@ -148,7 +148,6 @@ export default function Calendar({
         height="100%"
         moreLinkClick="popover"
         eventDisplay="block"
-        nowIndicator={true}
         showNonCurrentDates={false}
         fixedWeekCount={false}
         events={calendarEvents}

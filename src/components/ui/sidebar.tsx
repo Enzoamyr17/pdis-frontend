@@ -340,7 +340,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sidebar-header"
       data-sidebar="header"
       onClick={() => router.push('/dashboard')}
-      className={cn("flex flex-col gap-2 p-6 cursor-pointer", className)}
+      className={cn("flex flex-col gap-0 cursor-pointer", className)}
       {...props}
     />
   )
