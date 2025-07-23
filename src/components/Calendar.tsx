@@ -49,21 +49,21 @@ export default function Calendar({
     {
       title: 'Morning Standup',
       date: addDays(0),
-      backgroundColor: '#3b82f6',
+      backgroundColor: '#1B2E6E',
       borderColor: '#3b82f6',
       textColor: 'white'
     },
     {
       title: 'Design Review',
       date: addDays(0),
-      backgroundColor: '#f59e42',
+      backgroundColor: '#1B2E6E',
       borderColor: '#f59e42',
       textColor: 'white'
     },
     {
       title: 'Client Call',
       date: addDays(0),
-      backgroundColor: '#f43f5e',
+      backgroundColor: '#1B2E6E',
       borderColor: '#f43f5e',
       textColor: 'white'
     },
@@ -72,7 +72,7 @@ export default function Calendar({
       title: 'Sprint Planning',
       start: addDays(1),
       end: addDays(3), // end is exclusive, so this covers 2 days
-      backgroundColor: '#10b981',
+      backgroundColor: '#1B2E6E',
       borderColor: '#10b981',
       textColor: 'white'
     },
@@ -81,7 +81,7 @@ export default function Calendar({
       title: 'Hackathon',
       start: addDays(4),
       end: addDays(8), // 4 days
-      backgroundColor: '#6366f1',
+      backgroundColor: '#1B2E6E',
       borderColor: '#6366f1',
       textColor: 'white'
     },
@@ -89,35 +89,35 @@ export default function Calendar({
     {
       title: 'Team Lunch',
       date: addDays(2),
-      backgroundColor: '#eab308',
+      backgroundColor: '#1B2E6E',
       borderColor: '#eab308',
       textColor: 'white'
     },
     {
       title: 'Demo Day',
       date: addDays(3),
-      backgroundColor: '#0ea5e9',
+      backgroundColor: '#1B2E6E',
       borderColor: '#0ea5e9',
       textColor: 'white'
     },
     {
       title: '1:1 with Manager',
       date: addDays(5),
-      backgroundColor: '#14b8a6',
+      backgroundColor: '#1B2E6E',
       borderColor: '#14b8a6',
       textColor: 'white'
     },
     {
       title: 'Retrospective',
       date: addDays(7),
-      backgroundColor: '#a21caf',
+      backgroundColor: '#1B2E6E',
       borderColor: '#a21caf',
       textColor: 'white'
     },
     {
       title: 'Sprint Start',
       date: addDays(9),
-      backgroundColor: '#f97316',
+      backgroundColor: '#1B2E6E',
       borderColor: '#f97316',
       textColor: 'white'
     }
@@ -230,7 +230,8 @@ export default function Calendar({
         
         .minimal-calendar .fc-event {
           border-radius: 3px;
-          font-size: 10px;
+          font-size: 16px;
+          font-weight: 600;
           padding: 1px 3px;
           margin: 1px 2px;
           border-width: 0;

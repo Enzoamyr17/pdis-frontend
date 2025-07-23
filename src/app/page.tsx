@@ -1,9 +1,22 @@
 "use client"
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Home() {
   const router = useRouter();
+  const { login } = useUser();
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = () => {
+    if (login(email)) {
+      router.push('/dashboard');
+    } else {
+      setError("Email not found. Please use a valid Project Duo email.");
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-b lg:bg-gradient-to-r from-white to-blue/90 lg:to-orange/90">
       <div className="flex flex-col lg:flex-row min-h-screen">
@@ -26,7 +39,7 @@ export default function Home() {
             <div className="bg-white/70 backdrop-blur-sm border border-orange/20 rounded-2xl p-8 shadow-lg">
               {/* Header */}
               <div className="text-center mb-8 text-orange">
-                <h2 className="text-3xl font-bold mb-2">
+                <h2 className="text-3xl font-bold mb-2 text-blue/90">
                   Welcome Back
                 </h2>
                 <p className="text-black/80">
@@ -38,16 +51,19 @@ export default function Home() {
               <div className="space-y-6">
                 {/* Username Field */}
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-black/50 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-black/50 mb-2">
                     Username
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
-                      id="username"
-                      name="username"
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-4 py-3 bg-white/50 border border-white/30 rounded-lg placeholder-zinc-800/50 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent transition-all duration-200"
                       placeholder="Enter your username"
+                      onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                       <svg className="h-5 w-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,6 +71,9 @@ export default function Home() {
                       </svg>
                     </div>
                   </div>
+                  {error && (
+                    <p className="text-red-500 text-sm mt-2">{error}</p>
+                  )}
                 </div>
 
                 {/* Password Field */}
@@ -104,8 +123,8 @@ export default function Home() {
                 {/* Submit Button */}
                 <button
                   type="button"
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm text-white font-medium bg-orange hover:bg-orange/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange transition-all duration-200"
-                  onClick={() => { router.push('/dashboard') }}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm text-white font-medium bg-blue hover:bg-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange transition-all duration-200"
+                  onClick={handleLogin}
                 >
                   Sign In
                 </button>

@@ -26,6 +26,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import Calendar from '@/components/Calendar';
+import UserProfile from '@/components/UserProfile';
 
 interface Task {
   id: number
@@ -164,35 +165,33 @@ export default function Dashboard() {
         <ResizablePanel defaultSize={23}>
           {/* Widget Bar */}
           <div className="flex flex-col gap-2 h-full overflow-y-auto max-w-full p-2 scrollbar-left">
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 min-h-64">
-              <h1>User Profile</h1>
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-3 flex-shrink-0">
+              <h2 className="text-sm font-semibold mb-2 text-blue">User Profile</h2>
+              <div className="overflow-y-auto max-h-80">
+                <UserProfile />
+              </div>
             </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
-              <h1>Service Request Tracker</h1>
-            </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
-              <h1>Approval Center</h1>
-            </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
-              <h1>Bulletin Board</h1>
-            </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden h-96">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden h-96">
               <h2 className="text-lg font-semibold mb-2 text-blue">Calendar</h2>
-              <Calendar />
+              <Calendar />  
             </div>
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
-              <h1>Advisory Center</h1>
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
+              <h2 className="text-lg font-semibold mb-2 text-blue">Today&apos;s News</h2>
             </div>
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-2 overflow-hidden">
+              <h2 className="text-lg font-semibold mb-2 text-blue">Bulletin Board</h2>
+            </div>
+            
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle/>
         <ResizablePanel>
           {/* Main Work Area */}
           <div className="flex flex-col h-full gap-2 p-2">
-            <div className="rounded-xl p-2 h-1/2 border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45">
-              <h1>Service Request Tracker and Approval Center</h1>
+            <div className="rounded-xl p-2 h-1/2 border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45">
+              <h1 className="text-lg font-semibold mb-2 text-blue">Service Request Tracker and Approval Center</h1>
             </div>
-            <div className="rounded-xl p-4 h-1/2 border border-zinc-500/10 shadow-sm bg-gradient-to-tl from-blue/10 to-light-blue/45 overflow-hidden flex flex-col">
+            <div className="rounded-xl p-4 h-1/2 border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 overflow-hidden flex flex-col">
               <h1 className="text-lg font-semibold mb-4 text-blue">User To do List</h1>
               
               {/* Add New Task Input */}
