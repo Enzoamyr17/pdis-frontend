@@ -319,16 +319,16 @@ function DashboardContent({
 
         <SidebarInset className="max-h-screen overflow-y-auto">
         {/* Header with sidebar trigger */}
-        <header className="z-40 w-full bg-gradient-to-r from-light-blue to-blue flex items-center justify-between pl-0 pr-12 text-white min-h-[3.5rem] max-h-[3.5rem]">
+        <header className="z-40 w-full bg-orange flex items-center justify-between pl-0 pr-12 text-white min-h-[3.5rem] max-h-[3.5rem]">
             <div className="flex items-center justify-center h-full w-auto aspect-square">
-                <SidebarTrigger className="hover:bg-white/20 transition-all duration-300" />
+                <SidebarTrigger className="text-blue hover:bg-blue transition-all duration-300" />
             </div>
             <div className="flex items-center justify-center">
                 <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none">
                     <div className="flex items-center gap-2 border-2 border-transparent hover:border-orange px-4 py-1 rounded-xl transition-all duration-100">
                     <User className="w-6 h-6" />
-                    <h1 className="font-medium text-lg">{user ? getFirstAndLastName(user.name) : "Guest"}</h1>
+                    <h1 className="font-black text-lg">{user ? getFirstAndLastName(user.name) : "Guest"}</h1>
                     <ChevronDown className="w-4 h-4" />
                     </div>
                 </DropdownMenuTrigger>

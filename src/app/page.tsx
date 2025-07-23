@@ -39,7 +39,7 @@ export default function Home() {
             <div className="bg-white/70 backdrop-blur-sm border border-orange/20 rounded-2xl p-8 shadow-lg">
               {/* Header */}
               <div className="text-center mb-8 text-orange">
-                <h2 className="text-3xl font-bold mb-2">
+                <h2 className="text-3xl font-bold mb-2 text-blue/90">
                   Welcome Back
                 </h2>
                 <p className="text-black/80">
@@ -123,7 +123,7 @@ export default function Home() {
                 {/* Submit Button */}
                 <button
                   type="button"
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm text-white font-medium bg-orange hover:bg-orange/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange transition-all duration-200"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm text-white font-medium bg-blue hover:bg-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange transition-all duration-200"
                   onClick={handleLogin}
                 >
                   Sign In
