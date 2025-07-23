@@ -85,7 +85,7 @@ function SortableTask({ task, toggleTask }: SortableTaskProps) {
           </svg>
         )}
       </button>
-      <span className={`flex-1 text-sm ${
+      <span className={`flex-1 text-sm whitespace-pre-line ${
         task.completed 
           ? 'line-through text-zinc-500' 
           : 'text-zinc-800'
@@ -201,6 +201,13 @@ export default function Dashboard() {
                   onChange={(e) => setNewTask(e.target.value)}
                   placeholder="Add new task..."
                   className="flex-1 px-3 py-2 rounded-lg border border-zinc-300 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue/30"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                      e.preventDefault();
+                      addTask();
+                    }
+                  }}
+                  rows={3}
                 />
                 <button
                   onClick={addTask}
@@ -257,7 +264,7 @@ export default function Dashboard() {
                             </svg>
                           )}
                         </button>
-                        <span className={`flex-1 text-sm ${
+                        <span className={`flex-1 text-sm whitespace-pre-line ${
                           task.completed 
                             ? 'line-through text-zinc-500' 
                             : 'text-zinc-800'
