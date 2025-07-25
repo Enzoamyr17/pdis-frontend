@@ -211,7 +211,6 @@ export default function Dashboard() {
           {/* Widget Bar */}
           <div className="flex flex-col gap-2 h-full overflow-y-auto max-w-full p-2 scrollbar-left">
             <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-3 flex-shrink-0">
-              <h2 className="text-sm font-semibold mb-2 text-blue">User Profile</h2>
               <div className="overflow-y-auto max-h-80">
                 <UserProfile />
               </div>
