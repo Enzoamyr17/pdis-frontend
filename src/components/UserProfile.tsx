@@ -22,8 +22,8 @@ export default function UserProfile() {
         <div className="flex-1 min-w-0">
           <div className="space-y-0.5">
               <p className="font-bold text-blue truncate leading-tight">{user.name}</p>
-              <p className="text-blue/70 font-semibold leading-none">{user.position}</p>
-              <p className="text-blue/70 font-semibold leading-none">{user.idNumber}</p>
+              <p className="text-blue/70 leading-none py-1">{user.position}</p>
+              <p className="text-blue/70 leading-none">{user.idNumber}</p>
           </div>
         </div>
         <div className="m-auto flex items-center gap-2 flex-shrink-0">
@@ -57,22 +57,22 @@ export default function UserProfile() {
           <div className="space-y-0.5 py-2 border-t-2 border-blue/20">
             <div className="grid grid-cols-1 gap-0.5 capitalize">
                 <p className="font-bold leading-none text-blue/90">Employment Date:</p>
-                <p className="text-blue/70 font-semibold pl-1 leading-none">{user.employmentDate}</p>
+                <p className="text-blue/70 pl-1 leading-none">{user.employmentDate}</p>
                 <p className="font-bold leading-none text-blue/90 pt-2">Office:</p>
-                <p className="text-blue/70 font-semibold pl-1 leading-none">{user.office}</p>
+                <p className="text-blue/70 pl-1 leading-none">{user.office}</p>
                 <p className="font-bold leading-none text-blue/90 pt-2">Group:</p>
-                <p className="text-blue/70 font-semibold pl-1 leading-none">{user.group}</p>
+                <p className="text-blue/70 pl-1 leading-none">{user.group}</p>
                 <p className="font-bold leading-none text-blue/90 pt-2">Department:</p>
-                <p className="text-blue/70 font-semibold pl-1 leading-none">{user.department}</p>
+                <p className="text-blue/70 pl-1 leading-none">{user.department}</p>
             </div>
           </div>
 
           {/* Contact Information */}
           <div className="space-y-0.5 py-2 border-t-2 border-blue/20">
               <p className="font-bold leading-none text-blue/90">Contact Number:</p>
-              <p className="text-blue/70 font-semibold pl-1 leading-none">{user.contactNumber}</p>
+              <p className="text-blue/70 pl-1 leading-none">{user.contactNumber}</p>
               <p className="font-bold leading-none pt-2 text-blue/90">PD Email:</p>
-              <p className="text-blue/70 font-semibold pl-1 leading-none">{user.email}</p>
+              <p className="text-blue/70 pl-1 leading-none">{user.email}</p>
           </div>
         </div>
       )}

@@ -110,10 +110,6 @@ const genAdTools = [
     title: "IM Registration",
     moduleId: "im-registration",
   },
-  {
-    title: "Encoding of New Employees",
-    moduleId: "employee-encoding",
-  },
 ]
 
 const genOpsTools = [

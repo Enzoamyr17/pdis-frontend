@@ -1,5 +1,5 @@
 "use client"
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 export interface User {
   id: string
@@ -70,10 +70,22 @@ const mockUsers: User[] = [
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem('pdis-user')
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser))
+      } catch (error) {
+        localStorage.removeItem('pdis-user')
+      }
+    }
+  }, [])
+
   const login = (email: string): boolean => {
     const foundUser = mockUsers.find(u => u.email === email)
     if (foundUser) {
       setUser(foundUser)
+      localStorage.setItem('pdis-user', JSON.stringify(foundUser))
       return true
     }
     return false
@@ -81,6 +93,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null)
+    localStorage.removeItem('pdis-user')
   }
 
   const isAuthenticated = user !== null
