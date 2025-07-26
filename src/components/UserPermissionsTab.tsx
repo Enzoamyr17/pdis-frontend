@@ -7,7 +7,7 @@ import { moduleRegistry } from "./modules/ModuleRegistry"
 interface UserPermission {
   userId: string
   moduleId: string
-  role: 'requestor' | 'approver' | 'none'
+  roles: ('requestor' | 'approver')[]
 }
 
 interface UserPermissionsTabProps {
@@ -54,24 +54,40 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
     user.position.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Get user's permission for a specific module
-  const getUserPermission = (userId: string, moduleId: string): 'requestor' | 'approver' | 'none' => {
+  // Get user's permissions for a specific module
+  const getUserPermissions = (userId: string, moduleId: string): ('requestor' | 'approver')[] => {
     const permission = permissions.find(p => p.userId === userId && p.moduleId === moduleId)
-    return permission?.role || 'none'
+    return permission?.roles || []
   }
 
-  // Update user permission for a module
-  const updatePermission = (userId: string, moduleId: string, role: 'requestor' | 'approver' | 'none') => {
+  // Check if user has a specific role for a module
+  const hasRole = (userId: string, moduleId: string, role: 'requestor' | 'approver'): boolean => {
+    const userPermissions = getUserPermissions(userId, moduleId)
+    return userPermissions.includes(role)
+  }
+
+  // Toggle user role for a module
+  const toggleRole = (userId: string, moduleId: string, role: 'requestor' | 'approver') => {
     setPermissions(prev => {
       const existing = prev.find(p => p.userId === userId && p.moduleId === moduleId)
       if (existing) {
-        return prev.map(p => 
-          p.userId === userId && p.moduleId === moduleId 
-            ? { ...p, role }
-            : p
-        )
+        const newRoles = existing.roles.includes(role)
+          ? existing.roles.filter(r => r !== role)
+          : [...existing.roles, role]
+        
+        if (newRoles.length === 0) {
+          // Remove permission entry if no roles remain
+          return prev.filter(p => !(p.userId === userId && p.moduleId === moduleId))
+        } else {
+          return prev.map(p => 
+            p.userId === userId && p.moduleId === moduleId 
+              ? { ...p, roles: newRoles }
+              : p
+          )
+        }
       } else {
-        return [...prev, { userId, moduleId, role }]
+        // Create new permission with the role
+        return [...prev, { userId, moduleId, roles: [role] }]
       }
     })
   }
@@ -93,9 +109,38 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
     setSelectedUsers([])
   }
 
-  const massUpdatePermission = (moduleId: string, role: 'requestor' | 'approver' | 'none') => {
+  const massSetRole = (moduleId: string, role: 'requestor' | 'approver', enable: boolean) => {
     selectedUsers.forEach(userId => {
-      updatePermission(userId, moduleId, role)
+      setPermissions(prev => {
+        const existing = prev.find(p => p.userId === userId && p.moduleId === moduleId)
+        if (existing) {
+          const newRoles = enable
+            ? existing.roles.includes(role) ? existing.roles : [...existing.roles, role]
+            : existing.roles.filter(r => r !== role)
+          
+          if (newRoles.length === 0) {
+            return prev.filter(p => !(p.userId === userId && p.moduleId === moduleId))
+          } else {
+            return prev.map(p => 
+              p.userId === userId && p.moduleId === moduleId 
+                ? { ...p, roles: newRoles }
+                : p
+            )
+          }
+        } else if (enable) {
+          return [...prev, { userId, moduleId, roles: [role] }]
+        } else {
+          return prev
+        }
+      })
+    })
+  }
+
+  const massClearAllRoles = (moduleId: string) => {
+    selectedUsers.forEach(userId => {
+      setPermissions(prev => 
+        prev.filter(p => !(p.userId === userId && p.moduleId === moduleId))
+      )
     })
   }
 
@@ -104,7 +149,18 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
     
     toUserIds.forEach(toUserId => {
       fromUserPermissions.forEach(permission => {
-        updatePermission(toUserId, permission.moduleId, permission.role)
+        setPermissions(prev => {
+          const existing = prev.find(p => p.userId === toUserId && p.moduleId === permission.moduleId)
+          if (existing) {
+            return prev.map(p => 
+              p.userId === toUserId && p.moduleId === permission.moduleId 
+                ? { ...p, roles: [...permission.roles] }
+                : p
+            )
+          } else {
+            return [...prev, { userId: toUserId, moduleId: permission.moduleId, roles: [...permission.roles] }]
+          }
+        })
       })
     })
   }
@@ -113,6 +169,23 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
     setPermissions(prev => 
       prev.filter(p => !userIds.includes(p.userId))
     )
+  }
+
+  // Helper functions for mass edit visual feedback
+  const getMassEditRoleState = (moduleId: string, role: 'requestor' | 'approver'): 'all' | 'some' | 'none' => {
+    if (selectedUsers.length === 0) return 'none'
+    
+    const usersWithRole = selectedUsers.filter(userId => hasRole(userId, moduleId, role))
+    
+    if (usersWithRole.length === selectedUsers.length) return 'all'
+    if (usersWithRole.length > 0) return 'some'
+    return 'none'
+  }
+
+  const toggleMassRole = (moduleId: string, role: 'requestor' | 'approver') => {
+    const currentState = getMassEditRoleState(moduleId, role)
+    const shouldEnable = currentState !== 'all'
+    massSetRole(moduleId, role, shouldEnable)
   }
 
   const inputClasses = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -125,7 +198,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
           <h2 className="text-xl font-semibold text-gray-800">User Permissions Management</h2>
         </div>
         <p className="text-gray-600 text-sm">
-          Manage user permissions for different modules. Users can be assigned as requestors or approvers for each module.
+          Manage user permissions for different modules. Users can have multiple roles - they can be both requestors and approvers for each module.
         </p>
       </div>
 
@@ -337,11 +410,11 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Module</th>
                     <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b">
-                      No Access
+                      Clear All
                       {massEditMode && (
                         <div className="mt-1">
                           <button
-                            onClick={() => allModules.forEach(module => massUpdatePermission(module.id, 'none'))}
+                            onClick={() => allModules.forEach(module => massClearAllRoles(module.id))}
                             className="text-xs text-red-600 hover:text-red-800 font-normal"
                           >
                             All
@@ -353,12 +426,24 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                       Requestor
                       {massEditMode && (
                         <div className="mt-1">
-                          <button
-                            onClick={() => allModules.forEach(module => massUpdatePermission(module.id, 'requestor'))}
-                            className="text-xs text-blue-600 hover:text-blue-800 font-normal"
-                          >
-                            All
-                          </button>
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.length > 0 && allModules.every(module => getMassEditRoleState(module.id, 'requestor') === 'all')}
+                            ref={(el) => {
+                              if (el && selectedUsers.length > 0) {
+                                const states = allModules.map(module => getMassEditRoleState(module.id, 'requestor'))
+                                const hasAll = states.every(state => state === 'all')
+                                const hasNone = states.every(state => state === 'none')
+                                el.indeterminate = !hasAll && !hasNone
+                              }
+                            }}
+                            onChange={() => {
+                              const shouldEnable = !allModules.every(module => getMassEditRoleState(module.id, 'requestor') === 'all')
+                              allModules.forEach(module => massSetRole(module.id, 'requestor', shouldEnable))
+                            }}
+                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            disabled={selectedUsers.length === 0}
+                          />
                         </div>
                       )}
                     </th>
@@ -366,12 +451,24 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                       Approver
                       {massEditMode && (
                         <div className="mt-1">
-                          <button
-                            onClick={() => allModules.forEach(module => massUpdatePermission(module.id, 'approver'))}
-                            className="text-xs text-green-600 hover:text-green-800 font-normal"
-                          >
-                            All
-                          </button>
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.length > 0 && allModules.every(module => getMassEditRoleState(module.id, 'approver') === 'all')}
+                            ref={(el) => {
+                              if (el && selectedUsers.length > 0) {
+                                const states = allModules.map(module => getMassEditRoleState(module.id, 'approver'))
+                                const hasAll = states.every(state => state === 'all')
+                                const hasNone = states.every(state => state === 'none')
+                                el.indeterminate = !hasAll && !hasNone
+                              }
+                            }}
+                            onChange={() => {
+                              const shouldEnable = !allModules.every(module => getMassEditRoleState(module.id, 'approver') === 'all')
+                              allModules.forEach(module => massSetRole(module.id, 'approver', shouldEnable))
+                            }}
+                            className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                            disabled={selectedUsers.length === 0}
+                          />
                         </div>
                       )}
                     </th>
@@ -379,7 +476,10 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {allModules.map(module => {
-                    const currentPermission = massEditMode ? 'none' : getUserPermission(selectedUser, module.id)
+                    const userPermissions = massEditMode ? [] : getUserPermissions(selectedUser, module.id)
+                    const hasRequestor = massEditMode ? false : hasRole(selectedUser, module.id, 'requestor')
+                    const hasApprover = massEditMode ? false : hasRole(selectedUser, module.id, 'approver')
+                    
                     return (
                       <tr key={module.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-sm font-medium text-gray-900">
@@ -388,54 +488,60 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                         <td className="px-4 py-3 text-center">
                           {massEditMode ? (
                             <button
-                              onClick={() => massUpdatePermission(module.id, 'none')}
+                              onClick={() => massClearAllRoles(module.id)}
                               className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
                             >
-                              Set None
+                              Clear All
                             </button>
                           ) : (
+                            <span className="text-sm text-gray-500">
+                              {userPermissions.length === 0 ? 'No Access' : 'Has Access'}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {massEditMode ? (
+                            <div className="flex items-center justify-center">
+                              <input
+                                type="checkbox"
+                                checked={getMassEditRoleState(module.id, 'requestor') === 'all'}
+                                ref={(el) => {
+                                  if (el) el.indeterminate = getMassEditRoleState(module.id, 'requestor') === 'some'
+                                }}
+                                onChange={() => toggleMassRole(module.id, 'requestor')}
+                                className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                disabled={selectedUsers.length === 0}
+                              />
+                            </div>
+                          ) : (
                             <input
-                              type="radio"
-                              name={`${selectedUser}-${module.id}`}
-                              checked={currentPermission === 'none'}
-                              onChange={() => updatePermission(selectedUser, module.id, 'none')}
-                              className="w-4 h-4 text-red-600 focus:ring-red-500"
+                              type="checkbox"
+                              checked={hasRequestor}
+                              onChange={() => toggleRole(selectedUser, module.id, 'requestor')}
+                              className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
                           )}
                         </td>
                         <td className="px-4 py-3 text-center">
                           {massEditMode ? (
-                            <button
-                              onClick={() => massUpdatePermission(module.id, 'requestor')}
-                              className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                            >
-                              Set Requestor
-                            </button>
+                            <div className="flex items-center justify-center">
+                              <input
+                                type="checkbox"
+                                checked={getMassEditRoleState(module.id, 'approver') === 'all'}
+                                ref={(el) => {
+                                  if (el) el.indeterminate = getMassEditRoleState(module.id, 'approver') === 'some'
+                                }}
+                                onChange={() => toggleMassRole(module.id, 'approver')}
+                                className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                                disabled={selectedUsers.length === 0}
+                              />
+                            </div>
                           ) : (
                             <input
-                              type="radio"
-                              name={`${selectedUser}-${module.id}`}
-                              checked={currentPermission === 'requestor'}
-                              onChange={() => updatePermission(selectedUser, module.id, 'requestor')}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            />
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {massEditMode ? (
-                            <button
-                              onClick={() => massUpdatePermission(module.id, 'approver')}
-                              className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
-                            >
-                              Set Approver
-                            </button>
-                          ) : (
-                            <input
-                              type="radio"
-                              name={`${selectedUser}-${module.id}`}
-                              checked={currentPermission === 'approver'}
-                              onChange={() => updatePermission(selectedUser, module.id, 'approver')}
-                              className="w-4 h-4 text-green-600 focus:ring-green-500"
+                              type="checkbox"
+                              checked={hasApprover}
+                              onChange={() => toggleRole(selectedUser, module.id, 'approver')}
+                              className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                             />
                           )}
                         </td>
