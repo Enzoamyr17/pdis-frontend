@@ -198,7 +198,7 @@ function DashboardContent({
 
   return (
     <div className="flex min-h-screen max-h-screen w-full overflow-hidden">
-      <Sidebar className="p-2 shadow-inner-red z-40">
+      <Sidebar className="p-2 shadow-toolbar z-40">
           <SidebarHeader className="border-b border-sidebar-border min-h-[3rem] max-h-[3rem] flex items-center justify-center">
             <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
                 <Image className={`${isCollapsed ? "hidden" : "block"} min-w-[240px] pr-2`} src="/assets/pd/colored_wide_logo.png" alt="logo" width={240} height={37} />

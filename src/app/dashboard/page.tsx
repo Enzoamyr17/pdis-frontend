@@ -20,18 +20,18 @@ export default function Dashboard() {
 
         <ResizablePanel defaultSize={23}>
           {/* Widget Bar */}
-          <div className="flex flex-col h-full p-2">
+          <div className="flex flex-col h-full p-2 min-w-70">
             {/* Fixed User Profile at top */}
-            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-3 flex-shrink-0 mb-2">
-              <div className="overflow-y-auto max-h-80">
+            <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-2 flex-shrink-0 mb-2">
+              <div className="overflow-y-auto h-auto">
                 <UserProfile />
               </div>
             </div>
             
             {/* Scrollable widgets below */}
-            <div className="flex flex-col gap-2 flex-1 overflow-y-auto scrollbar-left min-h-0">
+            <div className="no-scrollbar flex flex-col gap-2 flex-1 overflow-y-auto scrollbar-left min-h-0">
               <div className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-2 flex-shrink-0">
-                <h2 className="text-lg font-semibold mb-2 text-blue">Calendar</h2>
+                <h2 className="text-lg font-semibold mb-2 pl-1 text-blue">Calendar</h2>
                 <div className="h-40 overflow-hidden">
                   <Calendar />  
                 </div>
