@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import { EventClickArg, EventChangeArg } from '@fullcalendar/core'
+import { EventClickArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
 
 interface CalendarEvent {
@@ -141,11 +141,14 @@ export default function Calendar({
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridDay"
         headerToolbar={{
-          left: 'prev,next',
+          left: '',
           center: 'title',
-          right: 'today'
+          right: ''
         }}
+        dayHeaderFormat={{ weekday: 'short' }}
+        dayHeaders={false}
         height="100%"
+        validRange={{ start: today.toISOString().split('T')[0], end: today.toISOString().split('T')[0] }}
         moreLinkClick="popover"
         eventDisplay="block"
         showNonCurrentDates={false}
@@ -164,7 +167,7 @@ export default function Calendar({
         }
         
         .minimal-calendar .fc-header-toolbar {
-          margin-bottom: 8px;
+          margin-bottom: 4px;
         }
         
         .minimal-calendar .fc-toolbar-title {
@@ -196,16 +199,24 @@ export default function Calendar({
         }
         
         .minimal-calendar .fc-daygrid-day-frame {
-          min-height: 28px;
+          min-height: 20px;
+          padding: 2px !important;
+        }
+        
+        .minimal-calendar .fc-daygrid-body {
+          border: none;
+        }
+        
+        .minimal-calendar .fc-scrollgrid {
+          border: none;
+        }
+        
+        .minimal-calendar .fc-daygrid-day-top {
+          padding: 2px 4px !important;
         }
         
         .minimal-calendar .fc-col-header-cell {
-          background: transparent;
-          border-color: #f4f4f5;
-          font-weight: 500;
-          color: #71717a;
-          font-size: 10px;
-          padding: 4px 2px;
+          display: none !important;
         }
         
         .minimal-calendar .fc-daygrid-day {
@@ -230,14 +241,14 @@ export default function Calendar({
         .minimal-calendar .fc-event {
           border-radius: 3px;
           font-size: 16px;
-          font-weight: 600;
-          padding: 1px 3px;
-          margin: 1px 2px;
+          font-weight: 500;
+          padding: 2px 4px;
+          margin: 0px 1px 1px 1px;
           border-width: 0;
         }
         
         .minimal-calendar .fc-daygrid-event-harness {
-          margin-top: 1px;
+          margin-top: 0px;
         }
         
         .minimal-calendar .fc-more-link {

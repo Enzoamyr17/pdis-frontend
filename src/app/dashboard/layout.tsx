@@ -30,98 +30,100 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+// import { usePathname } from "next/navigation" // Currently unused
 import { useState } from "react"
 import { useUser } from "@/contexts/UserContext"
 import { useRouter } from "next/navigation"
+import { useModule, ModuleProvider } from "@/contexts/ModuleContext"
+import { moduleRegistry } from "@/components/modules/ModuleRegistry"
 // Menu items for the sidebar
 
 const genAdServices = [
   {
     title: "Supplies Requisition",
-    url: "#",
+    moduleId: "supplies-requisition",
   },
   {
     title: "Vehicle Requisition",
-    url: "#",
+    moduleId: "vehicle-requisition",
   },
   {
     title: "IM Clearance Form (Independent Manpowers)",
-    url: "#",
+    moduleId: "im-clearance-form",
   },
   {
     title: "Gate Pass In / Gate Pass Out",
-    url: "#",
+    moduleId: "gate-pass",
   },
   {
     title: "Equipment Rental",
-    url: "#",
+    moduleId: "equipment-rental",
   },
   {
     title: "Fabrication / Refurbishing Request",
-    url: "#",
+    moduleId: "fabrication-request",
   },
   {
     title: "Flight Booking Requisition",
-    url: "#",
+    moduleId: "flight-booking",
   },
   {
     title: "JO for Messengerial Service (JOMS)",
-    url: "#",
+    moduleId: "joms",
   },
   {
     title: "Purchase Request (with SAP Tracker)",
-    url: "#",
+    moduleId: "purchase-request",
   },
   {
     title: "BR Cash Advance",
-    url: "#",
+    moduleId: "br-cash-advance",
   },
   {
     title: "BR Reimbursement",
-    url: "#",
+    moduleId: "br-reimbursement",
   },
 ]
 
 const genAdTools = [
   {
     title: "OPEX Budget (GenAd PEP)",
-    url: "#",
+    moduleId: "opex-budget",
   },
   {
     title: "Bulletins, Advisories, Policies",
-    url: "#",
+    moduleId: "bulletins-advisories",
   },
   {
     title: "Performance Management",
-    url: "#",
+    moduleId: "performance-management",
   },
   {
     title: "User Creation (Org Chart)",
-    url: "#",
+    moduleId: "user-creation",
   },
   {
     title: "Client Registration",
-    url: "#",
+    moduleId: "client-registration",
   },
   {
     title: "IM Registration",
-    url: "#",
+    moduleId: "im-registration",
   },
   {
     title: "Encoding of New Employees",
-    url: "#",
+    moduleId: "employee-encoding",
   },
 ]
 
 const genOpsTools = [
   {
     title: "Creation of JO",
-    url: "#",
+    moduleId: "creation-of-jo",
   },
   {
     title: "Creation of PEP",
-    url: "#",
+    moduleId: "creation-of-pep",
   }
 ]
 
@@ -143,7 +145,7 @@ const quickLinks = [
   },
   {
     title: "HRIS",
-    url: "#",
+    url: "https://app.greatdayhr.com/features/home/home-web",
     icon: Users,
   },
   {
@@ -158,9 +160,10 @@ function DashboardContent({
 }: {
   children: React.ReactNode
 }) {
-  const pathname = usePathname()
+  // const pathname = usePathname() // Currently unused
   const router = useRouter()
   const { user, logout } = useUser()
+  const { setActiveModule } = useModule()
   const [isGenAdServicesOpen, setIsGenAdServicesOpen] = useState(false)
   const [isGenAdToolsOpen, setIsGenAdToolsOpen] = useState(false)
   const [isGenOpsToolsOpen, setIsGenOpsToolsOpen] = useState(false)
@@ -182,11 +185,22 @@ function DashboardContent({
     return fullName
   }
 
+  const handleModuleClick = (moduleId: string) => {
+    const moduleData = moduleRegistry[moduleId]
+    if (moduleData) {
+      setActiveModule(moduleData)
+    }
+  }
+
+  const handleLogoClick = () => {
+    setActiveModule(null)
+  }
+
   return (
     <div className="flex min-h-screen max-h-screen w-full overflow-hidden">
       <Sidebar className="p-2 shadow-inner-red z-40">
           <SidebarHeader className="border-b border-sidebar-border min-h-[3rem] max-h-[3rem] flex items-center justify-center">
-            <div className="flex items-center">
+            <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
                 <Image className={`${isCollapsed ? "hidden" : "block"} min-w-[240px] pr-2`} src="/assets/pd/colored_wide_logo.png" alt="logo" width={240} height={37} />
                 <Image className={`${isCollapsed ? "block" : "hidden"}`} src="/assets/pd/colored_square_logo.png" alt="logo" width={50} height={50} />
             </div>
@@ -206,10 +220,8 @@ function DashboardContent({
                         {genAdServices.map((item) => (
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
-                                <SidebarMenuButton asChild className="text-blue/80 font-medium">
-                                  <a href={item.url} target="_blank" className="">
-                                    <span className="">{item.title}</span>
-                                  </a>
+                                <SidebarMenuButton onClick={() => handleModuleClick(item.moduleId)} className="text-blue/80 font-medium cursor-pointer">
+                                  <span className="">{item.title}</span>
                                 </SidebarMenuButton>
                               </TooltipTrigger>
                               <TooltipContent side="right" className="max-w-[300px]">
@@ -229,10 +241,8 @@ function DashboardContent({
                         {genAdTools.map((item) => (
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
-                                <SidebarMenuButton asChild className="text-blue/80 font-medium">
-                                  <a href={item.url} target="_blank" className="">
-                                    <span className="">{item.title}</span>
-                                  </a>
+                                <SidebarMenuButton onClick={() => handleModuleClick(item.moduleId)} className="text-blue/80 font-medium cursor-pointer">
+                                  <span className="">{item.title}</span>
                                 </SidebarMenuButton>
                               </TooltipTrigger>
                               <TooltipContent side="right" className="max-w-[300px]">
@@ -252,10 +262,8 @@ function DashboardContent({
                         {genOpsTools.map((item) => (
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
-                                <SidebarMenuButton asChild className="text-blue/80 font-medium">
-                                  <a href={item.url} target="_blank" className="">
-                                    <span className="">{item.title}</span>
-                                  </a>
+                                <SidebarMenuButton onClick={() => handleModuleClick(item.moduleId)} className="text-blue/80 font-medium cursor-pointer">
+                                  <span className="">{item.title}</span>
                                 </SidebarMenuButton>
                               </TooltipTrigger>
                               <TooltipContent side="right" className="max-w-[300px]">
@@ -356,7 +364,9 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <DashboardContent>{children}</DashboardContent>
+      <ModuleProvider>
+        <DashboardContent>{children}</DashboardContent>
+      </ModuleProvider>
     </SidebarProvider>
   )
 }

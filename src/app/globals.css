@@ -13,6 +13,12 @@
   --color-blue: #1B2E6E;
   --color-light-blue: #99c4ff;
 
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+
 }
 
 @utility shadow-inner-red {
