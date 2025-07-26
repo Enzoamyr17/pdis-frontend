@@ -54,13 +54,13 @@ function SortableTask({ task, toggleTask, deleteTask }: SortableTaskProps) {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className={`flex items-center gap-3 p-2 rounded-lg bg-white/40 hover:bg-white/60 transition-colors ${
+      className={`flex items-center gap-3 p-1 rounded-lg bg-white/90 hover:bg-white/60 transition-colors ${
         isDragging ? 'opacity-50 shadow-lg z-50' : ''
       }`}
     >
       <div
         {...listeners}
-        className="flex items-center justify-center w-6 h-6 cursor-grab active:cursor-grabbing text-zinc-400 hover:text-zinc-600 transition-colors"
+        className="flex items-center justify-center w-6 h-6 cursor-grab active:cursor-grabbing text-blue hover:text-zinc-600 transition-colors"
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zM7 8a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zM7 14a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zM13 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 2zM13 8a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zM13 14a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z" />
@@ -68,7 +68,7 @@ function SortableTask({ task, toggleTask, deleteTask }: SortableTaskProps) {
       </div>
       <button
         onClick={() => toggleTask(task.id)}
-        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
           task.completed 
             ? 'bg-blue border-blue text-white' 
             : 'border-zinc-400 hover:border-blue'
@@ -80,16 +80,16 @@ function SortableTask({ task, toggleTask, deleteTask }: SortableTaskProps) {
           </svg>
         )}
       </button>
-      <span className={`flex-1 text-sm whitespace-pre-line ${
+      <span className={`flex-1 text-sm font-medium whitespace-pre-line ${
         task.completed 
-          ? 'line-through text-zinc-500' 
-          : 'text-zinc-800'
+          ? 'line-through text-blue/60' 
+          : 'text-blue/90'
       }`}>
         {task.text}
       </span>
       <button
         onClick={() => deleteTask(task.id)}
-        className="w-5 h-5 flex items-center justify-center text-zinc-400 hover:text-red-500 transition-colors"
+        className="w-5 h-5 flex items-center justify-center text-zinc-400 hover:text-orange transition-colors"
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -210,7 +210,7 @@ export default function UserTodoList() {
         />
         <button
           onClick={addTask}
-          className="px-4 py-2 bg-blue text-white rounded-lg text-sm hover:bg-blue/90 transition-colors font-medium"
+          className="m-auto px-6 py-2 bg-blue text-white rounded-lg text-sm hover:bg-blue/90 transition-colors font-medium"
         >
           Add
         </button>

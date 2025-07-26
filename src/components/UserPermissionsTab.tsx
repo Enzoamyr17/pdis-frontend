@@ -188,16 +188,16 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
     massSetRole(moduleId, role, shouldEnable)
   }
 
-  const inputClasses = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  const inputClasses = "w-full bg-white/90 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border ${className}`}>
+    <div className={`bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border ${className}`}>
       <div className="p-6 border-b">
         <div className="flex items-center gap-2 mb-4">
-          <Shield className="w-5 h-5 text-blue-500" />
-          <h2 className="text-xl font-semibold text-gray-800">User Permissions Management</h2>
+          <Shield className="w-5 h-5 text-blue" />
+          <h2 className="text-xl font-semibold text-blue">User Permissions Management</h2>
         </div>
-        <p className="text-gray-600 text-sm">
+        <p className="text-blue text-sm">
           Manage user permissions for different modules. Users can have multiple roles - they can be both requestors and approvers for each module.
         </p>
       </div>
@@ -207,9 +207,9 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
         <div className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search Users</label>
+              <label className="block text-sm font-medium text-blue mb-2">Search Users</label>
               <div className="relative">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                <Search className="w-4 h-4 text-blue absolute left-3 top-3" />
                 <input
                   type="text"
                   placeholder="Search by name, email, or position..."
@@ -220,7 +220,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Edit Mode</label>
+              <label className="block text-sm font-medium text-blue mb-2">Edit Mode</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => {
@@ -229,8 +229,8 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   }}
                   className={`flex-1 px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
                     !massEditMode
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      ? 'bg-blue text-white border-blue'
+                      : 'bg-white text-blue border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <User className="w-4 h-4 inline mr-1" />
@@ -243,8 +243,8 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   }}
                   className={`flex-1 px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
                     massEditMode
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      ? 'bg-blue text-white border-blue'
+                      : 'bg-white text-blue border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <Users className="w-4 h-4 inline mr-1" />
@@ -254,7 +254,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
             </div>
             {!massEditMode && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select User to Edit</label>
+                <label className="block text-sm font-medium text-blue mb-2">Select User to Edit</label>
                 <select
                   value={selectedUser}
                   onChange={(e) => setSelectedUser(e.target.value)}
@@ -274,19 +274,19 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
 
         {/* Mass Edit Controls */}
         {massEditMode && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-6 p-4 bg-white border border-light-blue/50 rounded-lg">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-medium text-blue-900">Mass Edit Mode</h4>
+              <h4 className="font-medium text-blue/90">Mass Edit Mode</h4>
               <div className="flex gap-2">
                 <button
                   onClick={selectAllUsers}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm text-blue/90 hover:text-blue font-medium"
                 >
                   Select All
                 </button>
                 <button
                   onClick={clearUserSelection}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm text-blue/90 hover:text-blue font-medium"
                 >
                   Clear Selection
                 </button>
@@ -294,7 +294,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-blue-700 mb-2">Copy Permissions From</label>
+                <label className="block text-sm font-medium text-blue/90 mb-2">Copy Permissions From</label>
                 <select
                   value={copyFromUser}
                   onChange={(e) => setCopyFromUser(e.target.value)}
@@ -339,7 +339,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
             </div>
             {selectedUsers.length > 0 && (
               <div className="mt-3 p-2 bg-white rounded border">
-                <p className="text-sm text-blue-700">
+                <p className="text-sm text-blue">
                   <strong>{selectedUsers.length}</strong> user{selectedUsers.length !== 1 ? 's' : ''} selected for mass editing
                 </p>
               </div>
@@ -349,45 +349,57 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
 
         {/* Users List */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Users</h3>
+          <h3 className="text-lg font-semibold text-blue mb-4">Current Users</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredUsers.map(user => (
               <div
                 key={user.id}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                className={`p-1 pr-2 border rounded-full cursor-pointer transition-all ${
                   massEditMode
                     ? selectedUsers.includes(user.id)
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-blue bg-blue'
+                      : 'border-light-blue/50 bg-white hover:border-gray-300'
                     : selectedUser === user.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-blue bg-blue'
+                      : 'border-light-blue/50 bg-white hover:border-gray-300'
                 }`}
                 onClick={() => massEditMode ? toggleUserSelection(user.id) : setSelectedUser(user.id)}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2">
                   {massEditMode && (
                     <input
                       type="checkbox"
                       checked={selectedUsers.includes(user.id)}
                       onChange={() => toggleUserSelection(user.id)}
-                      className="mt-1 w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="m-auto ml-2 size-5 appearance-none rounded-full border-2 border-gray-300 bg-white checked:bg-blue checked:border-white focus:ring-2 focus:ring-blue/20 cursor-pointer relative before:content-['✓'] before:absolute before:inset-0 before:flex before:items-center before:justify-center before:text-white before:text-xs before:font-bold before:opacity-0 checked:before:opacity-100 duration-400"
                       onClick={(e) => e.stopPropagation()}
                     />
                   )}
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-gray-500" />
+                  <div className="m-auto w-7 h-7 bg-orange/80 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-blue/80" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{user.name}</h4>
-                    <p className="text-sm text-gray-500 truncate">{user.position}</p>
-                    <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                  <div className="flex-1 text-xs min-w-0">
+                    <h4 className={`font-semibold truncate
+                      ${massEditMode
+                        ? selectedUsers.includes(user.id)
+                          ? 'text-white'
+                          : 'text-blue/90'
+                        : selectedUser === user.id
+                          ? 'text-white'
+                          : 'text-blue/90'
+                      }`}>{user.name}</h4>
+                    <p className={`truncate
+                      ${massEditMode
+                        ? selectedUsers.includes(user.id)
+                          ? 'text-white'
+                          : 'text-blue/90'
+                        : selectedUser === user.id
+                          ? 'text-white'
+                          : 'text-blue/90'
+                      }`}>{user.position}</p>
                   </div>
-                  {!massEditMode && selectedUser === user.id && (
-                    <Edit className="w-4 h-4 text-blue-500" />
-                  )}
                   {massEditMode && selectedUsers.includes(user.id) && (
-                    <CheckCircle className="w-4 h-4 text-blue-500" />
+                    <CheckCircle className="w-4 h-4 text-blue" />
                   )}
                 </div>
               </div>
@@ -398,7 +410,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
         {/* Module Permissions Table */}
         {(selectedUser || (massEditMode && selectedUsers.length > 0)) && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <h3 className="text-lg font-semibold text-blue mb-4">
               {massEditMode 
                 ? `Module Permissions for ${selectedUsers.length} Selected User${selectedUsers.length !== 1 ? 's' : ''}`
                 : `Module Permissions for ${filteredUsers.find(u => u.id === selectedUser)?.name}`
@@ -408,8 +420,8 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
               <table className="w-full border border-gray-200 rounded-lg">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Module</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-blue border-b">Module</th>
+                    <th className="px-4 py-3 text-center text-sm font-medium text-blue border-b">
                       Clear All
                       {massEditMode && (
                         <div className="mt-1">
@@ -422,7 +434,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                         </div>
                       )}
                     </th>
-                    <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b">
+                    <th className="px-4 py-3 text-center text-sm font-medium text-blue border-b">
                       Requestor
                       {massEditMode && (
                         <div className="mt-1">
@@ -441,13 +453,13 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                               const shouldEnable = !allModules.every(module => getMassEditRoleState(module.id, 'requestor') === 'all')
                               allModules.forEach(module => massSetRole(module.id, 'requestor', shouldEnable))
                             }}
-                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="w-4 h-4 text-blue focus:ring-blue border-gray-300 rounded"
                             disabled={selectedUsers.length === 0}
                           />
                         </div>
                       )}
                     </th>
-                    <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 border-b">
+                    <th className="px-4 py-3 text-center text-sm font-medium text-blue border-b">
                       Approver
                       {massEditMode && (
                         <div className="mt-1">
@@ -482,7 +494,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                     
                     return (
                       <tr key={module.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        <td className="px-4 py-3 text-sm font-medium text-blue/90">
                           {module.title}
                         </td>
                         <td className="px-4 py-3 text-center">
@@ -494,7 +506,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                               Clear All
                             </button>
                           ) : (
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-blue">
                               {userPermissions.length === 0 ? 'No Access' : 'Has Access'}
                             </span>
                           )}
@@ -509,7 +521,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                                   if (el) el.indeterminate = getMassEditRoleState(module.id, 'requestor') === 'some'
                                 }}
                                 onChange={() => toggleMassRole(module.id, 'requestor')}
-                                className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                className="w-4 h-4 text-blue focus:ring-blue border-gray-300 rounded"
                                 disabled={selectedUsers.length === 0}
                               />
                             </div>
@@ -518,7 +530,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                               type="checkbox"
                               checked={hasRequestor}
                               onChange={() => toggleRole(selectedUser, module.id, 'requestor')}
-                              className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              className="w-4 h-4 text-blue focus:ring-blue border-gray-300 rounded"
                             />
                           )}
                         </td>
@@ -564,7 +576,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                     alert('Permissions saved successfully!')
                   }
                 }}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-blue text-white font-medium rounded-lg hover:bg-blue focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-colors"
               >
                 <CheckCircle className="w-4 h-4" />
                 {massEditMode ? `Save Permissions (${selectedUsers.length} users)` : 'Save Permissions'}
@@ -576,8 +588,8 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
         {/* Summary Section */}
         {permissions.length > 0 && (
           <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium text-gray-800 mb-2">Permissions Summary</h4>
-            <div className="text-sm text-gray-600">
+            <h4 className="font-medium text-blue mb-2">Permissions Summary</h4>
+            <div className="text-sm text-blue">
               <p>Total permissions configured: <span className="font-medium">{permissions.length}</span></p>
               <p>Users with permissions: <span className="font-medium">{new Set(permissions.map(p => p.userId)).size}</span></p>
               <p>Modules with permissions: <span className="font-medium">{new Set(permissions.map(p => p.moduleId)).size}</span></p>

@@ -186,24 +186,24 @@ export default function IMRegistrationModule() {
     alert('IM Registration submitted successfully!')
   }
 
-  const inputClasses = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-  const labelClasses = "block text-sm font-medium text-gray-700 mb-1"
+  const inputClasses = "w-full px-3 py-2 border border-zinc-300 shadow-sm rounded-md focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-blue/90 font-medium bg-white/90"
+  const labelClasses = "block text-sm font-medium text-blue/90 mb-1"
 
   return (
     <div className="h-full p-6 overflow-auto">
       <div className="flex items-center gap-3 mb-6">
-        <IdCard className="w-8 h-8 text-blue-500" />
-        <h1 className="text-3xl font-semibold text-gray-700">IM Registration</h1>
+        <IdCard className="w-8 h-8 text-blue" />
+        <h1 className="text-3xl font-semibold text-blue/90">IM Registration</h1>
       </div>
       
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           
           {/* Personal Information */}
           <div className="border-b pb-6">
             <div className="flex items-center gap-2 mb-4">
-              <User className="w-5 h-5 text-blue-500" />
-              <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
+              <User className="w-5 h-5 text-blue" />
+              <h2 className="text-xl font-semibold text-blue/90">Personal Information</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -244,14 +244,14 @@ export default function IMRegistrationModule() {
           {/* Contact Information */}
           <div className="border-b pb-6">
             <div className="flex items-center gap-2 mb-4">
-              <Phone className="w-5 h-5 text-blue-500" />
-              <h2 className="text-xl font-semibold text-gray-800">Contact Information</h2>
+              <Phone className="w-5 h-5 text-blue" />
+              <h2 className="text-xl font-semibold text-blue/90">Contact Information</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className={labelClasses}>Birthday *</label>
                 <div className="relative">
-                  <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <Calendar className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                   <input
                     type="date"
                     name="birthday"
@@ -265,7 +265,7 @@ export default function IMRegistrationModule() {
               <div>
                 <label className={labelClasses}>Contact No. *</label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <Phone className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                   <input
                     type="tel"
                     name="contactNo"
@@ -280,7 +280,7 @@ export default function IMRegistrationModule() {
               <div>
                 <label className={labelClasses}>Email *</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                   <input
                     type="email"
                     name="email"
@@ -297,8 +297,8 @@ export default function IMRegistrationModule() {
           {/* Address Information */}
           <div className="border-b pb-6">
             <div className="flex items-center gap-2 mb-4">
-              <Home className="w-5 h-5 text-blue-500" />
-              <h2 className="text-xl font-semibold text-gray-800">Address Information</h2>
+              <Home className="w-5 h-5 text-blue" />
+              <h2 className="text-xl font-semibold text-blue/90">Address Information</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -338,7 +338,7 @@ export default function IMRegistrationModule() {
               <div>
                 <label className={labelClasses}>Region *</label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <MapPin className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                   <select
                     name="region"
                     value={formData.region}
@@ -385,10 +385,10 @@ export default function IMRegistrationModule() {
               </div>
             )}
             {isNCR && formData.region && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-blue-700">
+              <div className="bg-blue border border-blue rounded-lg p-3 mb-4">
+                <p className="text-sm text-blue">
                   <MapPin className="w-4 h-4 inline mr-2" />
-                  NCR (National Capital Region) selected - no province selection needed, proceed to city selection.
+                  NCR (National Capital Region) selected - no province selection needed.
                 </p>
               </div>
             )}
@@ -442,8 +442,8 @@ export default function IMRegistrationModule() {
           {/* Payment Information */}
           <div className="border-b pb-6">
             <div className="flex items-center gap-2 mb-4">
-              <CreditCard className="w-5 h-5 text-blue-500" />
-              <h2 className="text-xl font-semibold text-gray-800">Payment Information</h2>
+              <CreditCard className="w-5 h-5 text-blue" />
+              <h2 className="text-xl font-semibold text-blue/90">Payment Information</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -485,14 +485,14 @@ export default function IMRegistrationModule() {
           {/* Social Media & Files */}
           <div className="border-b pb-6">
             <div className="flex items-center gap-2 mb-4">
-              <Link className="w-5 h-5 text-blue-500" />
-              <h2 className="text-xl font-semibold text-gray-800">Social Media & Files</h2>
+              <Link className="w-5 h-5 text-blue" />
+              <h2 className="text-xl font-semibold text-blue/90">Social Media & Files</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={labelClasses}>FB Link</label>
                 <div className="relative">
-                  <Facebook className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <Facebook className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                   <input
                     type="url"
                     name="fbLink"
@@ -506,7 +506,7 @@ export default function IMRegistrationModule() {
               <div>
                 <label className={labelClasses}>IM Files Link</label>
                 <div className="relative">
-                  <Link className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <Link className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                   <input
                     type="url"
                     name="imFilesLink"
@@ -524,7 +524,7 @@ export default function IMRegistrationModule() {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue text-white font-medium rounded-lg hover:bg-blue/80 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 transition-colors"
             >
               <Save className="w-4 h-4" />
               Register Independent Manpower

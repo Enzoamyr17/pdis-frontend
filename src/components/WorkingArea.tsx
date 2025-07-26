@@ -22,13 +22,13 @@ export default function WorkingArea() {
   }
 
   return (
-    <div className="h-full p-2">
+    <div className="h-full">
       <ResizablePanelGroup direction="vertical">
-        <ResizablePanel className="py-2" defaultSize={50}>
+        <ResizablePanel className="p-2" defaultSize={50}>
           <ServiceRequestTracker />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel className="py-2" defaultSize={50}>
+        <ResizablePanel className="p-2" defaultSize={50}>
           <UserTodoList />
         </ResizablePanel>
       </ResizablePanelGroup>

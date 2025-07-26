@@ -218,14 +218,14 @@ export default function UserCreationModule() {
   const availableDepartments = formData.group && formData.office ? 
     (organizationalStructure[formData.office as keyof typeof organizationalStructure] as Record<string, string[]>)[formData.group] || [] : []
 
-  const inputClasses = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-  const labelClasses = "block text-sm font-medium text-gray-700 mb-1"
+  const inputClasses = "w-full px-3 py-2 border border-zinc-300 shadow-sm rounded-md focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-blue/90 font-medium bg-white/90"
+  const labelClasses = "block text-sm font-medium text-blue/90 mb-1"
 
   return (
-    <div className="h-full p-6 overflow-auto">
+    <div className="h-full  p-6 overflow-auto">
       <div className="flex items-center gap-3 mb-6">
-        <UserCheck className="w-8 h-8 text-blue-500" />
-        <h1 className="text-3xl font-semibold text-gray-700">User Creation (Org Chart)</h1>
+        <UserCheck className="w-8 h-8 text-blue" />
+        <h1 className="text-3xl font-semibold text-blue/90">User Creation (Org Chart)</h1>
       </div>
 
       {/* Tab Navigation */}
@@ -236,8 +236,8 @@ export default function UserCreationModule() {
               onClick={() => setActiveTab('encoding')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'encoding'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue text-blue'
+                  : 'border-transparent text-blue/90 hover:text-blue/90 hover:border-zinc-300 shadow-sm'
               }`}
             >
               <UserCheck className="w-4 h-4 inline mr-2" />
@@ -247,8 +247,8 @@ export default function UserCreationModule() {
               onClick={() => setActiveTab('permissions')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'permissions'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue text-blue'
+                  : 'border-transparent text-blue/90 hover:text-blue/90 hover:border-zinc-300 shadow-sm'
               }`}
             >
               <Shield className="w-4 h-4 inline mr-2" />
@@ -259,37 +259,37 @@ export default function UserCreationModule() {
       </div>
 
       {activeTab === 'encoding' && (
-        <div className="bg-white rounded-lg shadow-sm border">
+        <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             
             {/* Basic Information */}
             <div className="border-b pb-6">
               <div className="flex items-center gap-2 mb-4">
-                <User className="w-5 h-5 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-800">Basic Information</h2>
+                <User className="w-5 h-5 text-blue" />
+                <h2 className="text-xl font-semibold text-blue/90">Basic Information</h2>
               </div>
               
               {/* Picture Upload */}
               <div className="mb-4">
                 <label className={labelClasses}>Employee Picture</label>
                 <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center">
+                  <div className="w-24 h-24 bg-gray-100 border border-zinc-300 shadow-sm rounded-lg flex items-center justify-center">
                     {formData.picture ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={formData.picture} alt="Employee" className="w-full h-full object-cover rounded-lg" />
                     ) : (
-                      <User className="w-8 h-8 text-gray-400" />
+                      <User className="w-8 h-8 text-blue/90" />
                     )}
                   </div>
                   <div>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-50"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 border border-zinc-300 shadow-sm rounded-md hover:bg-gray-50"
                     >
                       <Upload className="w-4 h-4" />
                       Upload Picture
                     </button>
-                    <p className="text-xs text-gray-500 mt-1">JPG, PNG up to 2MB</p>
+                    <p className="text-xs text-blue/90 mt-1">JPG, PNG up to 2MB</p>
                   </div>
                 </div>
               </div>
@@ -331,7 +331,7 @@ export default function UserCreationModule() {
                 <div>
                   <label className={labelClasses}>Employment Date *</label>
                   <div className="relative">
-                    <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                    <Calendar className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <input
                       type="date"
                       name="employmentDate"
@@ -348,8 +348,8 @@ export default function UserCreationModule() {
             {/* Organization Information */}
             <div className="border-b pb-6">
               <div className="flex items-center gap-2 mb-4">
-                <Building className="w-5 h-5 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-800">Organization Information</h2>
+                <Building className="w-5 h-5 text-blue" />
+                <h2 className="text-xl font-semibold text-blue/90">Organization Information</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -415,14 +415,14 @@ export default function UserCreationModule() {
             {/* Contact Information */}
             <div className="border-b pb-6">
               <div className="flex items-center gap-2 mb-4">
-                <Phone className="w-5 h-5 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-800">Contact Information</h2>
+                <Phone className="w-5 h-5 text-blue" />
+                <h2 className="text-xl font-semibold text-blue/90">Contact Information</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className={labelClasses}>Contact Number *</label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                    <Phone className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <input
                       type="tel"
                       name="contactNumber"
@@ -437,7 +437,7 @@ export default function UserCreationModule() {
                 <div>
                   <label className={labelClasses}>PD Email *</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                    <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <input
                       type="email"
                       name="pdEmail"
@@ -452,7 +452,7 @@ export default function UserCreationModule() {
                 <div>
                   <label className={labelClasses}>Personal Email</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                    <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <input
                       type="email"
                       name="personalEmail"
@@ -469,14 +469,14 @@ export default function UserCreationModule() {
             {/* Personal Information */}
             <div className="border-b pb-6">
               <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-5 h-5 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
+                <Calendar className="w-5 h-5 text-blue" />
+                <h2 className="text-xl font-semibold text-blue/90">Personal Information</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className={labelClasses}>Birthdate *</label>
                   <div className="relative">
-                    <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                    <Calendar className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <input
                       type="date"
                       name="birthdate"
@@ -506,7 +506,7 @@ export default function UserCreationModule() {
                 <div>
                   <label className={labelClasses}>Region *</label>
                   <div className="relative">
-                    <MapPin className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                    <MapPin className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <select
                       name="region"
                       value={formData.region}
@@ -556,8 +556,8 @@ export default function UserCreationModule() {
               )}
 
               {isNCR && formData.region && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                  <p className="text-sm text-blue-700">
+                <div className="bg-blue border border-blue rounded-lg p-3 mb-4">
+                  <p className="text-sm text-blue">
                     <MapPin className="w-4 h-4 inline mr-2" />
                     NCR (National Capital Region) selected - no province selection needed.
                   </p>
@@ -615,7 +615,7 @@ export default function UserCreationModule() {
             <div className="flex justify-end pt-4">
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-blue text-white font-medium rounded-lg hover:bg-blue/80 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 transition-colors"
               >
                 <Save className="w-4 h-4" />
                 Save Employee
