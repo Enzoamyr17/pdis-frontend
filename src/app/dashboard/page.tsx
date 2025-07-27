@@ -18,7 +18,7 @@ export default function Dashboard() {
     <div className="m-auto w-full h-full">
       <ResizablePanelGroup direction="horizontal">
 
-        <ResizablePanel defaultSize={23}>
+        <ResizablePanel className="min-w-70" defaultSize={23}>
           {/* Widget Bar */}
           <div className="flex flex-col h-full p-2 min-w-70">
             {/* Fixed User Profile at top */}

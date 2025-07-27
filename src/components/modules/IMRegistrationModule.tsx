@@ -196,7 +196,7 @@ export default function IMRegistrationModule() {
         <h1 className="text-3xl font-semibold text-blue/90">IM Registration</h1>
       </div>
       
-      <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border">
+      <div className="bg-gradient-to-t from-blue/5 to-light-blue/10 rounded-lg shadow-sm border">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           
           {/* Personal Information */}
@@ -385,7 +385,7 @@ export default function IMRegistrationModule() {
               </div>
             )}
             {isNCR && formData.region && (
-              <div className="bg-blue border border-blue rounded-lg p-3 mb-4">
+              <div className="border border-blue rounded-lg p-3 mb-4">
                 <p className="text-sm text-blue">
                   <MapPin className="w-4 h-4 inline mr-2" />
                   NCR (National Capital Region) selected - no province selection needed.
