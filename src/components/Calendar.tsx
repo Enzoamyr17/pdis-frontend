@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
@@ -31,11 +31,33 @@ export default function Calendar({
   className = ""
 }: CalendarProps) {
   const [isClient, setIsClient] = useState(false)
+  const [forceUpdate, setForceUpdate] = useState(0)
+  const calendarRef = useRef<any>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // Ensure client-side hydration
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  // Handle resize events to force calendar re-render
+  useEffect(() => {
+    if (!isClient || !containerRef.current) return
+
+    const resizeObserver = new ResizeObserver(() => {
+      // Force calendar to update its layout
+      if (calendarRef.current?.getApi()) {
+        calendarRef.current.getApi().updateSize()
+        setForceUpdate(prev => prev + 1)
+      }
+    })
+
+    resizeObserver.observe(containerRef.current)
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [isClient])
 
   const today = new Date();
   const addDays = (days: number) => {
@@ -136,8 +158,10 @@ export default function Calendar({
   }
 
   return (
-    <div className={`h-full minimal-calendar ${className}`}>
+    <div ref={containerRef} className={`h-full minimal-calendar ${className}`}>
       <FullCalendar
+        ref={calendarRef}
+        key={forceUpdate} // Force re-render when size changes
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridDay"
         headerToolbar={{
