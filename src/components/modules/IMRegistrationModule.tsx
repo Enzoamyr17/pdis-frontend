@@ -186,8 +186,8 @@ export default function IMRegistrationModule() {
     alert('IM Registration submitted successfully!')
   }
 
-  const inputClasses = "w-full px-3 py-2 border border-zinc-300 shadow-sm rounded-md focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-blue/90 font-medium bg-white/90"
-  const labelClasses = "block text-sm font-medium text-blue/90 mb-1"
+  const inputClasses = "w-full px-2 py-1.5 text-sm border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"
+  const labelClasses = "block text-xs font-medium text-blue/90 mb-1"
 
   return (
     <div className="h-full p-6 overflow-auto">
@@ -200,10 +200,10 @@ export default function IMRegistrationModule() {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           
           {/* Personal Information */}
-          <div className="border-b pb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <User className="w-5 h-5 text-blue" />
-              <h2 className="text-xl font-semibold text-blue/90">Personal Information</h2>
+          <div className="p-3 bg-white/50 rounded border mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <User className="w-4 h-4 text-blue" />
+              <h2 className="text-sm font-semibold text-blue/90">Personal Information</h2>
             </div>
             <div className="flex flex-wrap gap-4">
               <div className="w-[30%] min-w-[22rem]">
@@ -242,10 +242,10 @@ export default function IMRegistrationModule() {
           </div>
 
           {/* Contact Information */}
-          <div className="border-b pb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Phone className="w-5 h-5 text-blue" />
-              <h2 className="text-xl font-semibold text-blue/90">Contact Information</h2>
+          <div className="p-3 bg-white/50 rounded border mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Phone className="w-4 h-4 text-blue" />
+              <h2 className="text-sm font-semibold text-blue/90">Contact Information</h2>
             </div>
             <div className="flex flex-wrap gap-4">
               <div className="w-[30%] min-w-[22rem]">
@@ -295,10 +295,10 @@ export default function IMRegistrationModule() {
           </div>
 
           {/* Address Information */}
-          <div className="border-b pb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Home className="w-5 h-5 text-blue" />
-              <h2 className="text-xl font-semibold text-blue/90">Address Information</h2>
+          <div className="p-3 bg-white/50 rounded border mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Home className="w-4 h-4 text-blue" />
+              <h2 className="text-sm font-semibold text-blue/90">Address Information</h2>
             </div>
             <div className="flex flex-wrap gap-4 mb-4">
               <div className="w-[48%] min-w-[24rem]">
@@ -432,10 +432,10 @@ export default function IMRegistrationModule() {
           </div>
 
           {/* Payment Information */}
-          <div className="border-b pb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <CreditCard className="w-5 h-5 text-blue" />
-              <h2 className="text-xl font-semibold text-blue/90">Payment Information</h2>
+          <div className="p-3 bg-white/50 rounded border mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <CreditCard className="w-4 h-4 text-blue" />
+              <h2 className="text-sm font-semibold text-blue/90">Payment Information</h2>
             </div>
             <div className="flex flex-wrap gap-4">
               <div className="w-[30%] min-w-[22rem]">
@@ -475,10 +475,10 @@ export default function IMRegistrationModule() {
           </div>
 
           {/* Social Media & Files */}
-          <div className="border-b pb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Link className="w-5 h-5 text-blue" />
-              <h2 className="text-xl font-semibold text-blue/90">Social Media & Files</h2>
+          <div className="p-3 bg-white/50 rounded border mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Link className="w-4 h-4 text-blue" />
+              <h2 className="text-sm font-semibold text-blue/90">Social Media & Files</h2>
             </div>
             <div className="flex flex-wrap gap-4">
               <div className="w-[48%] min-w-[24rem]">

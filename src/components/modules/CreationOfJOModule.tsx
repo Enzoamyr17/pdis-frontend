@@ -4,21 +4,24 @@ import { FileText } from "lucide-react"
 
 export default function CreationOfJOModule() {
   return (
-    <div className="h-full p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <FileText className="w-8 h-8 text-blue-500" />
-        <h1 className="text-3xl font-semibold text-gray-700">Creation of JO</h1>
+    <div className="h-full p-4 overflow-auto">
+      <div className="flex items-center gap-2 mb-4">
+        <FileText className="w-6 h-6 text-blue" />
+        <h1 className="text-2xl font-semibold text-blue/90">Creation of JO</h1>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <div className="text-center py-12">
-          <FileText className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-          <h2 className="text-xl font-medium text-gray-600 mb-2">Creation of JO Module</h2>
-          <p className="text-gray-500 mb-6">This module is currently under development. Features will include job order creation, workflow management, and progress tracking.</p>
-          <div className="inline-flex items-center px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-            <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-sm text-blue-600 font-medium">Coming Soon</span>
+      
+      <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border">
+        <div className="p-4">
+          <div className="text-center py-12">
+            <FileText className="w-16 h-16 text-blue mx-auto mb-4" />
+            <h2 className="text-xl font-medium text-blue/90 mb-2">Creation of JO Module</h2>
+            <p className="text-blue/70 mb-6">This module is currently under development. Features will include job order creation, workflow management, and progress tracking.</p>
+            <div className="inline-flex items-center px-4 py-2 bg-orange/10 border border-orange/20 rounded-lg">
+              <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm text-orange font-medium">Coming Soon</span>
+            </div>
           </div>
         </div>
       </div>

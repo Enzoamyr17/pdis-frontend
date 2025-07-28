@@ -218,8 +218,8 @@ export default function UserCreationModule() {
   const availableDepartments = formData.group && formData.office ? 
     (organizationalStructure[formData.office as keyof typeof organizationalStructure] as Record<string, string[]>)[formData.group] || [] : []
 
-  const inputClasses = "w-full px-3 py-2 border border-zinc-300 shadow-sm rounded-md focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-blue/90 font-medium bg-white/90"
-  const labelClasses = "block text-sm font-medium text-blue/90 mb-1"
+  const inputClasses = "w-full px-2 py-1.5 text-sm border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"
+  const labelClasses = "block text-xs font-medium text-blue/90 mb-1"
 
   return (
     <div className="h-full  p-6 overflow-auto min-w-[32rem]">
@@ -259,14 +259,14 @@ export default function UserCreationModule() {
       </div>
 
       {activeTab === 'encoding' && (
-        <div className="bg-gradient-to-t from-blue/5 to-light-blue/10 rounded-lg shadow-sm border">
+        <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             
             {/* Basic Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <User className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Basic Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <User className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Basic Information</h2>
               </div>
               
               {/* Picture Upload */}
@@ -346,10 +346,10 @@ export default function UserCreationModule() {
             </div>
 
             {/* Organization Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Building className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Organization Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Building className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Organization Information</h2>
               </div>
               <div className="flex flex-wrap gap-4">
                 <div className="w-[46%] min-w-[24rem]"> 
@@ -413,10 +413,10 @@ export default function UserCreationModule() {
             </div>
 
             {/* Contact Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Phone className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Contact Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Phone className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Contact Information</h2>
               </div>
               <div className="flex flex-wrap gap-4">
                 <div className="w-[30%] min-w-[18rem]">
@@ -467,10 +467,10 @@ export default function UserCreationModule() {
             </div>
 
             {/* Personal Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Personal Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Personal Information</h2>
               </div>
               <div className="grid grid-cols-1 gap-4 mb-4">
                 <div>
