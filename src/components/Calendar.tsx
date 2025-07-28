@@ -32,7 +32,7 @@ export default function Calendar({
 }: CalendarProps) {
   const [isClient, setIsClient] = useState(false)
   const [forceUpdate, setForceUpdate] = useState(0)
-  const calendarRef = useRef<any>(null)
+  const calendarRef = useRef<FullCalendar>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Ensure client-side hydration
