@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { moduleRegistry } from '@/components/modules/ModuleRegistry'
 
 export interface ModuleData {
   id: string
@@ -23,8 +24,7 @@ export function ModuleProvider({ children }: { children: React.ReactNode }) {
     if (savedModule) {
       try {
         const savedModuleData = JSON.parse(savedModule)
-        const { moduleRegistry } = require('@/components/modules/ModuleRegistry')
-        const fullModule = moduleRegistry.get(savedModuleData.id)
+        const fullModule = moduleRegistry[savedModuleData.id]
         if (fullModule) {
           setActiveModule(fullModule)
         } else {
