@@ -191,7 +191,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
   const inputClasses = "w-full bg-white/90 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
 
   return (
-    <div className={`bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border ${className}`}>
+    <div className={`bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border ${className} min-w-[32rem]`}>
       <div className="p-6 border-b">
         <div className="flex items-center gap-2 mb-4">
           <Shield className="w-5 h-5 text-blue" />
@@ -202,12 +202,45 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
         </p>
       </div>
 
+      {/* Edit Mode Selection */}
+      <div className="flex justify-between items-center gap-4 w-[28rem] pl-8">
+        <label className="block text-sm font-semibold text-blue">Edit Mode</label>
+          <button
+            onClick={() => {
+              setMassEditMode(false)
+              setSelectedUsers([])
+            }}
+            className={` px-2 min-w-36 py-2 flex gap-2 justify-center items-center rounded-lg ${
+              !massEditMode
+                ? 'bg-blue text-white border-blue'
+                : 'bg-white text-blue border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            Single
+          </button>
+          <button
+            onClick={() => {
+              setMassEditMode(true)
+              setSelectedUser("")
+            }}
+            className={` px-2 min-w-36 py-2 flex gap-2 justify-center items-center rounded-lg ${
+              massEditMode
+                ? 'bg-blue text-white border-blue'
+                : 'bg-white text-blue border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            Mass
+          </button>
+      </div>
+
       <div className="p-6">
         {/* Search and Filter Section */}
         <div className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-blue mb-2">Search Users</label>
+              <label className="block text-lg font-semibold text-blue mb-2">Search Users</label>
               <div className="relative">
                 <Search className="w-4 h-4 text-blue absolute left-3 top-3" />
                 <input
@@ -215,60 +248,10 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   placeholder="Search by name, email, or position..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`${inputClasses} pl-10`}
+                  className={`${inputClasses} pl-10 max-w-[32rem]`}
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-blue mb-2">Edit Mode</label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setMassEditMode(false)
-                    setSelectedUsers([])
-                  }}
-                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
-                    !massEditMode
-                      ? 'bg-blue text-white border-blue'
-                      : 'bg-white text-blue border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <User className="w-4 h-4 inline mr-1" />
-                  Single
-                </button>
-                <button
-                  onClick={() => {
-                    setMassEditMode(true)
-                    setSelectedUser("")
-                  }}
-                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
-                    massEditMode
-                      ? 'bg-blue text-white border-blue'
-                      : 'bg-white text-blue border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <Users className="w-4 h-4 inline mr-1" />
-                  Mass
-                </button>
-              </div>
-            </div>
-            {!massEditMode && (
-              <div>
-                <label className="block text-sm font-medium text-blue mb-2">Select User to Edit</label>
-                <select
-                  value={selectedUser}
-                  onChange={(e) => setSelectedUser(e.target.value)}
-                  className={inputClasses}
-                >
-                  <option value="">Select a user to manage permissions</option>
-                  {filteredUsers.map(user => (
-                    <option key={user.id} value={user.id}>
-                      {user.name} - {user.position}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
           </div>
         </div>
 
@@ -348,13 +331,13 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
         )}
 
         {/* Users List */}
-        <div className="mb-6">
+        <div className="flex flex-col mb-6">
           <h3 className="text-lg font-semibold text-blue mb-4">Current Users</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="m-auto flex flex-wrap justify-start items-start gap-1 overflow-y-auto max-h-[15rem] max-w-[59rem] min-w-[29rem]">
             {filteredUsers.map(user => (
               <div
                 key={user.id}
-                className={`p-1 pr-2 border rounded-full cursor-pointer transition-all ${
+                className={`p-1 px-3 border rounded-full cursor-pointer transition-all w-[24rem] ${
                   massEditMode
                     ? selectedUsers.includes(user.id)
                       ? 'border-blue bg-blue'
@@ -378,7 +361,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   <div className="m-auto w-7 h-7 bg-orange/80 rounded-full flex items-center justify-center">
                     <User className="w-5 h-5 text-blue/80" />
                   </div>
-                  <div className="flex-1 text-xs min-w-0">
+                  <div className="flex-1 text-sm min-w-0">
                     <h4 className={`font-semibold truncate
                       ${massEditMode
                         ? selectedUsers.includes(user.id)

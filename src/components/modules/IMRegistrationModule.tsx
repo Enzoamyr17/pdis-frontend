@@ -196,7 +196,7 @@ export default function IMRegistrationModule() {
         <h1 className="text-3xl font-semibold text-blue/90">IM Registration</h1>
       </div>
       
-      <div className="bg-gradient-to-t from-blue/5 to-light-blue/10 rounded-lg shadow-sm border">
+      <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border min-w-[32rem]">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           
           {/* Personal Information */}
@@ -205,8 +205,8 @@ export default function IMRegistrationModule() {
               <User className="w-5 h-5 text-blue" />
               <h2 className="text-xl font-semibold text-blue/90">Personal Information</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
+            <div className="flex flex-wrap gap-4">
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Last Name *</label>
                 <input
                   type="text"
@@ -217,7 +217,7 @@ export default function IMRegistrationModule() {
                   required
                 />
               </div>
-              <div>
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>First Name *</label>
                 <input
                   type="text"
@@ -228,7 +228,7 @@ export default function IMRegistrationModule() {
                   required
                 />
               </div>
-              <div>
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Middle Name</label>
                 <input
                   type="text"
@@ -247,8 +247,8 @@ export default function IMRegistrationModule() {
               <Phone className="w-5 h-5 text-blue" />
               <h2 className="text-xl font-semibold text-blue/90">Contact Information</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
+            <div className="flex flex-wrap gap-4">
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Birthday *</label>
                 <div className="relative">
                   <Calendar className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -262,7 +262,7 @@ export default function IMRegistrationModule() {
                   />
                 </div>
               </div>
-              <div>
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Contact No. *</label>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -277,7 +277,7 @@ export default function IMRegistrationModule() {
                   />
                 </div>
               </div>
-              <div>
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Email *</label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -300,8 +300,8 @@ export default function IMRegistrationModule() {
               <Home className="w-5 h-5 text-blue" />
               <h2 className="text-xl font-semibold text-blue/90">Address Information</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
+            <div className="flex flex-wrap gap-4 mb-4">
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>House No. *</label>
                 <input
                   type="text"
@@ -312,7 +312,7 @@ export default function IMRegistrationModule() {
                   required
                 />
               </div>
-              <div>
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>Street *</label>
                 <input
                   type="text"
@@ -324,8 +324,8 @@ export default function IMRegistrationModule() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
+            <div className="flex flex-wrap gap-4 mb-4">
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>Subdivision</label>
                 <input
                   type="text"
@@ -335,7 +335,7 @@ export default function IMRegistrationModule() {
                   className={inputClasses}
                 />
               </div>
-              <div>
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>Region *</label>
                 <div className="relative">
                   <MapPin className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -360,8 +360,8 @@ export default function IMRegistrationModule() {
               </div>
             </div>
             {hasProvinces && !isNCR && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
+              <div className="flex flex-wrap gap-4 mb-4">
+                <div className="w-[48%] min-w-[24rem]">
                   <label className={labelClasses}>Province *</label>
                   <select
                     name="province"
@@ -381,19 +381,11 @@ export default function IMRegistrationModule() {
                     ))}
                   </select>
                 </div>
-                <div></div>
+                <div className="w-[48%] min-w-[24rem]"></div>
               </div>
             )}
-            {isNCR && formData.region && (
-              <div className="border border-blue rounded-lg p-3 mb-4">
-                <p className="text-sm text-blue">
-                  <MapPin className="w-4 h-4 inline mr-2" />
-                  NCR (National Capital Region) selected - no province selection needed.
-                </p>
-              </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+            <div className="flex flex-wrap gap-4">
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>City/Municipality *</label>
                 <select
                   name="cityMunicipality"
@@ -416,7 +408,7 @@ export default function IMRegistrationModule() {
                   ))}
                 </select>
               </div>
-              <div>
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>Barangay *</label>
                 <select
                   name="barangay"
@@ -445,8 +437,8 @@ export default function IMRegistrationModule() {
               <CreditCard className="w-5 h-5 text-blue" />
               <h2 className="text-xl font-semibold text-blue/90">Payment Information</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
+            <div className="flex flex-wrap gap-4">
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Own Gcash</label>
                 <input
                   type="text"
@@ -457,7 +449,7 @@ export default function IMRegistrationModule() {
                   placeholder="09XX XXX XXXX"
                 />
               </div>
-              <div>
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Authorized Gcash</label>
                 <input
                   type="text"
@@ -468,7 +460,7 @@ export default function IMRegistrationModule() {
                   placeholder="09XX XXX XXXX"
                 />
               </div>
-              <div>
+              <div className="w-[30%] min-w-[22rem]">
                 <label className={labelClasses}>Authorized Receiver</label>
                 <input
                   type="text"
@@ -488,8 +480,8 @@ export default function IMRegistrationModule() {
               <Link className="w-5 h-5 text-blue" />
               <h2 className="text-xl font-semibold text-blue/90">Social Media & Files</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+            <div className="flex flex-wrap gap-4">
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>FB Link</label>
                 <div className="relative">
                   <Facebook className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -503,7 +495,7 @@ export default function IMRegistrationModule() {
                   />
                 </div>
               </div>
-              <div>
+              <div className="w-[48%] min-w-[24rem]">
                 <label className={labelClasses}>IM Files Link</label>
                 <div className="relative">
                   <Link className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
