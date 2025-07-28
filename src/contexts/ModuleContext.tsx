@@ -32,6 +32,7 @@ export function ModuleProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         localStorage.removeItem('pdis-active-module')
+        console.error('Error loading saved module:', error)
       }
     }
   }, [])

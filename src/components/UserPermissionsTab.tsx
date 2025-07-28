@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Shield, User, Search, CheckCircle, Edit, Users, Copy, RotateCcw } from "lucide-react"
+import { Shield, User, Search, CheckCircle, Users, Copy, RotateCcw } from "lucide-react"
 import { moduleRegistry } from "./modules/ModuleRegistry"
 
 interface UserPermission {

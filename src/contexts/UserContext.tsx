@@ -77,6 +77,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setUser(JSON.parse(savedUser))
       } catch (error) {
         localStorage.removeItem('pdis-user')
+        console.error('Error loading saved user:', error)
       }
     }
   }, [])
