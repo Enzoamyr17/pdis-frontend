@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { FileText, Save, Plus, Trash2, Calendar, Building, User, CreditCard } from "lucide-react"
+import { FileText, Save, Plus, Trash2, Building, User, CreditCard } from "lucide-react"
+import { useUser } from "@/contexts/UserContext"
 
 interface IMClearanceFormData {
   referenceNumber: string
@@ -38,7 +39,6 @@ interface IMPersonnel {
   authGcash: string
   authGcashAccName: string
 }
-
 
 const organizationalStructure = {
   PGOS: {
@@ -86,13 +86,15 @@ const projectNames = [
 ]
 
 export default function IMClearanceFormModule() {
+  const { user } = useUser()
+  
   const [formData, setFormData] = useState<IMClearanceFormData>({
     referenceNumber: `IMCF 24-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')}`,
     projectName: '',
     budgetCode: '',
     cepdNumber: `24-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')}.1 V1`,
-    clearanceRequestor: '',
-    department: '',
+    clearanceRequestor: user?.name || '',
+    department: user ? `${user.group} - ${user.department}` : '',
     dateOfRequest: new Date().toISOString().split('T')[0],
     coverageFromDate: '',
     coverageToDate: '',
@@ -127,7 +129,56 @@ export default function IMClearanceFormModule() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    
+    if (name === 'coverageFromDate') {
+      const selectedDate = new Date(value)
+      const sunday = new Date(selectedDate)
+      sunday.setDate(selectedDate.getDate() + 6)
+      const sundayString = sunday.toISOString().split('T')[0]
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        [name]: value,
+        coverageToDate: sundayString
+      }))
+      return
+    }
+    
     setFormData(prev => ({ ...prev, [name]: value }))
+  }
+  
+  const isMonday = (dateString: string) => {
+    if (!dateString) return false
+    const date = new Date(dateString)
+    return date.getDay() === 1
+  }
+
+  const handleDateClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    const input = e.target as HTMLInputElement
+    input.showPicker?.()
+  }
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (!value) return
+    
+    const selectedDate = new Date(value)
+    const dayOfWeek = selectedDate.getDay()
+    
+    // Only allow Mondays
+    if (dayOfWeek !== 1) {
+      e.preventDefault()
+      alert('Please select a Monday. Only Mondays are allowed for the Coverage From Date.')
+      // Clear the input
+      setFormData(prev => ({ 
+        ...prev, 
+        coverageFromDate: '',
+        coverageToDate: ''
+      }))
+      return false
+    }
+    
+    handleInputChange(e)
   }
 
   const handlePersonnelChange = (id: string, field: keyof IMPersonnel, value: string | number | IMPersonnel['dailyFees']) => {
@@ -164,6 +215,7 @@ export default function IMClearanceFormModule() {
       setPersonnelList(prev => prev.filter(person => person.id !== id))
     }
   }
+
 
 
   const calculateTotalFees = () => {
@@ -219,25 +271,23 @@ export default function IMClearanceFormModule() {
                 name="clearanceRequestor"
                 value={formData.clearanceRequestor}
                 onChange={handleInputChange}
-                className={inputClasses}
+                className={disabledInputClasses}
                 required
+                readOnly
               />
             </div>
             
             <div>
               <label className={labelClasses}>Department/Group</label>
-              <select
+              <input
+                type="text"
                 name="department"
                 value={formData.department}
                 onChange={handleInputChange}
-                className={inputClasses}
+                className={disabledInputClasses}
                 required
-              >
-                <option value="">Select Department</option>
-                {getAllDepartments().map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
+                readOnly
+              />
             </div>
             
             <div>
@@ -247,8 +297,9 @@ export default function IMClearanceFormModule() {
                 name="dateOfRequest"
                 value={formData.dateOfRequest}
                 onChange={handleInputChange}
-                className={inputClasses}
+                className={disabledInputClasses}
                 required
+                readOnly
               />
             </div>
             
@@ -281,15 +332,26 @@ export default function IMClearanceFormModule() {
             </div>
             
             <div>
-              <label className={labelClasses}>Coverage From Date</label>
+              <label className={labelClasses}>Coverage From Date (Mondays only)</label>
               <input
                 type="date"
                 name="coverageFromDate"
                 value={formData.coverageFromDate}
-                onChange={handleInputChange}
+                onChange={handleDateChange}
                 className={inputClasses}
                 required
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    e.preventDefault()
+                  }
+                }}
+                style={{
+                  colorScheme: 'light'
+                }}
               />
+              {formData.coverageFromDate && !isMonday(formData.coverageFromDate) && (
+                <p className="text-xs text-red-600 mt-1">Please select a Monday</p>
+              )}
             </div>
             
             <div>
@@ -299,8 +361,9 @@ export default function IMClearanceFormModule() {
                 name="coverageToDate"
                 value={formData.coverageToDate}
                 onChange={handleInputChange}
-                className={inputClasses}
+                className={disabledInputClasses}
                 required
+                readOnly
               />
             </div>
           </div>
@@ -318,14 +381,14 @@ export default function IMClearanceFormModule() {
                 className="flex items-center gap-1 px-2 py-1 text-xs bg-blue text-white rounded hover:bg-blue/80"
               >
                 <Plus className="w-3 h-3" />
-                Add Personnel
+                Add IM Personnel
               </button>
             </div>
             
             {personnelList.map((person, index) => (
               <div key={person.id} className="mb-6 p-4 bg-white/70 rounded-lg border-l-4 border-orange shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-blue/90">Personnel #{index + 1}</h3>
+                  <h3 className="text-sm font-semibold text-blue/90">IM #{index + 1}</h3>
                   {personnelList.length > 1 && (
                     <button
                       type="button"
@@ -377,11 +440,29 @@ export default function IMClearanceFormModule() {
                     <label className={labelClasses}>Packaged Fee (₱)</label>
                     <input
                       type="number"
-                      value={person.packagedFee}
-                      onChange={(e) => handlePersonnelChange(person.id, 'packagedFee', parseFloat(e.target.value) || 0)}
-                      className={inputClasses}
+                      value={person.packagedFee === 0 ? '' : person.packagedFee}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
+                        if (value > 0) {
+                          // Clear all daily fees when packaged fee is entered
+                          const clearedDailyFees = {
+                            monday: 0,
+                            tuesday: 0,
+                            wednesday: 0,
+                            thursday: 0,
+                            friday: 0,
+                            saturday: 0,
+                            sunday: 0
+                          }
+                          handlePersonnelChange(person.id, 'dailyFees', clearedDailyFees)
+                        }
+                        handlePersonnelChange(person.id, 'packagedFee', value)
+                      }}
+                      className={Object.values(person.dailyFees).some(fee => fee > 0) ? disabledInputClasses : inputClasses}
                       min="0"
                       step="0.01"
+                      placeholder="0.00"
+                      disabled={Object.values(person.dailyFees).some(fee => fee > 0)}
                     />
                   </div>
                 </div>
@@ -395,15 +476,21 @@ export default function IMClearanceFormModule() {
                         <label className={labelClasses}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
                         <input
                           type="number"
-                          value={fee}
+                          value={fee === 0 ? '' : fee}
                           onChange={(e) => {
-                            const newDailyFees = { ...person.dailyFees, [day]: parseFloat(e.target.value) || 0 }
+                            const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
+                            if (value > 0) {
+                              // Clear packaged fee when daily fee is entered
+                              handlePersonnelChange(person.id, 'packagedFee', 0)
+                            }
+                            const newDailyFees = { ...person.dailyFees, [day]: value }
                             handlePersonnelChange(person.id, 'dailyFees', newDailyFees)
                           }}
-                          className={inputClasses}
+                          className={person.packagedFee > 0 ? disabledInputClasses : inputClasses}
                           min="0"
                           step="0.01"
                           placeholder="0.00"
+                          disabled={person.packagedFee > 0}
                         />
                       </div>
                     ))}
@@ -512,6 +599,7 @@ export default function IMClearanceFormModule() {
               />
             </div>
           </div>
+            
 
           {/* Submit Button */}
           <div className="flex justify-end pt-2">

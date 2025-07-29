@@ -25,7 +25,24 @@ import {
   Facebook,
   Instagram,
   Users,
-  Database
+  Database,
+  Package,
+  Car,
+  FileText,
+  DoorOpen,
+  Hammer,
+  Plane,
+  MessageSquare,
+  ShoppingCart,
+  DollarSign,
+  Receipt,
+  PieChart,
+  Megaphone,
+  Target,
+  UserCheck,
+  Building,
+  IdCard,
+  Clipboard
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
@@ -42,46 +59,57 @@ const genAdServices = [
   {
     title: "Supplies Requisition",
     moduleId: "supplies-requisition",
+    icon: Package,
   },
   {
     title: "Vehicle Requisition",
     moduleId: "vehicle-requisition",
+    icon: Car,
   },
   {
     title: "IM Clearance Form (Independent Manpowers)",
     moduleId: "im-clearance-form",
+    icon: FileText,
   },
   {
     title: "Gate Pass In / Gate Pass Out",
     moduleId: "gate-pass",
+    icon: DoorOpen,
   },
   {
     title: "Equipment Rental",
     moduleId: "equipment-rental",
+    icon: Wrench,
   },
   {
     title: "Fabrication / Refurbishing Request",
     moduleId: "fabrication-request",
+    icon: Hammer,
   },
   {
     title: "Flight Booking Requisition",
     moduleId: "flight-booking",
+    icon: Plane,
   },
   {
     title: "JO for Messengerial Service (JOMS)",
     moduleId: "joms",
+    icon: MessageSquare,
   },
   {
     title: "Purchase Request (with SAP Tracker)",
     moduleId: "purchase-request",
+    icon: ShoppingCart,
   },
   {
     title: "BR Cash Advance",
     moduleId: "br-cash-advance",
+    icon: DollarSign,
   },
   {
     title: "BR Reimbursement",
     moduleId: "br-reimbursement",
+    icon: Receipt,
   },
 ]
 
@@ -89,26 +117,32 @@ const genAdTools = [
   {
     title: "OPEX Budget (GenAd PEP)",
     moduleId: "opex-budget",
+    icon: PieChart,
   },
   {
     title: "Bulletins, Advisories, Policies",
     moduleId: "bulletins-advisories",
+    icon: Megaphone,
   },
   {
     title: "Performance Management",
     moduleId: "performance-management",
+    icon: Target,
   },
   {
     title: "User Creation (Org Chart)",
     moduleId: "user-creation",
+    icon: UserCheck,
   },
   {
     title: "Client Registration",
     moduleId: "client-registration",
+    icon: Building,
   },
   {
     title: "IM Registration",
     moduleId: "im-registration",
+    icon: IdCard,
   },
 ]
 
@@ -116,10 +150,12 @@ const genOpsTools = [
   {
     title: "Creation of JO",
     moduleId: "creation-of-jo",
+    icon: FileText,
   },
   {
     title: "Creation of PEP",
     moduleId: "creation-of-pep",
+    icon: Clipboard,
   }
 ]
 
@@ -159,7 +195,7 @@ function DashboardContent({
   // const pathname = usePathname() // Currently unused
   const router = useRouter()
   const { user, logout } = useUser()
-  const { setActiveModule } = useModule()
+  const { activeModule, setActiveModule } = useModule()
   const [isGenAdServicesOpen, setIsGenAdServicesOpen] = useState(false)
   const [isGenAdToolsOpen, setIsGenAdToolsOpen] = useState(false)
   const [isGenOpsToolsOpen, setIsGenOpsToolsOpen] = useState(false)
@@ -213,18 +249,29 @@ function DashboardContent({
                         <ChevronDown className={`w-5 h-5 ${isGenAdServicesOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
                       </button>
                       <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenAdServicesOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
-                        {genAdServices.map((item) => (
+                        {genAdServices.map((item) => {
+                          const IconComponent = item.icon;
+                          return (
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
-                                <SidebarMenuButton onClick={() => handleModuleClick(item.moduleId)} className="text-blue/80 font-medium cursor-pointer">
-                                  <span className="">{item.title}</span>
+                                <SidebarMenuButton 
+                                  onClick={() => handleModuleClick(item.moduleId)} 
+                                  className={`font-medium cursor-pointer transition-all duration-200 ${
+                                    activeModule?.id === item.moduleId 
+                                      ? "bg-blue/20 text-blue border-l-4 border-blue" 
+                                      : "text-blue/80 hover:bg-blue/10"
+                                  }`}
+                                >
+                                  {isCollapsed && <IconComponent className="w-4 h-4" />}
+                                  <span className={`${isCollapsed ? "hidden" : "block"}`}>{item.title}</span>
                                 </SidebarMenuButton>
                               </TooltipTrigger>
                               <TooltipContent side="right" className="max-w-[300px]">
                                 <p>{item.title}</p>
                               </TooltipContent>
                             </Tooltip>
-                        ))}
+                          );
+                        })}
                       </div>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="flex flex-col">
@@ -234,18 +281,29 @@ function DashboardContent({
                         <ChevronDown className={`w-5 h-5 ${isGenAdToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
                       </button>
                       <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenAdToolsOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
-                        {genAdTools.map((item) => (
+                        {genAdTools.map((item) => {
+                          const IconComponent = item.icon;
+                          return (
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
-                                <SidebarMenuButton onClick={() => handleModuleClick(item.moduleId)} className="text-blue/80 font-medium cursor-pointer">
-                                  <span className="">{item.title}</span>
+                                <SidebarMenuButton 
+                                  onClick={() => handleModuleClick(item.moduleId)} 
+                                  className={`font-medium cursor-pointer transition-all duration-200 ${
+                                    activeModule?.id === item.moduleId 
+                                      ? "bg-blue/20 text-blue border-l-4 border-blue" 
+                                      : "text-blue/80 hover:bg-blue/10"
+                                  }`}
+                                >
+                                  {isCollapsed && <IconComponent className="w-4 h-4" />}
+                                  <span className={`${isCollapsed ? "hidden" : "block"}`}>{item.title}</span>
                                 </SidebarMenuButton>
                               </TooltipTrigger>
                               <TooltipContent side="right" className="max-w-[300px]">
                                 <p>{item.title}</p>
                               </TooltipContent>
                             </Tooltip>
-                        ))}
+                          );
+                        })}
                       </div>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="flex flex-col">
@@ -255,18 +313,29 @@ function DashboardContent({
                         <ChevronDown className={`w-5 h-5 ${isGenOpsToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
                       </button>
                       <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenOpsToolsOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
-                        {genOpsTools.map((item) => (
+                        {genOpsTools.map((item) => {
+                          const IconComponent = item.icon;
+                          return (
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
-                                <SidebarMenuButton onClick={() => handleModuleClick(item.moduleId)} className="text-blue/80 font-medium cursor-pointer">
-                                  <span className="">{item.title}</span>
+                                <SidebarMenuButton 
+                                  onClick={() => handleModuleClick(item.moduleId)} 
+                                  className={`font-medium cursor-pointer transition-all duration-200 ${
+                                    activeModule?.id === item.moduleId 
+                                      ? "bg-blue/20 text-blue border-l-4 border-blue" 
+                                      : "text-blue/80 hover:bg-blue/10"
+                                  }`}
+                                >
+                                  {isCollapsed && <IconComponent className="w-4 h-4" />}
+                                  <span className={`${isCollapsed ? "hidden" : "block"}`}>{item.title}</span>
                                 </SidebarMenuButton>
                               </TooltipTrigger>
                               <TooltipContent side="right" className="max-w-[300px]">
                                 <p>{item.title}</p>
                               </TooltipContent>
                             </Tooltip>
-                        ))}
+                          );
+                        })}
                       </div>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="flex flex-col">
