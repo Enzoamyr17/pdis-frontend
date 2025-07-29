@@ -21,10 +21,10 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b lg:bg-gradient-to-r from-white to-blue/90 lg:to-orange/90">
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Left Side - Logo */}
-        <div className="h-[25vh] lg:h-screen flex lg:w-1/2 items-center justify-center p-4 lg:p-12">
+        <div className="h-[25vh] lg:h-screen flex lg:w-1/2 items-center justify-center p-4 lg:p-2 lg:pl-22">
           <div className="m-auto mb-0 lg:mb-auto w-full max-w-sm lg:max-w-3xl">
             <Image 
-              src="/assets/pd/colored_wide_logo.png" 
+              src="/assets/pd/colored_wide_logo_3-01.png" 
               alt="logo" 
               width={1200} 
               height={144}

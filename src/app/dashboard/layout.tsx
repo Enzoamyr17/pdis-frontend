@@ -197,7 +197,7 @@ function DashboardContent({
       <Sidebar className="p-2 shadow-toolbar z-40">
           <SidebarHeader className="border-b border-sidebar-border min-h-[3rem] max-h-[3rem] flex items-center justify-center">
             <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
-                <Image className={`${isCollapsed ? "hidden" : "block"} min-w-[240px] pr-2`} src="/assets/pd/colored_wide_logo.png" alt="logo" width={240} height={37} />
+                <Image className={`${isCollapsed ? "hidden" : "block"} min-w-[240px]`} src="/assets/pd/colored_wide_logo_3-01.png" alt="logo" width={240} height={37} />
                 <Image className={`${isCollapsed ? "block" : "hidden"}`} src="/assets/pd/colored_square_logo.png" alt="logo" width={50} height={50} />
             </div>
           </SidebarHeader>

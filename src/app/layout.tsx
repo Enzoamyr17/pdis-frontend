@@ -10,7 +10,7 @@ const montserrat = Montserrat({
 
 
 export const metadata: Metadata = {
-  title: "PDIS",
+  title: "Project Duo Information System",
   description: "ProjectDuo Information System",
 };
 
