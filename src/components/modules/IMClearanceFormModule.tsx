@@ -40,42 +40,6 @@ interface IMPersonnel {
   authGcashAccName: string
 }
 
-const organizationalStructure = {
-  PGOS: {
-    'Sales and Operations Group (SOG)': [
-      'Business Unit 1',
-      'Business Unit 2',
-      'Business Development'
-    ],
-    'Creatives Group (CG)': [
-      'Design and Multimedia',
-      'Copy and Digital'
-    ]
-  },
-  PGAS: {
-    'Administrative Support Group (ASG)': [
-      'Assets & Property Management',
-      'People Management'
-    ],
-    'Accounting and Finance Group (AFG)': [
-      'Accounts Payable',
-      'Accounts Receivable',
-      'Treasury'
-    ]
-  }
-}
-
-const getAllDepartments = () => {
-  const allDepts: string[] = []
-  Object.values(organizationalStructure).forEach(office => {
-    Object.entries(office).forEach(([group, departments]) => {
-      departments.forEach(dept => {
-        allDepts.push(`${group} - ${dept}`)
-      })
-    })
-  })
-  return allDepts
-}
 
 const projectNames = [
   'Project Alpha - PA001',
@@ -151,11 +115,6 @@ export default function IMClearanceFormModule() {
     if (!dateString) return false
     const date = new Date(dateString)
     return date.getDay() === 1
-  }
-
-  const handleDateClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    const input = e.target as HTMLInputElement
-    input.showPicker?.()
   }
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
