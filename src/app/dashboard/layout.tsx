@@ -34,8 +34,7 @@ import {
   Plane,
   MessageSquare,
   ShoppingCart,
-  DollarSign,
-  Receipt,
+  PhilippinePeso,
   PieChart,
   Megaphone,
   Target,
@@ -102,14 +101,14 @@ const genAdServices = [
     icon: ShoppingCart,
   },
   {
-    title: "BR Cash Advance",
+    title: "Cash Advance",
     moduleId: "br-cash-advance",
-    icon: DollarSign,
+    icon: PhilippinePeso,
   },
   {
-    title: "BR Reimbursement",
+    title: "Reimbursement",
     moduleId: "br-reimbursement",
-    icon: Receipt,
+    icon: PhilippinePeso,
   },
 ]
 
