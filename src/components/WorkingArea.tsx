@@ -24,11 +24,11 @@ export default function WorkingArea() {
   return (
     <div className="h-full">
       <ResizablePanelGroup direction="vertical">
-        <ResizablePanel className="p-2" defaultSize={50}>
+        <ResizablePanel className="min-h-40" defaultSize={50}>
           <ServiceRequestTracker />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel className="p-2" defaultSize={50}>
+        <ResizablePanel className="p-2 min-h-18" defaultSize={50}>
           <UserTodoList />
         </ResizablePanel>
       </ResizablePanelGroup>
