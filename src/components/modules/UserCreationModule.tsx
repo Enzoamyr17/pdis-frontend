@@ -218,11 +218,11 @@ export default function UserCreationModule() {
   const availableDepartments = formData.group && formData.office ? 
     (organizationalStructure[formData.office as keyof typeof organizationalStructure] as Record<string, string[]>)[formData.group] || [] : []
 
-  const inputClasses = "w-full px-3 py-2 border border-zinc-300 shadow-sm rounded-md focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-blue/90 font-medium bg-white/90"
-  const labelClasses = "block text-sm font-medium text-blue/90 mb-1"
+  const inputClasses = "w-full px-2 py-1.5 text-sm border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"
+  const labelClasses = "block text-xs font-medium text-blue/90 mb-1"
 
   return (
-    <div className="h-full  p-6 overflow-auto">
+    <div className="h-full  p-6 overflow-auto min-w-[32rem]">
       <div className="flex items-center gap-3 mb-6">
         <UserCheck className="w-8 h-8 text-blue" />
         <h1 className="text-3xl font-semibold text-blue/90">User Creation (Org Chart)</h1>
@@ -237,7 +237,7 @@ export default function UserCreationModule() {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'encoding'
                   ? 'border-blue text-blue'
-                  : 'border-transparent text-blue/90 hover:text-blue/90 hover:border-zinc-300 shadow-sm'
+                  : 'border-transparent text-blue/90 hover:text-blue/90 hover:border-zinc-300'
               }`}
             >
               <UserCheck className="w-4 h-4 inline mr-2" />
@@ -248,7 +248,7 @@ export default function UserCreationModule() {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'permissions'
                   ? 'border-blue text-blue'
-                  : 'border-transparent text-blue/90 hover:text-blue/90 hover:border-zinc-300 shadow-sm'
+                  : 'border-transparent text-blue/90 hover:text-blue/90 hover:border-zinc-300'
               }`}
             >
               <Shield className="w-4 h-4 inline mr-2" />
@@ -259,14 +259,14 @@ export default function UserCreationModule() {
       </div>
 
       {activeTab === 'encoding' && (
-        <div className="bg-gradient-to-t from-blue/5 to-light-blue/10 rounded-lg shadow-sm border">
+        <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             
             {/* Basic Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <User className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Basic Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <User className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Basic Information</h2>
               </div>
               
               {/* Picture Upload */}
@@ -294,7 +294,7 @@ export default function UserCreationModule() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4 w-1/2 min-w-[24rem]">
                 <div>
                   <label className={labelClasses}>Full Name *</label>
                   <input
@@ -346,13 +346,13 @@ export default function UserCreationModule() {
             </div>
 
             {/* Organization Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Building className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Organization Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Building className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Organization Information</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="flex flex-wrap gap-4">
+                <div className="w-[46%] min-w-[24rem]"> 
                   <label className={labelClasses}>Office *</label>
                   <select
                     name="office"
@@ -366,7 +366,7 @@ export default function UserCreationModule() {
                     <option value="PGOS">PGOS - Project Duo General Operations</option>
                   </select>
                 </div>
-                <div>
+                <div className="w-[46%] min-w-[24rem]">
                   <label className={labelClasses}>Group *</label>
                   <select
                     name="group"
@@ -382,7 +382,7 @@ export default function UserCreationModule() {
                     ))}
                   </select>
                 </div>
-                <div>
+                <div className="w-[46%] min-w-[24rem]">
                   <label className={labelClasses}>Department *</label>
                   <select
                     name="department"
@@ -398,7 +398,7 @@ export default function UserCreationModule() {
                     ))}
                   </select>
                 </div>
-                <div>
+                <div className="w-[46%] min-w-[24rem]">
                   <label className={labelClasses}>Email Group</label>
                   <input
                     type="text"
@@ -413,13 +413,13 @@ export default function UserCreationModule() {
             </div>
 
             {/* Contact Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Phone className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Contact Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Phone className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Contact Information</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
+              <div className="flex flex-wrap gap-4">
+                <div className="w-[30%] min-w-[18rem]">
                   <label className={labelClasses}>Contact Number *</label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -434,7 +434,7 @@ export default function UserCreationModule() {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="w-[30%] min-w-[18rem]">
                   <label className={labelClasses}>PD Email *</label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -449,7 +449,7 @@ export default function UserCreationModule() {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="w-[30%] min-w-[18rem]">
                   <label className={labelClasses}>Personal Email</label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -467,15 +467,15 @@ export default function UserCreationModule() {
             </div>
 
             {/* Personal Information */}
-            <div className="border-b pb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-5 h-5 text-blue" />
-                <h2 className="text-xl font-semibold text-blue/90">Personal Information</h2>
+            <div className="p-3 bg-white/50 rounded border mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-blue" />
+                <h2 className="text-sm font-semibold text-blue/90">Personal Information</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 gap-4 mb-4">
                 <div>
                   <label className={labelClasses}>Birthdate *</label>
-                  <div className="relative">
+                  <div className="relative w-1/2">
                     <Calendar className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <input
                       type="date"
@@ -487,7 +487,7 @@ export default function UserCreationModule() {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="w-1/2">
                   <label className={labelClasses}>Complete Address *</label>
                   <input
                     type="text"
@@ -502,8 +502,8 @@ export default function UserCreationModule() {
               </div>
 
               {/* Address Selection using PSGC API */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
+              <div className="grid grid-cols-1 gap-4 mb-4">
+                <div className="w-1/2">
                   <label className={labelClasses}>Region *</label>
                   <div className="relative">
                     <MapPin className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -526,46 +526,37 @@ export default function UserCreationModule() {
                     </select>
                   </div>
                 </div>
-                <div></div>
+                <div>
+                  
+                </div>
               </div>
 
+              
+
+              <div className="flex flex-wrap gap-4">
               {hasProvinces && !isNCR && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className={labelClasses}>Province *</label>
-                    <select
-                      name="province"
-                      value={formData.province}
-                      onChange={handleInputChange}
-                      className={inputClasses}
-                      required
-                      disabled={!formData.region || loading.provinces}
-                    >
-                      <option value="">
-                        {loading.provinces ? "Loading provinces..." : "Select Province"}
-                      </option>
-                      {provinces.map(province => (
-                        <option key={province.psgc_id} value={province.name}>
-                          {province.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div></div>
-                </div>
-              )}
-
-              {isNCR && formData.region && (
-                <div className="border border-blue rounded-lg p-3 mb-4">
-                  <p className="text-sm text-blue">
-                    <MapPin className="w-4 h-4 inline mr-2" />
-                    NCR (National Capital Region) selected - no province selection needed.
-                  </p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                      <div className="w-[30%] min-w-[18rem]">
+                        <label className={labelClasses}>Province *</label>
+                        <select
+                          name="province"
+                          value={formData.province}
+                          onChange={handleInputChange}
+                          className={inputClasses}
+                          required
+                          disabled={!formData.region || loading.provinces}
+                        >
+                          <option value="">
+                            {loading.provinces ? "Loading provinces..." : "Select Province"}
+                          </option>
+                          {provinces.map(province => (
+                            <option key={province.psgc_id} value={province.name}>
+                              {province.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                  )}
+                <div className="w-[30%] min-w-[18rem]">
                   <label className={labelClasses}>City/Municipality *</label>
                   <select
                     name="cityMunicipality"
@@ -588,7 +579,7 @@ export default function UserCreationModule() {
                     ))}
                   </select>
                 </div>
-                <div>
+                <div className="w-[30%] min-w-[18rem]">
                   <label className={labelClasses}>Barangay *</label>
                   <select
                     name="barangay"
