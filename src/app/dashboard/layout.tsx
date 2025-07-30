@@ -242,18 +242,26 @@ function DashboardContent({
               <SidebarGroupContent>
                 <SidebarMenu className="gap-1">
                     <SidebarMenuItem className="flex flex-col">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button onClick={() => {setIsGenAdServicesOpen(!isGenAdServicesOpen);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdServicesOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
-                            <Cog className="w-5 h-5" />
-                            <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Service Center</h1>
-                            <ChevronDown className={`w-5 h-5 ${isGenAdServicesOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-[300px]">
-                          <p>Service Center</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      {isCollapsed ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button onClick={() => {setIsGenAdServicesOpen(!isGenAdServicesOpen);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdServicesOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                              <Cog className="w-5 h-5" />
+                              <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Service Center</h1>
+                              <ChevronDown className={`w-5 h-5 ${isGenAdServicesOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-[300px]">
+                            <p>Service Center - Request forms and administrative services</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <button onClick={() => {setIsGenAdServicesOpen(!isGenAdServicesOpen);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdServicesOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                          <Cog className="w-5 h-5" />
+                          <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Service Center</h1>
+                          <ChevronDown className={`w-5 h-5 ${isGenAdServicesOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                        </button>
+                      )}
                       <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenAdServicesOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
                         {genAdServices.map((item) => {
                           const IconComponent = item.icon;
@@ -281,18 +289,26 @@ function DashboardContent({
                       </div>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="flex flex-col">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button onClick={() => {setIsGenAdToolsOpen(!isGenAdToolsOpen);setIsGenAdServicesOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
-                            <Wrench className="w-5 h-5" />
-                            <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenAd Tools</h1>
-                            <ChevronDown className={`w-5 h-5 ${isGenAdToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-[300px]">
-                          <p>GenAd Tools</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      {isCollapsed ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button onClick={() => {setIsGenAdToolsOpen(!isGenAdToolsOpen);setIsGenAdServicesOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                              <Wrench className="w-5 h-5" />
+                              <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenAd Tools</h1>
+                              <ChevronDown className={`w-5 h-5 ${isGenAdToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-[300px]">
+                            <p>GenAd Tools - General Administration management and monitoring tools</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <button onClick={() => {setIsGenAdToolsOpen(!isGenAdToolsOpen);setIsGenAdServicesOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                          <Wrench className="w-5 h-5" />
+                          <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenAd Tools</h1>
+                          <ChevronDown className={`w-5 h-5 ${isGenAdToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                        </button>
+                      )}
                       <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenAdToolsOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
                         {genAdTools.map((item) => {
                           const IconComponent = item.icon;
@@ -320,18 +336,26 @@ function DashboardContent({
                       </div>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="flex flex-col">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button onClick={() => {setIsGenOpsToolsOpen(!isGenOpsToolsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenOpsToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
-                            <Wrench className="w-5 h-5" />
-                            <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenOps Tools</h1>
-                            <ChevronDown className={`w-5 h-5 ${isGenOpsToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-[300px]">
-                          <p>GenOps Tools</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      {isCollapsed ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button onClick={() => {setIsGenOpsToolsOpen(!isGenOpsToolsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenOpsToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                              <Wrench className="w-5 h-5" />
+                              <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenOps Tools</h1>
+                              <ChevronDown className={`w-5 h-5 ${isGenOpsToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-[300px]">
+                            <p>GenOps Tools - General Operations creation and management tools</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <button onClick={() => {setIsGenOpsToolsOpen(!isGenOpsToolsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenOpsToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                          <Wrench className="w-5 h-5" />
+                          <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenOps Tools</h1>
+                          <ChevronDown className={`w-5 h-5 ${isGenOpsToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                        </button>
+                      )}
                       <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenOpsToolsOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
                         {genOpsTools.map((item) => {
                           const IconComponent = item.icon;
@@ -359,18 +383,26 @@ function DashboardContent({
                       </div>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="flex flex-col">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button onClick={() => {setIsReportsOpen(!isReportsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isReportsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
-                            <FileBarChart className="w-5 h-5" />
-                            <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Reports</h1>
-                            <ChevronDown className={`w-5 h-5 ${isReportsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-[300px]">
-                          <p>Reports</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      {isCollapsed ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button onClick={() => {setIsReportsOpen(!isReportsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isReportsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                              <FileBarChart className="w-5 h-5" />
+                              <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Reports</h1>
+                              <ChevronDown className={`w-5 h-5 ${isReportsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-[300px]">
+                            <p>Reports - Generate and view various system reports</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <button onClick={() => {setIsReportsOpen(!isReportsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isReportsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                          <FileBarChart className="w-5 h-5" />
+                          <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Reports</h1>
+                          <ChevronDown className={`w-5 h-5 ${isReportsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                        </button>
+                      )}
                       <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isReportsOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
                         {/* Reports content will be added here later */}
                       </div>
