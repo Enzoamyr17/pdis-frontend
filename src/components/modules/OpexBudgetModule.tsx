@@ -172,90 +172,94 @@ export default function OpexBudgetModule() {
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           
           {/* Reference and Project Information */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white/50 rounded border">
+          <div className="flex flex-col gap-2 w-full mb-4 p-3 bg-white/50 rounded border">
             <div className="flex items-center gap-2 mb-2 md:col-span-3">
               <Building className="w-4 h-4 text-blue" />
               <h2 className="text-sm font-semibold text-blue/90">Project Information</h2>
             </div>
             
-            <div>
-              <label className={labelClasses}>Reference Number</label>
-              <input
-                type="text"
-                name="referenceNumber"
-                value={formData.referenceNumber}
-                onChange={handleInputChange}
-                className={inputClasses}
-                readOnly
-              />
+            <div className="flex flex-wrap gap-2 w-full mb-4">
+              <div className="w-[30%] min-w-[20rem] flex-grow-1">
+                <label className={labelClasses}>Reference Number</label>
+                <input
+                  type="text"
+                  name="referenceNumber"
+                  value={formData.referenceNumber}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  readOnly
+                />
+              </div>
+              
+              <div className="w-[30%] min-w-[20rem] flex-grow-1">
+                <label className={labelClasses}>Requested By</label>
+                <input
+                  type="text"
+                  name="requestedBy"
+                  value={formData.requestedBy}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  placeholder="Department Head Name"
+                  required
+                />
+              </div>
+              
+              <div className="w-[30%] min-w-[20rem] flex-grow-1">
+                <label className={labelClasses}>Department/Group</label>
+                <select
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {getAllDepartments().map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             
-            <div>
-              <label className={labelClasses}>Requested By</label>
-              <input
-                type="text"
-                name="requestedBy"
-                value={formData.requestedBy}
-                onChange={handleInputChange}
-                className={inputClasses}
-                placeholder="Department Head Name"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Department/Group</label>
-              <select
-                name="department"
-                value={formData.department}
-                onChange={handleInputChange}
-                className={inputClasses}
-                required
-              >
-                <option value="">Select Department</option>
-                {getAllDepartments().map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Request Date</label>
-              <input
-                type="date"
-                name="requestDate"
-                value={formData.requestDate}
-                onChange={handleInputChange}
-                className={inputClasses}
-                required
-              />
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Project Name</label>
-              <select
-                name="projectName"
-                value={formData.projectName}
-                onChange={handleInputChange}
-                className={inputClasses}
-                required
-              >
-                <option value="">Select Project</option>
-                {projectNames.map(project => (
-                  <option key={project} value={project}>{project}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Target Completion Date</label>
-              <input
-                type="date"
-                name="targetDate"
-                value={formData.targetDate}
-                onChange={handleInputChange}
-                className={inputClasses}
-              />
+            <div className="flex flex-wrap gap-2 w-full mb-4">
+              <div className="w-[30%] min-w-[20rem] flex-grow-1">
+                <label className={labelClasses}>Request Date</label>
+                <input
+                  type="date"
+                  name="requestDate"
+                  value={formData.requestDate}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  required
+                />
+              </div>
+              
+              <div className="w-[30%] min-w-[20rem] flex-grow-1">
+                <label className={labelClasses}>Project Name</label>
+                <select
+                  name="projectName"
+                  value={formData.projectName}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  required
+                >
+                  <option value="">Select Project</option>
+                  {projectNames.map(project => (
+                    <option key={project} value={project}>{project}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="w-[30%] min-w-[20rem] flex-grow-1">
+                <label className={labelClasses}>Target Completion Date</label>
+                <input
+                  type="date"
+                  name="targetDate"
+                  value={formData.targetDate}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                />
+              </div>
             </div>
           </div>
 
@@ -293,8 +297,8 @@ export default function OpexBudgetModule() {
                 </div>
                 
                 {/* Budget Line Basic Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <div>
+                <div className="flex flex-wrap gap-2 w-full mb-4">
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Cost Center</label>
                     <input
                       type="text"
@@ -306,7 +310,7 @@ export default function OpexBudgetModule() {
                     />
                   </div>
                   
-                  <div>
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Budget Code</label>
                     <select
                       value={line.budgetCode}
@@ -323,7 +327,7 @@ export default function OpexBudgetModule() {
                     </select>
                   </div>
                   
-                  <div>
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Final Budget (₱)</label>
                     <input
                       type="number"
@@ -359,7 +363,7 @@ export default function OpexBudgetModule() {
                     )}
                   </div>
                   
-                  <div>
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Remarks</label>
                     <input
                       type="text"
@@ -372,8 +376,8 @@ export default function OpexBudgetModule() {
                 </div>
                 
                 {/* Description and Components */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+                <div className="flex flex-wrap gap-2 w-full mb-4">
+                  <div className="w-[46%] min-w-[24rem] flex-grow-1">
                     <label className={labelClasses}>Description</label>
                     <textarea
                       value={line.description}
@@ -384,7 +388,7 @@ export default function OpexBudgetModule() {
                     />
                   </div>
                   
-                  <div>
+                  <div className="w-[46%] min-w-[24rem] flex-grow-1">
                     <label className={labelClasses}>Components</label>
                     <textarea
                       value={line.components}
@@ -406,8 +410,8 @@ export default function OpexBudgetModule() {
           </div>
 
           {/* Budget Remarks */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-white/50 rounded border">
-            <div className="flex items-center gap-2 mb-2 md:col-span-2">
+          <div className="flex flex-col gap-2 w-full mb-4 p-3 bg-white/50 rounded border">
+            <div className="flex items-center gap-2 mb-2">
               <User className="w-4 h-4 text-blue" />
               <h2 className="text-sm font-semibold text-blue/90">Budget Remarks</h2>
             </div>

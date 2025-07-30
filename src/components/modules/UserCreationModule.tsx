@@ -222,7 +222,7 @@ export default function UserCreationModule() {
   const labelClasses = "block text-xs font-medium text-blue/90 mb-1"
 
   return (
-    <div className="h-full  p-6 overflow-auto min-w-[32rem]">
+    <div className="h-full p-4 overflow-auto min-w-[32rem]">
       <div className="flex items-center gap-3 mb-6">
         <UserCheck className="w-8 h-8 text-blue" />
         <h1 className="text-3xl font-semibold text-blue/90">User Creation (Org Chart)</h1>
@@ -294,8 +294,8 @@ export default function UserCreationModule() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 w-1/2 min-w-[24rem]">
-                <div>
+              <div className="flex flex-col gap-4 w-full min-w-[24rem]">
+                <div className="w-full">
                   <label className={labelClasses}>Full Name *</label>
                   <input
                     type="text"
@@ -306,7 +306,7 @@ export default function UserCreationModule() {
                     required
                   />
                 </div>
-                <div>
+                <div className="w-full">
                   <label className={labelClasses}>Position *</label>
                   <input
                     type="text"
@@ -317,7 +317,7 @@ export default function UserCreationModule() {
                     required
                   />
                 </div>
-                <div>
+                <div className="w-full">
                   <label className={labelClasses}>ID Number *</label>
                   <input
                     type="text"
@@ -352,7 +352,7 @@ export default function UserCreationModule() {
                 <h2 className="text-sm font-semibold text-blue/90">Organization Information</h2>
               </div>
               <div className="flex flex-wrap gap-4">
-                <div className="w-[46%] min-w-[24rem]"> 
+                <div className="w-[46%] min-w-[24rem] flex-grow-1"> 
                   <label className={labelClasses}>Office *</label>
                   <select
                     name="office"
@@ -366,7 +366,7 @@ export default function UserCreationModule() {
                     <option value="PGOS">PGOS - Project Duo General Operations</option>
                   </select>
                 </div>
-                <div className="w-[46%] min-w-[24rem]">
+                <div className="w-[46%] min-w-[24rem] flex-grow-1">
                   <label className={labelClasses}>Group *</label>
                   <select
                     name="group"
@@ -382,7 +382,7 @@ export default function UserCreationModule() {
                     ))}
                   </select>
                 </div>
-                <div className="w-[46%] min-w-[24rem]">
+                <div className="w-[46%] min-w-[24rem] flex-grow-1">
                   <label className={labelClasses}>Department *</label>
                   <select
                     name="department"
@@ -398,7 +398,7 @@ export default function UserCreationModule() {
                     ))}
                   </select>
                 </div>
-                <div className="w-[46%] min-w-[24rem]">
+                <div className="w-[46%] min-w-[24rem] flex-grow-1">
                   <label className={labelClasses}>Email Group</label>
                   <input
                     type="text"
@@ -419,7 +419,7 @@ export default function UserCreationModule() {
                 <h2 className="text-sm font-semibold text-blue/90">Contact Information</h2>
               </div>
               <div className="flex flex-wrap gap-4">
-                <div className="w-[30%] min-w-[18rem]">
+                <div className="w-[30%] min-w-[18rem] flex-grow-1">
                   <label className={labelClasses}>Contact Number *</label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -434,7 +434,7 @@ export default function UserCreationModule() {
                     />
                   </div>
                 </div>
-                <div className="w-[30%] min-w-[18rem]">
+                <div className="w-[30%] min-w-[18rem] flex-grow-1">
                   <label className={labelClasses}>PD Email *</label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -449,7 +449,7 @@ export default function UserCreationModule() {
                     />
                   </div>
                 </div>
-                <div className="w-[30%] min-w-[18rem]">
+                <div className="w-[30%] min-w-[18rem] flex-grow-1">
                   <label className={labelClasses}>Personal Email</label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -467,15 +467,15 @@ export default function UserCreationModule() {
             </div>
 
             {/* Personal Information */}
-            <div className="p-3 bg-white/50 rounded border mb-4">
+            <div className="flex flex-col gap-4 p-3 bg-white/50 rounded border mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-4 h-4 text-blue" />
                 <h2 className="text-sm font-semibold text-blue/90">Personal Information</h2>
               </div>
-              <div className="grid grid-cols-1 gap-4 mb-4">
-                <div>
+              <div className="flex flex-wrap gap-4">
+                <div className="w-full flex-grow-1">
                   <label className={labelClasses}>Birthdate *</label>
-                  <div className="relative w-1/2">
+                  <div className="relative w-full">
                     <Calendar className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
                     <input
                       type="date"
@@ -487,7 +487,7 @@ export default function UserCreationModule() {
                     />
                   </div>
                 </div>
-                <div className="w-1/2">
+                <div className="w-[46%] min-w-[24rem] flex-grow-1">
                   <label className={labelClasses}>Complete Address *</label>
                   <input
                     type="text"
@@ -502,8 +502,8 @@ export default function UserCreationModule() {
               </div>
 
               {/* Address Selection using PSGC API */}
-              <div className="grid grid-cols-1 gap-4 mb-4">
-                <div className="w-1/2">
+              <div className="flex flex-wrap gap-4">
+                <div className="w-[46%] min-w-[24rem] flex-grow-1">
                   <label className={labelClasses}>Region *</label>
                   <div className="relative">
                     <MapPin className="w-4 h-4 text-blue/90 absolute left-3 top-3" />
@@ -526,16 +526,14 @@ export default function UserCreationModule() {
                     </select>
                   </div>
                 </div>
-                <div>
-                  
-                </div>
+                
               </div>
 
               
 
               <div className="flex flex-wrap gap-4">
               {hasProvinces && !isNCR && (
-                      <div className="w-[30%] min-w-[18rem]">
+                      <div className="w-[30%] min-w-[18rem] flex-grow-1">
                         <label className={labelClasses}>Province *</label>
                         <select
                           name="province"
@@ -556,7 +554,7 @@ export default function UserCreationModule() {
                         </select>
                       </div>
                   )}
-                <div className="w-[30%] min-w-[18rem]">
+                <div className="w-[30%] min-w-[18rem] flex-grow-1">
                   <label className={labelClasses}>City/Municipality *</label>
                   <select
                     name="cityMunicipality"
@@ -579,7 +577,7 @@ export default function UserCreationModule() {
                     ))}
                   </select>
                 </div>
-                <div className="w-[30%] min-w-[18rem]">
+                <div className="w-[30%] min-w-[18rem] flex-grow-1">
                   <label className={labelClasses}>Barangay *</label>
                   <select
                     name="barangay"

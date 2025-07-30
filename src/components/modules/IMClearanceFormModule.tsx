@@ -195,7 +195,7 @@ export default function IMClearanceFormModule() {
   const labelClasses = "block text-xs font-medium text-blue/90 mb-1"
 
   return (
-    <div className="h-full p-4 overflow-auto">
+    <div className="h-full p-4 overflow-auto min-w-[32rem]">
       <div className="flex items-center gap-2 mb-4">
         <FileText className="w-6 h-6 text-blue" />
         <h1 className="text-2xl font-semibold text-blue/90">Independent Manpower Clearance Form</h1>
@@ -205,92 +205,97 @@ export default function IMClearanceFormModule() {
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           
           {/* Reference and Project Information */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-white/50 rounded border">
-            <div className="flex items-center gap-2 mb-2 md:col-span-3">
+          <div className="flex flex-col gap-2 p-3 bg-white/50 rounded border">
+            <div className="flex items-center gap-2 mb-2 w-full">
               <Building className="w-4 h-4 text-blue" />
               <h2 className="text-sm font-semibold text-blue/90">Project Information</h2>
             </div>
             
-            <div>
-              <label className={labelClasses}>Reference Number</label>
-              <input
-                type="text"
-                name="referenceNumber"
-                value={formData.referenceNumber}
-                onChange={handleInputChange}
-                className={inputClasses}
-                readOnly
-              />
+            <div className="flex flex-wrap gap-2 w-full">
+              <div className="w-[30%] min-w-[18rem] flex-grow-1">
+                <label className={labelClasses}>Reference Number</label>
+                <input
+                  type="text"
+                  name="referenceNumber"
+                  value={formData.referenceNumber}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  readOnly
+                />
+              </div>
+              
+              <div className="w-[30%] min-w-[18rem] flex-grow-1">
+                <label className={labelClasses}>Clearance Requestor</label>
+                <input
+                  type="text"
+                  name="clearanceRequestor"
+                  value={formData.clearanceRequestor}
+                  onChange={handleInputChange}
+                  className={disabledInputClasses}
+                  required
+                  readOnly
+                />
+              </div>
+              
+              <div className="w-[30%] min-w-[18rem] flex-grow-1">
+                <label className={labelClasses}>Department/Group</label>
+                <input
+                  type="text"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputChange}
+                  className={disabledInputClasses}
+                  required
+                  readOnly
+                />
+              </div>
             </div>
             
-            <div>
-              <label className={labelClasses}>Clearance Requestor</label>
-              <input
-                type="text"
-                name="clearanceRequestor"
-                value={formData.clearanceRequestor}
-                onChange={handleInputChange}
-                className={disabledInputClasses}
-                required
-                readOnly
-              />
+            <div className="flex flex-wrap gap-2 w-full">
+              <div className="w-[30%] min-w-[18rem] flex-grow-1">
+                <label className={labelClasses}>Date of Request</label>
+                <input
+                  type="date"
+                  name="dateOfRequest"
+                  value={formData.dateOfRequest}
+                  onChange={handleInputChange}
+                  className={disabledInputClasses}
+                  required
+                  readOnly
+                />
+              </div>
+              
+              <div className="w-[30%] min-w-[18rem] flex-grow-1">
+                <label className={labelClasses}>Project Name / Budget Code</label>
+                <select
+                  name="projectName"
+                  value={formData.projectName}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  required
+                >
+                  <option value="">Select Project</option>
+                  {projectNames.map(project => (
+                    <option key={project} value={project}>{project}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="w-[30%] min-w-[18rem] flex-grow-1">
+                <label className={labelClasses}>CEPD No.</label>
+                <input
+                  type="text"
+                  name="cepdNumber"
+                  value={formData.cepdNumber}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  required
+                />
+              </div>
             </div>
             
-            <div>
-              <label className={labelClasses}>Department/Group</label>
-              <input
-                type="text"
-                name="department"
-                value={formData.department}
-                onChange={handleInputChange}
-                className={disabledInputClasses}
-                required
-                readOnly
-              />
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Date of Request</label>
-              <input
-                type="date"
-                name="dateOfRequest"
-                value={formData.dateOfRequest}
-                onChange={handleInputChange}
-                className={disabledInputClasses}
-                required
-                readOnly
-              />
-            </div>
-            
-            <div>
-              <label className={labelClasses}>Project Name / Budget Code</label>
-              <select
-                name="projectName"
-                value={formData.projectName}
-                onChange={handleInputChange}
-                className={inputClasses}
-                required
-              >
-                <option value="">Select Project</option>
-                {projectNames.map(project => (
-                  <option key={project} value={project}>{project}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className={labelClasses}>CEPD No.</label>
-              <input
-                type="text"
-                name="cepdNumber"
-                value={formData.cepdNumber}
-                onChange={handleInputChange}
-                className={inputClasses}
-                required
-              />
-            </div>
-            
-            <div>
+            <div className="flex flex-wrap gap-2 w-full">
+            <div className="w-[46%] min-w-[24rem] flex-grow-1">
               <label className={labelClasses}>Coverage From Date (Mondays only)</label>
               <input
                 type="date"
@@ -313,7 +318,7 @@ export default function IMClearanceFormModule() {
               )}
             </div>
             
-            <div>
+            <div className="w-[46%] min-w-[24rem] flex-grow-1">
               <label className={labelClasses}>Coverage To Date</label>
               <input
                 type="date"
@@ -324,6 +329,7 @@ export default function IMClearanceFormModule() {
                 required
                 readOnly
               />
+            </div>
             </div>
           </div>
 
@@ -361,8 +367,8 @@ export default function IMClearanceFormModule() {
                 </div>
                 
                 {/* Basic Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <div>
+                <div className="flex flex-wrap gap-2 w-full mb-4">
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Registered Name</label>
                     <input
                       type="text"
@@ -373,7 +379,7 @@ export default function IMClearanceFormModule() {
                     />
                   </div>
                   
-                  <div>
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Position</label>
                     <input
                       type="text"
@@ -384,7 +390,7 @@ export default function IMClearanceFormModule() {
                     />
                   </div>
                   
-                  <div>
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Outlet/Venue</label>
                     <input
                       type="text"
@@ -395,7 +401,7 @@ export default function IMClearanceFormModule() {
                     />
                   </div>
                   
-                  <div>
+                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
                     <label className={labelClasses}>Packaged Fee (₱)</label>
                     <input
                       type="number"
@@ -427,11 +433,11 @@ export default function IMClearanceFormModule() {
                 </div>
                 
                 {/* Daily Fees */}
-                <div className="mb-6">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-blue/90 mb-3">Daily Fees (₱)</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                  <div className="flex flex-wrap justify-center gap-2 w-full mb-4">
                     {Object.entries(person.dailyFees).map(([day, fee]) => (
-                      <div key={day}>
+                      <div key={day} className="flex-grow-1 max-w-[12rem]">
                         <label className={labelClasses}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
                         <input
                           type="number"
@@ -459,8 +465,8 @@ export default function IMClearanceFormModule() {
                 {/* GCash Information */}
                 <div>
                   <label className="block text-sm font-medium text-blue/90 mb-3">GCash Information</label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
+                  <div className="flex flex-wrap gap-2 w-full mb-4">
+                    <div className="w-[30%] min-w-[20rem] flex-grow-1">
                       <label className={labelClasses}>Own Gcash</label>
                       <input
                         type="text"
@@ -471,7 +477,7 @@ export default function IMClearanceFormModule() {
                       />
                     </div>
                     
-                    <div>
+                    <div className="w-[30%] min-w-[20rem] flex-grow-1">
                       <label className={labelClasses}>Auth Gcash</label>
                       <input
                         type="text"
@@ -482,7 +488,7 @@ export default function IMClearanceFormModule() {
                       />
                     </div>
                     
-                    <div>
+                    <div className="w-[30%] min-w-[20rem] flex-grow-1">
                       <label className={labelClasses}>Auth Gcash Name</label>
                       <input
                         type="text"
@@ -505,8 +511,8 @@ export default function IMClearanceFormModule() {
           </div>
 
           {/* Clearance Remarks */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-white/50 rounded border">
-            <div className="flex items-center gap-2 mb-2 md:col-span-2">
+          <div className="flex flex-col p-3 bg-white/50 rounded border">
+            <div className="flex items-center gap-2 mb-2">
               <CreditCard className="w-4 h-4 text-blue" />
               <h2 className="text-sm font-semibold text-blue/90">Clearance Remarks</h2>
             </div>
