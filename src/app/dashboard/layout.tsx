@@ -458,7 +458,7 @@ function DashboardContent({
             <div className="flex items-center justify-center">
                 <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none">
-                    <div className="flex items-center gap-2 border-2 border-transparent hover:border-orange px-4 py-1 rounded-xl transition-all duration-100">
+                    <div className="flex items-center gap-2 border-2 border-transparent hover:bg-white/20 px-4 py-1 rounded-xl transition-all duration-300">
                     <User className="w-6 h-6" />
                     <h1 className="font-black text-lg">{user ? getFirstAndLastName(user.name) : "Guest"}</h1>
                     <ChevronDown className="w-4 h-4" />

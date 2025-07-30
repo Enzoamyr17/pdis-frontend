@@ -8,11 +8,11 @@ export default function ServiceRequestTracker() {
   return (
     <div className="h-full px-2">
       <ResizablePanelGroup direction="vertical" className="h-full">
-        <ResizablePanel  className="py-2 min-h-18" defaultSize={50} minSize={20}>
+        <ResizablePanel  className="py-2 min-h-18" defaultSize={50}>
           <ServiceRequestTrackerModule />
         </ResizablePanel>
         <ResizableHandle withHandle className="bg-zinc-500/10" />
-        <ResizablePanel className="py-2 min-h-18" defaultSize={50} minSize={20}>
+        <ResizablePanel className="py-2 min-h-18" defaultSize={50}>
           <ApprovalCenterModule />
         </ResizablePanel>
       </ResizablePanelGroup>
