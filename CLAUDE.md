@@ -31,10 +31,9 @@ This is a Next.js 15 application using the App Router pattern with TypeScript an
 - `ModuleRegistry` - Central registry mapping module IDs to React components
 - `WorkingArea` - Conditional renderer that displays either active module or default dashboard
 
-**Authentication:** Simple mock authentication system using React Context (`UserContext`) with predefined users. No real OAuth integration currently implemented.
+**Authentication:** Authentication system removed in preparation for NextAuth + Prisma + PostgreSQL backend integration.
 
 **State Management:** Pure React Context API approach with no external state libraries:
-- `UserContext` - User authentication and profile data
 - `ModuleContext` - Active module state for dynamic loading
 
 ### Key Components Structure
@@ -75,7 +74,7 @@ When adding new modules:
 ### Context Providers Hierarchy
 
 ```
-RootLayout (UserProvider)
+RootLayout
   └── DashboardLayout (SidebarProvider → ModuleProvider)
       └── Dashboard content with module switching
 ```

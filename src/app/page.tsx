@@ -1,34 +1,106 @@
 "use client"
-import Image from "next/image";
+import { useSession, signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useUser } from "@/contexts/UserContext";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const { login } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    if (login(email)) {
-      router.push('/dashboard');
-    } else {
-      setError("Email not found. Please use a valid Project Duo email.");
+  useEffect(() => {
+    if (status === "loading") return;
+    
+    if (status === "authenticated") {
+      if (session?.user?.profileCompleted) {
+        router.push("/dashboard");
+      } else {
+        router.push("/auth/complete-profile");
+      }
+    }
+  }, [session, status, router]);
+
+  const handleCredentialsLogin = async () => {
+    if (!email || !password) {
+      setError("Please enter both email and password");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password");
+      } else {
+        await checkProfileAndRedirect();
+      }
+    } catch {
+      setError("An error occurred during login");
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await signIn("google", { redirect: false });
+      await checkProfileAndRedirect();
+    } catch {
+      setError("Google sign in failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const checkProfileAndRedirect = async () => {
+    const session = await getSession();
+    if (session?.user) {
+      if (session?.user?.profileCompleted) {
+        router.push("/dashboard");
+      } else {
+        router.push("/auth/complete-profile");
+      }
+    }
+  };
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (status === "authenticated") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Redirecting...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b lg:bg-gradient-to-r from-white to-blue/90 lg:to-orange/90">
-      <Image src="/assets/pd/landing_bg.png" alt="logo" fill className="object-cover hidden lg:block z-0 absolute w-full h-auto" />
+      <Image src="/assets/PD/landing_bg.png" alt="logo" fill className="object-cover hidden lg:block z-0 absolute w-full h-auto" />
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Left Side - Logo */}
         <div className="h-[25vh] lg:h-screen flex lg:w-2/3 items-center justify-center p-4 lg:p-2 lg:pl-22">
           <div className="block lg:hidden m-auto mb-0 lg:mb-auto w-full max-w-sm lg:max-w-3xl">
             <Image 
-              src="/assets/pd/colored_wide_logo_3-01.png" 
+              src="/assets/PD/colored_wide_logo_3-01.png" 
               alt="logo" 
               width={1200} 
               height={144}
@@ -51,12 +123,19 @@ export default function Home() {
                 </p>
               </div>
 
+              {/* Error Message */}
+              {error && (
+                <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  {error}
+                </div>
+              )}
+
               {/* Login Form */}
               <div className="space-y-6">
                 {/* Username Field */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Username
+                    Email
                   </label>
                   <div className="relative">
                     <input
@@ -66,8 +145,9 @@ export default function Home() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-800"
-                      placeholder="Enter your username"
-                      onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                      placeholder="Enter your email"
+                      onKeyPress={(e) => e.key === 'Enter' && handleCredentialsLogin()}
+                      disabled={isLoading}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                       <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,9 +155,6 @@ export default function Home() {
                       </svg>
                     </div>
                   </div>
-                  {error && (
-                    <p className="text-red-500 text-sm mt-2">{error}</p>
-                  )}
                 </div>
 
                 {/* Password Field */}
@@ -94,7 +171,8 @@ export default function Home() {
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-4 py-3 pr-12 bg-white border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-800"
                       placeholder="Enter your password"
-                      onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                      onKeyPress={(e) => e.key === 'Enter' && handleCredentialsLogin()}
+                      disabled={isLoading}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                       <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,6 +192,7 @@ export default function Home() {
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                       className="h-4 w-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      disabled={isLoading}
                     />
                     <label htmlFor="remember-me" className="text-gray-700 ml-2 block text-sm">
                       Remember me
@@ -123,6 +202,7 @@ export default function Home() {
                     <button
                       type="button"
                       className="font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                      disabled={isLoading}
                     >
                       Forgot password?
                     </button>
@@ -132,10 +212,11 @@ export default function Home() {
                 {/* Submit Button */}
                 <button
                   type="button"
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm text-white font-semibold bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
-                  onClick={handleLogin}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm text-white font-semibold bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50"
+                  onClick={handleCredentialsLogin}
+                  disabled={isLoading}
                 >
-                  Sign In
+                  {isLoading ? "Signing In..." : "Sign In"}
                 </button>
 
                 {/* Divider */}
@@ -146,7 +227,9 @@ export default function Home() {
                 {/* Google Sign In Button */}
                 <button
                   type="button"
-                  className="w-full flex justify-center items-center py-3 px-4 border border-gray-200 rounded-xl shadow-sm text-sm font-medium bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all duration-200 text-gray-700"
+                  className="w-full flex justify-center items-center py-3 px-4 border border-gray-200 rounded-xl shadow-sm text-sm font-medium bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all duration-200 text-gray-700 disabled:opacity-50"
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoading}
                 >
                   <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -154,8 +237,10 @@ export default function Home() {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   </svg>
-                  Continue with Google
+                  {isLoading ? "Please wait..." : "Continue with Google"}
                 </button>
+
+                
               </div>
             </div>
           </div>

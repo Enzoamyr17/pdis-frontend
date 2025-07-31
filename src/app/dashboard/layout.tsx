@@ -15,6 +15,9 @@ import {
   SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar"
+import { useSession, signOut } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { 
   Wrench,
   Cog,
@@ -48,8 +51,6 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import Image from "next/image"
 // import { usePathname } from "next/navigation" // Currently unused
 import { useState } from "react"
-import { useUser } from "@/contexts/UserContext"
-import { useRouter } from "next/navigation"
 import { useModule, ModuleProvider } from "@/contexts/ModuleContext"
 import { moduleRegistry } from "@/components/modules/ModuleRegistry"
 // Menu items for the sidebar
@@ -193,7 +194,7 @@ function DashboardContent({
 }) {
   // const pathname = usePathname() // Currently unused
   const router = useRouter()
-  const { user, logout } = useUser()
+  const { data: session, status } = useSession()
   const { activeModule, setActiveModule } = useModule()
   const [isGenAdServicesOpen, setIsGenAdServicesOpen] = useState(false)
   const [isGenAdToolsOpen, setIsGenAdToolsOpen] = useState(false)
@@ -203,18 +204,36 @@ function DashboardContent({
   const { state } = useSidebar()
   const isCollapsed = state === "collapsed"
 
-  const handleLogout = () => {
-    logout()
-    router.push('/')
+  useEffect(() => {
+    if (status === "loading") return
+    
+    if (status === "unauthenticated") {
+      router.push("/")
+      return
+    }
+    
+    if (session?.user && !session.user.profileCompleted) {
+      router.push("/auth/complete-profile")
+      return
+    }
+  }, [session, status, router])
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" })
   }
 
-  const getFirstAndLastName = (fullName: string) => {
-    const names = fullName.split(' ')
-    if (names.length >= 2) {
-      return `${names[0]} ${names[names.length - 1]}`
-    }
-    return fullName
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    )
   }
+
+  if (status === "unauthenticated" || !session?.user?.profileCompleted) {
+    return null
+  }
+
 
   const handleModuleClick = (moduleId: string) => {
     const moduleData = moduleRegistry[moduleId]
@@ -460,7 +479,7 @@ function DashboardContent({
                 <DropdownMenuTrigger className="focus:outline-none">
                     <div className="flex items-center gap-2 border-2 border-transparent hover:bg-white/20 px-4 py-1 rounded-xl transition-all duration-300">
                     <User className="w-6 h-6" />
-                    <h1 className="font-black text-lg">{user ? getFirstAndLastName(user.name) : "Guest"}</h1>
+                    <h1 className="font-black text-lg">{session?.user?.name || "User"}</h1>
                     <ChevronDown className="w-4 h-4" />
                     </div>
                 </DropdownMenuTrigger>

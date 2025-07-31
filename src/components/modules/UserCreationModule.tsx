@@ -17,11 +17,13 @@ interface EmployeeFormData {
   pdEmail: string
   personalEmail: string
   birthdate: string
+  houseNo: string
+  street: string
+  subdivision: string
   region: string
   province: string
   cityMunicipality: string
   barangay: string
-  address: string
   emailGroup: string
 }
 
@@ -92,11 +94,13 @@ export default function UserCreationModule() {
     pdEmail: '',
     personalEmail: '',
     birthdate: '',
+    houseNo: '',
+    street: '',
+    subdivision: '',
     region: '',
     province: '',
     cityMunicipality: '',
     barangay: '',
-    address: '',
     emailGroup: ''
   })
 
@@ -487,16 +491,42 @@ export default function UserCreationModule() {
                     />
                   </div>
                 </div>
-                <div className="w-[46%] min-w-[24rem] flex-grow-1">
-                  <label className={labelClasses}>Complete Address *</label>
+              </div>
+              
+              {/* Individual Address Fields */}
+              <div className="flex flex-wrap gap-4 mb-4">
+                <div className="w-[48%] min-w-[24rem] flex-grow-1">
+                  <label className={labelClasses}>Building/Unit/House No. *</label>
                   <input
                     type="text"
-                    name="address"
-                    value={formData.address}
+                    name="houseNo"
+                    value={formData.houseNo}
                     onChange={handleInputChange}
                     className={inputClasses}
-                    placeholder="House No., Street, Subdivision"
                     required
+                  />
+                </div>
+                <div className="w-[48%] min-w-[24rem] flex-grow-1">
+                  <label className={labelClasses}>Street *</label>
+                  <input
+                    type="text"
+                    name="street"
+                    value={formData.street}
+                    onChange={handleInputChange}
+                    className={inputClasses}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                <div className="w-[48%] min-w-[24rem] flex-grow-1">
+                  <label className={labelClasses}>Subdivision</label>
+                  <input
+                    type="text"
+                    name="subdivision"
+                    value={formData.subdivision}
+                    onChange={handleInputChange}
+                    className={inputClasses}
                   />
                 </div>
               </div>

@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { FileText, Save, Plus, Trash2, Building, User, CreditCard } from "lucide-react"
-import { useUser } from "@/contexts/UserContext"
 
 interface IMClearanceFormData {
   referenceNumber: string
@@ -50,15 +49,13 @@ const projectNames = [
 ]
 
 export default function IMClearanceFormModule() {
-  const { user } = useUser()
-  
   const [formData, setFormData] = useState<IMClearanceFormData>({
     referenceNumber: `IMCF 24-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')}`,
     projectName: '',
     budgetCode: '',
     cepdNumber: `24-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')}.1 V1`,
-    clearanceRequestor: user?.name || '',
-    department: user ? `${user.group} - ${user.department}` : '',
+    clearanceRequestor: '',
+    department: '',
     dateOfRequest: new Date().toISOString().split('T')[0],
     coverageFromDate: '',
     coverageToDate: '',

@@ -22,27 +22,8 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
   const [massEditMode, setMassEditMode] = useState(false)
   const [copyFromUser, setCopyFromUser] = useState<string>("")
 
-  // Mock users from UserContext (we'll need to expose all users, not just current user)
-  const mockUsers = [
-    {
-      id: 'PDID14-00001',
-      name: 'Von Aaron Torres Mauleon',
-      position: 'President and Chief Executive Officer',
-      email: 'von.mauleon@projectduo.com.ph'
-    },
-    {
-      id: 'PDID18-00045',
-      name: 'Alma Vida Mauleon Gerado',
-      position: 'Director for Administrative Support Group',
-      email: 'vida.gerado@projectduo.com.ph'
-    },
-    {
-      id: 'PDID18-00039',
-      name: 'Julie Anne Ingao Mendoza',
-      position: 'Associate Head for Business Unit 1',
-      email: 'julie.mendoza@projectduo.com.ph'
-    }
-  ]
+  // Users will be fetched from database once NextAuth + Prisma is implemented
+  const mockUsers: Array<{id: string, name: string, position: string, email: string}> = []
 
   // Get all modules from the registry
   const allModules = Object.values(moduleRegistry)
@@ -334,7 +315,14 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
         <div className="flex flex-col mb-6">
           <h3 className="text-lg font-semibold text-blue mb-4">Current Users</h3>
           <div className="m-auto flex flex-wrap justify-start items-start gap-1 overflow-y-auto max-h-[15rem] max-w-[59rem] min-w-[29rem]">
-            {filteredUsers.map(user => (
+            {filteredUsers.length === 0 ? (
+              <div className="w-full text-center py-8 text-blue/60">
+                <User className="w-12 h-12 mx-auto mb-3 text-blue/40" />
+                <p className="text-lg font-medium">No users available</p>
+                <p className="text-sm">Users will be loaded from the database once NextAuth + Prisma is implemented</p>
+              </div>
+            ) : (
+              filteredUsers.map(user => (
               <div
                 key={user.id}
                 className={`p-1 px-3 border rounded-full cursor-pointer transition-all w-[24rem] ${
@@ -386,7 +374,8 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   )}
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </div>
 

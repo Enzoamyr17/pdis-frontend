@@ -302,7 +302,7 @@ export default function IMRegistrationModule() {
             </div>
             <div className="flex flex-wrap gap-4 mb-4">
               <div className="w-[48%] min-w-[24rem] flex-grow-1">
-                <label className={labelClasses}>House No. *</label>
+                <label className={labelClasses}>Building/Unit/House No. *</label>
                 <input
                   type="text"
                   name="houseNo"
