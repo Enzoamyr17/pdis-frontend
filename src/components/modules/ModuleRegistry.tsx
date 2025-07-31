@@ -20,6 +20,7 @@ import ClientRegistrationModule from './ClientRegistrationModule'
 import IMRegistrationModule from './IMRegistrationModule'
 import CreationOfJOModule from './CreationOfJOModule'
 import CreationOfPEPModule from './CreationOfPEPModule'
+import BigCalendarModule from './BigCalendarModule'
 
 // Generic placeholder component for modules not yet implemented
 // Currently unused but kept for future module implementations
@@ -149,5 +150,12 @@ export const moduleRegistry: Record<string, ModuleData> = {
     id: 'creation-of-pep',
     title: 'Creation of PEP',
     component: CreationOfPEPModule
+  },
+
+  // Additional Tools
+  'big-calendar': {
+    id: 'big-calendar',
+    title: 'Big Calendar',
+    component: BigCalendarModule
   }
 }

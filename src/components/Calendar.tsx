@@ -92,8 +92,8 @@ export default function Calendar({
     // 2-day event
     {
       title: 'Sprint Planning',
-      start: addDays(1),
-      end: addDays(3), // end is exclusive, so this covers 2 days
+      start: addDays(0),
+      end: addDays(2), // end is exclusive, so this covers 2 days
       backgroundColor: '#1B2E6E',
       borderColor: '#10b981',
       textColor: 'white'

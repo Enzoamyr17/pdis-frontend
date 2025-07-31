@@ -144,6 +144,11 @@ const genAdTools = [
     moduleId: "im-registration",
     icon: IdCard,
   },
+  {
+    title: "Big Calendar",
+    moduleId: "big-calendar",
+    icon: Clipboard,
+  },
 ]
 
 const genOpsTools = [
