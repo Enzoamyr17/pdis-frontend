@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signOut } from 'next-auth/react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 
 interface CalendarEvent {
   id: string;
@@ -15,10 +15,26 @@ interface CalendarEvent {
   allDay?: boolean;
 }
 
+// Google Calendar API response types
+interface GoogleCalendarDateTime {
+  dateTime?: string;
+  date?: string;
+  timeZone?: string;
+}
+
+interface GoogleCalendarEvent {
+  id: string;
+  summary: string;
+  description?: string;
+  start: GoogleCalendarDateTime;
+  end: GoogleCalendarDateTime;
+  status?: string;
+  location?: string;
+}
+
 export default function BigCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEvents();
@@ -40,11 +56,11 @@ export default function BigCalendar() {
         throw new Error(data.error + (data.details ? `: ${data.details}` : ''));
       }
       
-      const formattedEvents = data.events?.map((event: any) => ({
+      const formattedEvents = data.events?.map((event: GoogleCalendarEvent) => ({
         id: event.id,
         title: event.summary,
-        start: event.start?.dateTime || event.start?.date,
-        end: event.end?.dateTime || event.end?.date,
+        start: event.start?.dateTime || event.start?.date || '',
+        end: event.end?.dateTime || event.end?.date || '',
         allDay: !event.start?.dateTime,
       })) || [];
       
@@ -60,7 +76,7 @@ export default function BigCalendar() {
     }
   };
 
-  const handleDateSelect = async (selectInfo: any) => {
+  const handleDateSelect = async (selectInfo: DateSelectArg) => {
     const title = prompt('Event Title:');
     if (!title) return;
 
@@ -86,7 +102,7 @@ export default function BigCalendar() {
     }
   };
 
-  const handleEventClick = async (clickInfo: any) => {
+  const handleEventClick = async (clickInfo: EventClickArg) => {
     const action = prompt(`What would you like to do with '${clickInfo.event.title}'?\nType 'edit' to edit or 'delete' to delete:`);
     
     if (action === 'delete') {

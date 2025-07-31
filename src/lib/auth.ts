@@ -70,38 +70,15 @@ export const authOptions: NextAuthOptions = {
       }
     })
   ],
-  session: {
-    strategy: "jwt"
-  },
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (user) {
-        token.id = user.id
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id }
-        })
-        token.profileCompleted = dbUser?.profileCompleted || false
-      }
-      
-      // Handle account tokens (including refresh token)
-      if (account && account.provider === "google") {
-        console.log('JWT callback - Google account tokens:', {
-          hasAccessToken: !!account.access_token,
-          hasRefreshToken: !!account.refresh_token,
-          expiresAt: account.expires_at
-        });
-      }
-      
-      return token
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string
-        session.user.profileCompleted = token.profileCompleted as boolean
+    async session({ session, user }) {
+      if (user && session.user) {
+        session.user.id = user.id
+        session.user.profileCompleted = user.profileCompleted || false
       }
       return session
     },
-    async signIn({ account, profile, user }) {
+    async signIn({ account, user }) {
       if (account?.provider === "google") {
         console.log('SignIn callback - Google account:', {
           hasAccessToken: !!account.access_token,
@@ -111,11 +88,23 @@ export const authOptions: NextAuthOptions = {
           userId: user?.id
         });
         
-        // Ensure we have the required tokens for calendar access
-        if (!account.refresh_token) {
-          console.error('Critical: No refresh token received from Google. This will cause calendar API failures.');
-          console.error('User needs to revoke app permissions and re-authorize.');
-          // Don't block sign-in, but log the issue
+        // If no refresh token is provided, clean up any existing account
+        // to force a fresh authorization next time
+        if (!account.refresh_token && user?.id) {
+          console.warn('No refresh token received. Cleaning up existing account to force re-authorization.');
+          try {
+            await prisma.account.deleteMany({
+              where: {
+                userId: user.id,
+                provider: "google"
+              }
+            });
+            console.log('Existing Google account deleted. User will need to re-authorize.');
+            // Return false to prevent storing an account without refresh token
+            return false;
+          } catch (error) {
+            console.error('Error cleaning up account:', error);
+          }
         }
         
         // Verify we have calendar scopes

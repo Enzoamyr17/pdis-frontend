@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getCalendarClient } from '@/lib/google-calendar';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Step 1: Check session
     const session = await getServerSession(authOptions);
