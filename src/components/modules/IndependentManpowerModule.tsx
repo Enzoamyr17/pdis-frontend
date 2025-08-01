@@ -293,9 +293,9 @@ export default function IndependentManpowerModule() {
     }
   }
 
-  const handleToggleStatus = async (imId: string, currentStatus: string | null) => {
+  const handleToggleStatus = async (imId: string, currentStatus: 'ACTIVE' | 'INACTIVE' | null) => {
     const newStatus = currentStatus === 'ACTIVE' ? 'inactive' : 'active'
-    const newPrismaStatus = newStatus === 'active' ? 'ACTIVE' : 'INACTIVE'
+    const newPrismaStatus: 'ACTIVE' | 'INACTIVE' = newStatus === 'active' ? 'ACTIVE' : 'INACTIVE'
     
     // Set loading state
     setStatusLoading(imId)

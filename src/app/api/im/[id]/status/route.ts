@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, IMStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -21,11 +21,11 @@ export async function PATCH(
     const { status } = body
 
     // Convert frontend status values to Prisma enum values
-    let prismaStatus
+    let prismaStatus: IMStatus
     if (status === 'active') {
-      prismaStatus = 'ACTIVE'
+      prismaStatus = IMStatus.ACTIVE
     } else if (status === 'inactive') {
-      prismaStatus = 'INACTIVE'
+      prismaStatus = IMStatus.INACTIVE
     } else {
       return new NextResponse('Invalid status. Must be active or inactive', { status: 400 })
     }
