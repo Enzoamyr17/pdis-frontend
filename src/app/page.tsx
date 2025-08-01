@@ -103,26 +103,15 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b lg:bg-gradient-to-r from-white to-blue/90 lg:to-orange/90">
-      <Image src="/assets/PD/landing_bg.png" alt="logo" fill className="object-cover hidden lg:block z-0 absolute w-full h-auto" />
-      <div className="flex flex-col lg:flex-row min-h-screen">
-        {/* Left Side - Logo */}
-        <div className="h-[25vh] lg:h-screen flex lg:w-2/3 items-center justify-center p-4 lg:p-2 lg:pl-22">
-          <div className="block lg:hidden m-auto mb-0 lg:mb-auto w-full max-w-sm lg:max-w-3xl">
-            <Image 
-              src="/assets/PD/colored_wide_logo_3-01.png" 
-              alt="logo" 
-              width={1200} 
-              height={144}
-              className="w-full h-auto"
-            />
-          </div>
+    <div className="min-h-screen overflow-hidden" style={{ backgroundImage: "url('/assets/PD/landing_bg.png')", backgroundSize: "cover", backgroundRepeat: "repeat", backgroundPosition: "center" }}>
+      <div className="flex flex-col min-h-screen overflow-hidden">
+        <div className="absolute h-screen w-full" style={{ backgroundImage: "url('/assets/PD/landing1.png')", backgroundSize: "contain", backgroundPosition: "left", backgroundRepeat: "no-repeat" }}>
         </div>
 
-        {/* Right Side - Login Form */}
-        <div className="flex w-full lg:w-1/3 items-center justify-center p-6">
-          <div className="w-full max-w-md">
-            <div className="bg-orange-50/90 backdrop-blur-sm border-3 border-gray-800/20 rounded-3xl p-8 shadow-xl">
+        <div className="flex w-full justify-end h-screen">
+          <div className="w-1/2"></div>
+          <div className="flex w-1/2 justify-center items-center">
+            <div className="m-auto w-1/2 min-w-[350px] bg-orange-50/90 backdrop-blur-sm border-3 border-gray-800/20 rounded-3xl p-8 shadow-xl">
               {/* Header */}
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold mb-2 text-blue-900">
@@ -255,6 +244,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        
       </div>
     </div>
   );
