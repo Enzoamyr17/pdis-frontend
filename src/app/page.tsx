@@ -3,7 +3,6 @@ import { signIn, getSession } from "next-auth/react";
 import { useOptimizedSession } from "@/hooks/useOptimizedSession";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
 export default function Home() {
   const { data: session, status } = useOptimizedSession();
