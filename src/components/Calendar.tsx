@@ -37,6 +37,7 @@ interface CalendarProps {
   onEventClick?: (info: EventClickArg) => void
   onDateClick?: (info: DateClickArg) => void
   className?: string
+  resizeTrigger?: number
 }
 
 // Helper function to get UTC+8 date string
@@ -49,7 +50,8 @@ const getUTC8DateString = () => {
 export default function Calendar({ 
   onEventClick,
   onDateClick,
-  className = ""
+  className = "",
+  resizeTrigger = 0
 }: CalendarProps) {
   const [isClient, setIsClient] = useState(false)
   const [forceUpdate, setForceUpdate] = useState(0)
@@ -87,22 +89,53 @@ export default function Calendar({
     return () => clearInterval(interval)
   }, [currentDateKey])
 
+  // Handle resizeTrigger prop changes
+  useEffect(() => {
+    if (!isClient || resizeTrigger === 0) return
+    
+    if (calendarRef?.current?.getApi()) {
+      requestAnimationFrame(() => {
+        calendarRef?.current?.getApi().updateSize()
+        setForceUpdate(prev => prev + 1)
+      })
+    }
+  }, [resizeTrigger, isClient])
+
   // Handle resize events to force calendar re-render
   useEffect(() => {
     if (!isClient || !containerRef.current) return
 
-    const resizeObserver = new ResizeObserver(() => {
-      // Force calendar to update its layout
-      if (calendarRef.current?.getApi()) {
-        calendarRef.current.getApi().updateSize()
-        setForceUpdate(prev => prev + 1)
+    const handleResize = () => {
+      if (calendarRef?.current?.getApi()) {
+        requestAnimationFrame(() => {
+          calendarRef?.current?.getApi().updateSize()
+          setForceUpdate(prev => prev + 1)
+        })
       }
-    })
+    }
 
+    // Create ResizeObserver to watch multiple elements
+    const resizeObserver = new ResizeObserver(handleResize)
+
+    // Observe the calendar container
     resizeObserver.observe(containerRef.current)
+
+    // Find and observe ALL parent elements up to the resizable panel
+    let element = containerRef.current.parentElement
+    while (element && element !== document.body) {
+      resizeObserver.observe(element)
+      element = element.parentElement
+    }
+
+    // Listen for custom resize events
+    const handlePanelResize = () => {
+      handleResize()
+    }
+    document.addEventListener('panelresize', handlePanelResize)
 
     return () => {
       resizeObserver.disconnect()
+      document.removeEventListener('panelresize', handlePanelResize)
     }
   }, [isClient])
 
@@ -157,7 +190,7 @@ export default function Calendar({
   }
 
   return (
-    <div ref={containerRef} className={`h-full minimal-calendar ${className}`}>
+    <div ref={containerRef} className={`h-full minimal-calendar w-full ${className}`}>
       <FullCalendar
         ref={calendarRef}
         key={`${forceUpdate}-${currentDateKey}`} // Force re-render when size changes or date changes

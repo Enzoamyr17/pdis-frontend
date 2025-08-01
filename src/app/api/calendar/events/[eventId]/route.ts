@@ -3,6 +3,31 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getCalendarClient } from '@/lib/google-calendar';
 
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ eventId: string }> }
+) {
+  const params = await context.params;
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const calendar = await getCalendarClient(session.user.id);
+    
+    const response = await calendar.events.get({
+      calendarId: 'primary',
+      eventId: params.eventId,
+    });
+
+    return NextResponse.json(response.data);
+  } catch (error) {
+    console.error('Get event error:', error);
+    return NextResponse.json({ error: 'Failed to fetch event' }, { status: 500 });
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ eventId: string }> }
@@ -14,17 +39,31 @@ export async function PUT(
   }
 
   try {
-    const { title, start, end, description, attendees } = await request.json();
+    const { title, start, end, description, location, attendees, allDay } = await request.json();
     const calendar = await getCalendarClient(session.user.id);
 
-    const event = {
+    const event: {
+      summary: string;
+      description?: string;
+      location?: string;
+      start: { date?: string; dateTime?: string; timeZone: string };
+      end: { date?: string; dateTime?: string; timeZone: string };
+      attendees?: Array<{ email: string }>;
+    } = {
       summary: title,
       description: description,
-      start: {
+      location: location,
+      start: allDay ? {
+        date: start.split('T')[0],
+        timeZone: 'UTC',
+      } : {
         dateTime: start,
         timeZone: 'UTC',
       },
-      end: {
+      end: allDay ? {
+        date: end.split('T')[0],
+        timeZone: 'UTC',
+      } : {
         dateTime: end,
         timeZone: 'UTC',
       },

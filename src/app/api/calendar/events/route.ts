@@ -105,40 +105,110 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { title, start, end, description, attendees } = await request.json();
+    const { title, start, end, description, location, attendees, allDay } = await request.json();
+    console.log('Received request data:', { title, start, end, description, location, attendees, allDay });
+    
     const calendar = await getCalendarClient(session.user.id);
 
-    const event = {
+    // Validate and format datetime strings
+    let startFormatted, endFormatted;
+    
+    if (allDay) {
+      // For all-day events, use date format (YYYY-MM-DD)
+      startFormatted = { date: start.split('T')[0] };
+      endFormatted = { date: end.split('T')[0] };
+    } else {
+      // For timed events, ensure proper ISO 8601 format with timezone
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error('Invalid start or end date format');
+      }
+      
+      startFormatted = { 
+        dateTime: startDate.toISOString(),
+        timeZone: 'UTC'
+      };
+      endFormatted = { 
+        dateTime: endDate.toISOString(),
+        timeZone: 'UTC'
+      };
+    }
+
+    const event: {
+      summary: string;
+      description?: string;
+      location?: string;
+      start: { date?: string; dateTime?: string; timeZone?: string };
+      end: { date?: string; dateTime?: string; timeZone?: string };
+      attendees?: Array<{ email: string }>;
+      conferenceData?: {
+        createRequest: {
+          requestId: string;
+          conferenceSolutionKey: {
+            type: string;
+          };
+        };
+      };
+    } = {
       summary: title,
-      description: description,
-      start: {
-        dateTime: start,
-        timeZone: 'UTC',
-      },
-      end: {
-        dateTime: end,
-        timeZone: 'UTC',
-      },
-      attendees: attendees?.map((email: string) => ({ email })),
-      conferenceData: {
+      start: startFormatted,
+      end: endFormatted,
+    };
+
+    // Only add optional fields if they have values
+    if (description && description.trim()) {
+      event.description = description;
+    }
+    
+    if (location && location.trim()) {
+      event.location = location;
+    }
+    
+    if (attendees && attendees.length > 0) {
+      event.attendees = attendees.map((email: string) => ({ email }));
+    }
+
+    // Only add conference data for non-all-day events with attendees
+    if (!allDay && attendees && attendees.length > 0) {
+      event.conferenceData = {
         createRequest: {
           requestId: Math.random().toString(36).substring(7),
           conferenceSolutionKey: {
             type: 'hangoutsMeet',
           },
         },
-      },
-    };
+      };
+    }
 
-    const response = await calendar.events.insert({
+    const insertOptions: {
+      calendarId: string;
+      requestBody: typeof event;
+      conferenceDataVersion?: number;
+    } = {
       calendarId: 'primary',
       requestBody: event,
-      conferenceDataVersion: 1,
-    });
+    };
+
+    // Only set conferenceDataVersion if we have conference data
+    if (event.conferenceData) {
+      insertOptions.conferenceDataVersion = 1;
+    }
+
+    console.log('Final event object being sent to Google Calendar:', JSON.stringify(event, null, 2));
+    console.log('Insert options:', JSON.stringify(insertOptions, null, 2));
+
+    const response = await calendar.events.insert(insertOptions);
 
     return NextResponse.json({ event: response.data });
   } catch (error) {
     console.error('Create event error:', error);
-    return NextResponse.json({ error: 'Failed to create event' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ 
+      error: 'Failed to create event',
+      details: errorMessage,
+      timestamp: new Date().toISOString()
+    }, { status: 500 });
   }
 }
