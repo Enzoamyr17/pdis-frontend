@@ -39,7 +39,7 @@ export async function PUT(
   }
 
   try {
-    const { title, start, end, description, location, attendees, allDay } = await request.json();
+    const { title, start, end, description, location, attendees, allDay, timeZone } = await request.json();
     const calendar = await getCalendarClient(session.user.id);
 
     const event: {
@@ -55,17 +55,17 @@ export async function PUT(
       location: location,
       start: allDay ? {
         date: start.split('T')[0],
-        timeZone: 'UTC',
+        timeZone: timeZone || 'Asia/Manila',
       } : {
         dateTime: start,
-        timeZone: 'UTC',
+        timeZone: timeZone || 'Asia/Manila',
       },
       end: allDay ? {
         date: end.split('T')[0],
-        timeZone: 'UTC',
+        timeZone: timeZone || 'Asia/Manila',
       } : {
         dateTime: end,
-        timeZone: 'UTC',
+        timeZone: timeZone || 'Asia/Manila',
       },
       attendees: attendees?.map((email: string) => ({ email })),
     };

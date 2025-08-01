@@ -200,14 +200,28 @@ export default function BigCalendar() {
     const startDate = new Date(selectInfo.start);
     const endDate = new Date(selectInfo.end);
     
+    // For time extraction, use local time formatting that preserves the intended time
+    const formatLocalTime = (date: Date): string => {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    
+    const formatLocalDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
     setEventFormData({
       title: '',
       description: '',
       location: '',
-      startDate: startDate.toISOString().split('T')[0],
-      startTime: selectInfo.allDay ? '' : startDate.toTimeString().slice(0, 5),
-      endDate: endDate.toISOString().split('T')[0],
-      endTime: selectInfo.allDay ? '' : endDate.toTimeString().slice(0, 5),
+      startDate: formatLocalDate(startDate),
+      startTime: selectInfo.allDay ? '' : formatLocalTime(startDate),
+      endDate: formatLocalDate(endDate),
+      endTime: selectInfo.allDay ? '' : formatLocalTime(endDate),
       attendees: [''],
       allDay: selectInfo.allDay
     });
@@ -287,13 +301,24 @@ export default function BigCalendar() {
     setIsSubmitting(true);
     
     try {
-      const startDateTime = eventFormData.allDay 
-        ? eventFormData.startDate
-        : `${eventFormData.startDate}T${eventFormData.startTime}:00`;
+      let startDateTime: string;
+      let endDateTime: string;
+      
+      if (eventFormData.allDay) {
+        startDateTime = eventFormData.startDate;
+        endDateTime = eventFormData.endDate;
+      } else {
+        // Create date objects and convert to UTC+8
+        const startDateLocal = new Date(`${eventFormData.startDate}T${eventFormData.startTime}:00`);
+        const endDateLocal = new Date(`${eventFormData.endDate}T${eventFormData.endTime}:00`);
         
-      const endDateTime = eventFormData.allDay 
-        ? eventFormData.endDate
-        : `${eventFormData.endDate}T${eventFormData.endTime}:00`;
+        // Convert to UTC+8 by adding 8 hours to the local time
+        const startDateUTC8 = new Date(startDateLocal.getTime() + (8 * 60 * 60 * 1000));
+        const endDateUTC8 = new Date(endDateLocal.getTime() + (8 * 60 * 60 * 1000));
+        
+        startDateTime = startDateUTC8.toISOString();
+        endDateTime = endDateUTC8.toISOString();
+      }
 
       const attendeesList = eventFormData.attendees.filter(email => email.trim());
       
@@ -305,11 +330,13 @@ export default function BigCalendar() {
         description?: string;
         location?: string;
         attendees?: string[];
+        timeZone?: string;
       } = {
         title: eventFormData.title,
         start: startDateTime,
         end: endDateTime,
         allDay: eventFormData.allDay,
+        timeZone: eventFormData.allDay ? undefined : 'Asia/Manila',
       };
 
       // Only add optional fields if they have values
@@ -363,13 +390,24 @@ export default function BigCalendar() {
     setIsSubmitting(true);
     
     try {
-      const startDateTime = eventFormData.allDay 
-        ? eventFormData.startDate
-        : `${eventFormData.startDate}T${eventFormData.startTime}:00`;
+      let startDateTime: string;
+      let endDateTime: string;
+      
+      if (eventFormData.allDay) {
+        startDateTime = eventFormData.startDate;
+        endDateTime = eventFormData.endDate;
+      } else {
+        // Create date objects and convert to UTC+8
+        const startDateLocal = new Date(`${eventFormData.startDate}T${eventFormData.startTime}:00`);
+        const endDateLocal = new Date(`${eventFormData.endDate}T${eventFormData.endTime}:00`);
         
-      const endDateTime = eventFormData.allDay 
-        ? eventFormData.endDate
-        : `${eventFormData.endDate}T${eventFormData.endTime}:00`;
+        // Convert to UTC+8 by adding 8 hours to the local time
+        const startDateUTC8 = new Date(startDateLocal.getTime() + (8 * 60 * 60 * 1000));
+        const endDateUTC8 = new Date(endDateLocal.getTime() + (8 * 60 * 60 * 1000));
+        
+        startDateTime = startDateUTC8.toISOString();
+        endDateTime = endDateUTC8.toISOString();
+      }
 
       const attendeesList = eventFormData.attendees.filter(email => email.trim());
       
@@ -381,11 +419,13 @@ export default function BigCalendar() {
         description?: string;
         location?: string;
         attendees?: string[];
+        timeZone?: string;
       } = {
         title: eventFormData.title,
         start: startDateTime,
         end: endDateTime,
         allDay: eventFormData.allDay,
+        timeZone: eventFormData.allDay ? undefined : 'Asia/Manila',
       };
 
       // Only add optional fields if they have values
@@ -542,14 +582,28 @@ export default function BigCalendar() {
     const startDate = new Date(selectedEvent.start.dateTime || selectedEvent.start.date!);
     const endDate = new Date(selectedEvent.end.dateTime || selectedEvent.end.date!);
     
+    // Helper functions for consistent formatting
+    const formatLocalTime = (date: Date): string => {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    
+    const formatLocalDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
     const formData = {
       title: selectedEvent.summary,
       description: selectedEvent.description || '',
       location: selectedEvent.location || '',
-      startDate: startDate.toISOString().split('T')[0],
-      startTime: selectedEvent.start.dateTime ? startDate.toTimeString().slice(0, 5) : '',
-      endDate: endDate.toISOString().split('T')[0],
-      endTime: selectedEvent.end.dateTime ? endDate.toTimeString().slice(0, 5) : '',
+      startDate: formatLocalDate(startDate),
+      startTime: selectedEvent.start.dateTime ? formatLocalTime(startDate) : '',
+      endDate: formatLocalDate(endDate),
+      endTime: selectedEvent.end.dateTime ? formatLocalTime(endDate) : '',
       attendees: selectedEvent.attendees?.map(a => a.email) || [''],
       allDay: !selectedEvent.start.dateTime
     };
@@ -564,14 +618,28 @@ export default function BigCalendar() {
       const startDate = new Date(selectedEvent.start.dateTime || selectedEvent.start.date!);
       const endDate = new Date(selectedEvent.end.dateTime || selectedEvent.end.date!);
       
+      // Helper functions for consistent formatting
+      const formatLocalTime = (date: Date): string => {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      };
+      
+      const formatLocalDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      
       setEventFormData({
         title: selectedEvent.summary,
         description: selectedEvent.description || '',
         location: selectedEvent.location || '',
-        startDate: startDate.toISOString().split('T')[0],
-        startTime: selectedEvent.start.dateTime ? startDate.toTimeString().slice(0, 5) : '',
-        endDate: endDate.toISOString().split('T')[0],
-        endTime: selectedEvent.end.dateTime ? endDate.toTimeString().slice(0, 5) : '',
+        startDate: formatLocalDate(startDate),
+        startTime: selectedEvent.start.dateTime ? formatLocalTime(startDate) : '',
+        endDate: formatLocalDate(endDate),
+        endTime: selectedEvent.end.dateTime ? formatLocalTime(endDate) : '',
         attendees: selectedEvent.attendees?.map(a => a.email) || [''],
         allDay: !selectedEvent.start.dateTime
       });

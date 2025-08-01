@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { title, start, end, description, location, attendees, allDay } = await request.json();
+    const { title, start, end, description, location, attendees, allDay, timeZone } = await request.json();
     console.log('Received request data:', { title, start, end, description, location, attendees, allDay });
     
     const calendar = await getCalendarClient(session.user.id);
@@ -118,21 +118,23 @@ export async function POST(request: NextRequest) {
       startFormatted = { date: start.split('T')[0] };
       endFormatted = { date: end.split('T')[0] };
     } else {
-      // For timed events, ensure proper ISO 8601 format with timezone
-      const startDate = new Date(start);
-      const endDate = new Date(end);
+      // For timed events, preserve the local time intention from the frontend
+      // The frontend sends datetime strings like "2024-01-01T10:00:00" meaning 10:00 in their local timezone
+      const eventTimeZone = timeZone || 'Asia/Manila';
       
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        throw new Error('Invalid start or end date format');
+      // Instead of parsing and converting, use the datetime directly with the intended timezone
+      // This prevents timezone shifts from Date constructor + toISOString()
+      if (!start.includes('T') || !end.includes('T')) {
+        throw new Error('Invalid datetime format - expected ISO format with time');
       }
       
       startFormatted = { 
-        dateTime: startDate.toISOString(),
-        timeZone: 'UTC'
+        dateTime: start,
+        timeZone: eventTimeZone
       };
       endFormatted = { 
-        dateTime: endDate.toISOString(),
-        timeZone: 'UTC'
+        dateTime: end,
+        timeZone: eventTimeZone
       };
     }
 
