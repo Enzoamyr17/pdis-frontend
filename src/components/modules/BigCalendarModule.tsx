@@ -11,7 +11,7 @@ export default function BigCalendarModule() {
         <h1 className="text-2xl font-semibold text-blue/90">Big Calendar</h1>
       </div>
       
-      <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border h-full">
+      <div className="bg-gradient-to-t from-blue/5 to-light-blue/25 rounded-lg shadow-sm border h-auto">
         <div className="p-4 h-full">
           <BigCalendar />
         </div>

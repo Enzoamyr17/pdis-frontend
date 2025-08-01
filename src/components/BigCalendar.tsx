@@ -9,7 +9,8 @@ import { DateSelectArg, EventClickArg, EventDropArg, EventResizeDoneArg } from '
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar, Clock, MapPin, Users, Edit, Trash2, Plus } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Calendar, Clock, MapPin, Users, Edit, Trash2, Plus, X, Check, CheckCircle2, XCircle, HelpCircle, User, ChevronDown } from 'lucide-react';
 
 interface CalendarEvent {
   id: string;
@@ -20,6 +21,14 @@ interface CalendarEvent {
   description?: string;
   location?: string;
   attendees?: string[];
+  organizer?: {
+    email: string;
+    displayName?: string;
+  };
+  isInvitation?: boolean;
+  backgroundColor?: string;
+  borderColor?: string;
+  textColor?: string;
 }
 
 interface GoogleCalendarDateTime {
@@ -64,7 +73,7 @@ interface EventFormData {
   startTime: string;
   endDate: string;
   endTime: string;
-  attendees: string;
+  attendees: string[];
   allDay: boolean;
 }
 
@@ -76,6 +85,7 @@ export default function BigCalendar() {
   const [selectedEvent, setSelectedEvent] = useState<GoogleCalendarEvent | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
   const [eventFormData, setEventFormData] = useState<EventFormData>({
     title: '',
     description: '',
@@ -84,9 +94,11 @@ export default function BigCalendar() {
     startTime: '',
     endDate: '',
     endTime: '',
-    attendees: '',
+    attendees: [''],
     allDay: false
   });
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [tempValue, setTempValue] = useState<string>('');
 
   useEffect(() => {
     fetchEvents();
@@ -95,6 +107,7 @@ export default function BigCalendar() {
   const fetchEvents = async () => {
     try {
       console.log('Fetching calendar events...');
+      
       const response = await fetch('/api/calendar/events');
       
       if (!response.ok) {
@@ -107,19 +120,67 @@ export default function BigCalendar() {
       if (data.error) {
         throw new Error(data.error + (data.details ? `: ${data.details}` : ''));
       }
+
+      // Get current user email from API response, session, or use existing
+      let userEmail = data.userEmail || currentUserEmail;
       
-      const formattedEvents = data.events?.map((event: GoogleCalendarEvent) => ({
-        id: event.id,
-        title: event.summary,
-        start: event.start?.dateTime || event.start?.date || '',
-        end: event.end?.dateTime || event.end?.date || '',
-        allDay: !event.start?.dateTime,
-        description: event.description,
-        location: event.location,
-        attendees: event.attendees?.map(a => a.email) || []
-      })) || [];
+      // If we still don't have user email, try to get it from session again
+      if (!userEmail) {
+        try {
+          const sessionResponse = await fetch('/api/auth/session');
+          if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json();
+            if (sessionData?.user?.email) {
+              userEmail = sessionData.user.email;
+              setCurrentUserEmail(userEmail);
+            }
+          }
+        } catch (sessionError) {
+          console.log('Could not fetch session for user email:', sessionError);
+        }
+      }
+      
+      // Update state if we got a new email
+      if (userEmail && userEmail !== currentUserEmail) {
+        setCurrentUserEmail(userEmail);
+      }
+      
+      console.log('Current user email:', userEmail);
+      
+      const formattedEvents = data.events?.map((event: GoogleCalendarEvent) => {
+        console.log('Processing event:', event.summary, 'Organizer:', event.organizer?.email, 'User:', userEmail);
+        
+        // Determine if this is an invitation (user is not the organizer)
+        const isInvitation = !!(event.organizer && userEmail && event.organizer.email !== userEmail);
+        
+        console.log('Is invitation?', isInvitation, 'for event:', event.summary);
+        
+        const calendarEvent: CalendarEvent = {
+          id: event.id,
+          title: event.summary,
+          start: event.start?.dateTime || event.start?.date || '',
+          end: event.end?.dateTime || event.end?.date || '',
+          allDay: !event.start?.dateTime,
+          description: event.description,
+          location: event.location,
+          attendees: event.attendees?.map(a => a.email) || [],
+          organizer: event.organizer,
+          isInvitation: isInvitation
+        };
+
+        // Style invitation events with white background and blue border
+        if (isInvitation) {
+          calendarEvent.backgroundColor = '#ffffff';
+          calendarEvent.borderColor = '#1B2E6E';
+          calendarEvent.textColor = '#1B2E6E';
+          console.log('Applied invitation styling to:', event.summary);
+        }
+
+        return calendarEvent;
+      }) || [];
       
       console.log('Formatted events:', formattedEvents);
+      console.log('Events with invitations:', formattedEvents.filter(e => e.isInvitation));
       setEvents(formattedEvents);
     } catch (error) {
       console.error('Failed to fetch events:', error);
@@ -142,7 +203,7 @@ export default function BigCalendar() {
       startTime: selectInfo.allDay ? '' : startDate.toTimeString().slice(0, 5),
       endDate: endDate.toISOString().split('T')[0],
       endTime: selectInfo.allDay ? '' : endDate.toTimeString().slice(0, 5),
-      attendees: '',
+      attendees: [''],
       allDay: selectInfo.allDay
     });
     
@@ -229,7 +290,7 @@ export default function BigCalendar() {
         ? eventFormData.endDate
         : `${eventFormData.endDate}T${eventFormData.endTime}:00`;
 
-      const attendeesList = eventFormData.attendees ? eventFormData.attendees.split(',').map(email => email.trim()).filter(email => email) : [];
+      const attendeesList = eventFormData.attendees.filter(email => email.trim());
       
       const eventData: {
         title: string;
@@ -278,7 +339,7 @@ export default function BigCalendar() {
           startTime: '',
           endDate: '',
           endTime: '',
-          attendees: '',
+          attendees: [''],
           allDay: false
         });
       } else {
@@ -305,7 +366,7 @@ export default function BigCalendar() {
         ? eventFormData.endDate
         : `${eventFormData.endDate}T${eventFormData.endTime}:00`;
 
-      const attendeesList = eventFormData.attendees ? eventFormData.attendees.split(',').map(email => email.trim()).filter(email => email) : [];
+      const attendeesList = eventFormData.attendees.filter(email => email.trim());
       
       const eventData: {
         title: string;
@@ -356,9 +417,103 @@ export default function BigCalendar() {
     }
   }, [selectedEvent, eventFormData, isSubmitting]);
 
-  const handleDeleteEvent = useCallback(async () => {
+  const addAttendeeField = useCallback(() => {
+    setEventFormData(prev => ({
+      ...prev,
+      attendees: [...prev.attendees, '']
+    }));
+  }, []);
+
+  const removeAttendeeField = useCallback((index: number) => {
+    setEventFormData(prev => ({
+      ...prev,
+      attendees: prev.attendees.filter((_, i) => i !== index)
+    }));
+  }, []);
+
+  const updateAttendeeField = useCallback((index: number, value: string) => {
+    setEventFormData(prev => ({
+      ...prev,
+      attendees: prev.attendees.map((email, i) => i === index ? value : email)
+    }));
+  }, []);
+
+  const startInlineEdit = useCallback((field: string, currentValue: string) => {
+    setEditingField(field);
+    setTempValue(currentValue);
+  }, []);
+
+  const saveInlineEdit = useCallback(async (field: string) => {
+    if (!selectedEvent) return;
+
+    const updatedData = { ...eventFormData };
+    if (field === 'title') updatedData.title = tempValue;
+    else if (field === 'description') updatedData.description = tempValue;
+    else if (field === 'startDate') updatedData.startDate = tempValue;
+    else if (field === 'startTime') updatedData.startTime = tempValue;
+    else if (field === 'endDate') updatedData.endDate = tempValue;
+    else if (field === 'endTime') updatedData.endTime = tempValue;
+
+    setEventFormData(updatedData);
+    setEditingField(null);
+    
+    // Auto-save the change
+    await handleUpdateEvent();
+  }, [selectedEvent, eventFormData, tempValue, handleUpdateEvent]);
+
+  const cancelInlineEdit = useCallback(() => {
+    setEditingField(null);
+    setTempValue('');
+  }, []);
+
+  const getCurrentUserResponse = useCallback((event: GoogleCalendarEvent) => {
+    if (!event.attendees || !currentUserEmail) return null;
+    const userAttendee = event.attendees.find(attendee => attendee.email === currentUserEmail);
+    return userAttendee?.responseStatus || null;
+  }, [currentUserEmail]);
+
+  const handleRSVPResponse = useCallback(async (responseStatus: 'accepted' | 'declined' | 'tentative') => {
     if (!selectedEvent || isSubmitting) return;
 
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`/api/calendar/events/${selectedEvent.id}/rsvp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: responseStatus }),
+      });
+
+      if (response.ok) {
+        // Refresh events to show updated RSVP status
+        await fetchEvents();
+        
+        // Update the selectedEvent to reflect the new status
+        const updatedEvent = { ...selectedEvent };
+        if (updatedEvent.attendees && currentUserEmail) {
+          updatedEvent.attendees = updatedEvent.attendees.map(attendee => 
+            attendee.email === currentUserEmail 
+              ? { ...attendee, responseStatus }
+              : attendee
+          );
+        }
+        setSelectedEvent(updatedEvent);
+        
+        console.log(`RSVP response ${responseStatus} sent successfully`);
+      } else {
+        console.error('Failed to send RSVP response:', await response.text());
+        alert('Failed to send RSVP response. Please try again.');
+      }
+    } catch (error) {
+      console.error('Failed to send RSVP response:', error);
+      alert('Failed to send RSVP response. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [selectedEvent, isSubmitting, currentUserEmail]);
+
+  const handleDeleteEvent = useCallback(async () => {
+    if (!selectedEvent || isSubmitting) return;
+the 
     if (confirm(`Delete event '${selectedEvent.summary}'?`)) {
       setIsSubmitting(true);
       try {
@@ -387,7 +542,7 @@ export default function BigCalendar() {
     const startDate = new Date(selectedEvent.start.dateTime || selectedEvent.start.date!);
     const endDate = new Date(selectedEvent.end.dateTime || selectedEvent.end.date!);
     
-    setEventFormData({
+    const formData = {
       title: selectedEvent.summary,
       description: selectedEvent.description || '',
       location: selectedEvent.location || '',
@@ -395,12 +550,33 @@ export default function BigCalendar() {
       startTime: selectedEvent.start.dateTime ? startDate.toTimeString().slice(0, 5) : '',
       endDate: endDate.toISOString().split('T')[0],
       endTime: selectedEvent.end.dateTime ? endDate.toTimeString().slice(0, 5) : '',
-      attendees: selectedEvent.attendees?.map(a => a.email).join(', ') || '',
+      attendees: selectedEvent.attendees?.map(a => a.email) || [''],
       allDay: !selectedEvent.start.dateTime
-    });
+    };
     
+    setEventFormData(formData);
     setIsEditing(true);
   }, [selectedEvent]);
+
+  // Initialize eventFormData for inline editing when event modal opens
+  useEffect(() => {
+    if (selectedEvent && !isEditing) {
+      const startDate = new Date(selectedEvent.start.dateTime || selectedEvent.start.date!);
+      const endDate = new Date(selectedEvent.end.dateTime || selectedEvent.end.date!);
+      
+      setEventFormData({
+        title: selectedEvent.summary,
+        description: selectedEvent.description || '',
+        location: selectedEvent.location || '',
+        startDate: startDate.toISOString().split('T')[0],
+        startTime: selectedEvent.start.dateTime ? startDate.toTimeString().slice(0, 5) : '',
+        endDate: endDate.toISOString().split('T')[0],
+        endTime: selectedEvent.end.dateTime ? endDate.toTimeString().slice(0, 5) : '',
+        attendees: selectedEvent.attendees?.map(a => a.email) || [''],
+        allDay: !selectedEvent.start.dateTime
+      });
+    }
+  }, [selectedEvent, isEditing]);
 
   if (loading) {
     return (
@@ -440,7 +616,7 @@ export default function BigCalendar() {
 
       {/* Create Event Modal */}
       <Sheet open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <SheetContent className="w-[90vw] max-w-md overflow-y-auto bg-white">
+        <SheetContent className="w-[90vw] max-w-md overflow-y-auto bg-white p-4">
           <SheetHeader className="pb-6">
             <SheetTitle className="flex items-center gap-2 text-blue">
               <Plus className="h-5 w-5" />
@@ -554,17 +730,43 @@ export default function BigCalendar() {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-900 flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                Attendees
-              </label>
-              <Input
-                value={eventFormData.attendees}
-                onChange={(e) => setEventFormData(prev => ({...prev, attendees: e.target.value}))}
-                placeholder="email1@example.com, email2@example.com"
-                className="border-gray-300 focus:border-blue focus:ring-blue"
-              />
-              <p className="text-xs text-gray-500">Separate multiple emails with commas</p>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-gray-900 flex items-center gap-1">
+                  <Users className="h-4 w-4" />
+                  Attendees
+                </label>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={addAttendeeField}
+                  className="h-7 px-2 text-xs"
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add
+                </Button>
+              </div>
+              {eventFormData.attendees.map((email, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input
+                    value={email}
+                    onChange={(e) => updateAttendeeField(index, e.target.value)}
+                    placeholder="attendee@example.com"
+                    className="border-gray-300 focus:border-blue focus:ring-blue"
+                  />
+                  {eventFormData.attendees.length > 1 && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => removeAttendeeField(index)}
+                      className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
           
@@ -590,7 +792,7 @@ export default function BigCalendar() {
 
       {/* Event Details Modal */}
       <Sheet open={showEventModal} onOpenChange={setShowEventModal}>
-        <SheetContent className="w-[90vw] max-w-md overflow-y-auto bg-white">
+        <SheetContent className="w-[90vw] max-w-md overflow-y-auto bg-white p-4">
           <SheetHeader className="pb-6">
             <SheetTitle className="flex items-center gap-2 text-blue">
               <Calendar className="h-5 w-5" />
@@ -704,45 +906,271 @@ export default function BigCalendar() {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-900 flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      Attendees
-                    </label>
-                    <Input
-                      value={eventFormData.attendees}
-                      onChange={(e) => setEventFormData(prev => ({...prev, attendees: e.target.value}))}
-                      placeholder="email1@example.com, email2@example.com"
-                      className="border-gray-300 focus:border-blue focus:ring-blue"
-                    />
-                    <p className="text-xs text-gray-500">Separate multiple emails with commas</p>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold text-gray-900 flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        Attendees
+                      </label>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={addAttendeeField}
+                        className="h-7 px-2 text-xs"
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                    {eventFormData.attendees.map((email, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={email}
+                          onChange={(e) => updateAttendeeField(index, e.target.value)}
+                          placeholder="attendee@example.com"
+                          className="border-gray-300 focus:border-blue focus:ring-blue"
+                        />
+                        {eventFormData.attendees.length > 1 && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => removeAttendeeField(index)}
+                            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </>
               ) : (
                 <>
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-lg text-gray-900">{selectedEvent.summary}</h3>
-                      {selectedEvent.description && (
-                        <p className="text-sm text-gray-600 mt-1">{selectedEvent.description}</p>
+                      {editingField === 'title' ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={tempValue}
+                            onChange={(e) => setTempValue(e.target.value)}
+                            className="font-semibold text-lg border-gray-300 focus:border-blue focus:ring-blue"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveInlineEdit('title');
+                              if (e.key === 'Escape') cancelInlineEdit();
+                            }}
+                            autoFocus
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => saveInlineEdit('title')}
+                            className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={cancelInlineEdit}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <h3 
+                          className="font-semibold text-lg text-gray-900 cursor-pointer hover:text-blue-600 hover:underline"
+                          onClick={() => startInlineEdit('title', selectedEvent.summary)}
+                        >
+                          {selectedEvent.summary}
+                        </h3>
+                      )}
+                      {editingField === 'description' ? (
+                        <div className="flex items-start gap-2 mt-1">
+                          <textarea
+                            value={tempValue}
+                            onChange={(e) => setTempValue(e.target.value)}
+                            className="min-h-[60px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.ctrlKey) saveInlineEdit('description');
+                              if (e.key === 'Escape') cancelInlineEdit();
+                            }}
+                            autoFocus
+                          />
+                          <div className="flex flex-col gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => saveInlineEdit('description')}
+                              className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={cancelInlineEdit}
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        selectedEvent.description && (
+                          <p 
+                            className="text-sm text-gray-600 mt-1 cursor-pointer hover:text-blue-600 hover:underline"
+                            onClick={() => startInlineEdit('description', selectedEvent.description || '')}
+                          >
+                            {selectedEvent.description}
+                          </p>
+                        )
+                      )}
+                      {!selectedEvent.description && editingField !== 'description' && (
+                        <p 
+                          className="text-sm text-gray-400 mt-1 cursor-pointer hover:text-blue-600 italic"
+                          onClick={() => startInlineEdit('description', '')}
+                        >
+                          Click to add description
+                        </p>
                       )}
                     </div>
                     
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">
-                          {new Date(selectedEvent.start.dateTime || selectedEvent.start.date!).toLocaleDateString()}
-                          {selectedEvent.start.dateTime && (
-                            <> at {new Date(selectedEvent.start.dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</>
-                          )}
-                        </span>
+                        {editingField === 'startDate' ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="date"
+                              value={tempValue}
+                              onChange={(e) => setTempValue(e.target.value)}
+                              className="text-sm w-40 border-gray-300 focus:border-blue focus:ring-blue"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveInlineEdit('startDate');
+                                if (e.key === 'Escape') cancelInlineEdit();
+                              }}
+                              autoFocus
+                            />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => saveInlineEdit('startDate')}
+                              className="h-7 w-7 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                            >
+                              <Check className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={cancelInlineEdit}
+                              className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <span 
+                            className="text-sm text-gray-700 cursor-pointer hover:text-blue-600 hover:underline"
+                            onClick={() => startInlineEdit('startDate', new Date(selectedEvent.start.dateTime || selectedEvent.start.date!).toISOString().split('T')[0])}
+                          >
+                            {new Date(selectedEvent.start.dateTime || selectedEvent.start.date!).toLocaleDateString()}
+                            {selectedEvent.start.dateTime && editingField === 'startTime' ? (
+                              <> at 
+                                <Input
+                                  type="time"
+                                  value={tempValue}
+                                  onChange={(e) => setTempValue(e.target.value)}
+                                  className="inline-block w-20 mx-1 text-sm border-gray-300 focus:border-blue focus:ring-blue"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') saveInlineEdit('startTime');
+                                    if (e.key === 'Escape') cancelInlineEdit();
+                                  }}
+                                  autoFocus
+                                />
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => saveInlineEdit('startTime')}
+                                  className="inline-block h-6 w-6 p-0 mx-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                >
+                                  <Check className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={cancelInlineEdit}
+                                  className="inline-block h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </>
+                            ) : (
+                              selectedEvent.start.dateTime && (
+                                <> at <span 
+                                  className="cursor-pointer hover:text-blue-600 hover:underline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    startInlineEdit('startTime', new Date(selectedEvent.start.dateTime!).toTimeString().slice(0, 5));
+                                  }}
+                                >
+                                  {new Date(selectedEvent.start.dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </span></>
+                              )
+                            )}
+                          </span>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-gray-500" />
                         <span className="text-sm text-gray-700">
                           {selectedEvent.start.dateTime ? (
-                            `${new Date(selectedEvent.start.dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(selectedEvent.end.dateTime!).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+                            <>
+                              {editingField === 'endTime' ? (
+                                <div className="inline-flex items-center gap-1">
+                                  <span>{new Date(selectedEvent.start.dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - </span>
+                                  <Input
+                                    type="time"
+                                    value={tempValue}
+                                    onChange={(e) => setTempValue(e.target.value)}
+                                    className="inline-block w-20 text-sm border-gray-300 focus:border-blue focus:ring-blue"
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') saveInlineEdit('endTime');
+                                      if (e.key === 'Escape') cancelInlineEdit();
+                                    }}
+                                    autoFocus
+                                  />
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => saveInlineEdit('endTime')}
+                                    className="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                  >
+                                    <Check className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={cancelInlineEdit}
+                                    className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <>
+                                  {new Date(selectedEvent.start.dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
+                                  <span 
+                                    className="cursor-pointer hover:text-blue-600 hover:underline"
+                                    onClick={() => startInlineEdit('endTime', new Date(selectedEvent.end.dateTime!).toTimeString().slice(0, 5))}
+                                  >
+                                    {new Date(selectedEvent.end.dateTime!).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                  </span>
+                                </>
+                              )}
+                            </>
                           ) : (
                             'All day'
                           )}
@@ -756,6 +1184,15 @@ export default function BigCalendar() {
                         </div>
                       )}
                       
+                      {selectedEvent.organizer && (
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-gray-500" />
+                          <span className="text-sm text-gray-700">
+                            <span className="font-medium">Organizer:</span> {selectedEvent.organizer.displayName || selectedEvent.organizer.email}
+                          </span>
+                        </div>
+                      )}
+                      
                       {selectedEvent.attendees && selectedEvent.attendees.length > 0 && (
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
@@ -764,17 +1201,71 @@ export default function BigCalendar() {
                           </div>
                           <div className="space-y-1 ml-6">
                             {selectedEvent.attendees.map((attendee, index) => (
-                              <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                              <div key={index} className="flex items-center justify-between text-sm text-gray-600">
                                 <span>{attendee.displayName || attendee.email}</span>
-                                {attendee.responseStatus && (
-                                  <span className={`px-1.5 py-0.5 rounded-xs text-xs ${
-                                    attendee.responseStatus === 'accepted' ? 'bg-green-100 text-green-700' :
-                                    attendee.responseStatus === 'declined' ? 'bg-red-100 text-red-700' :
-                                    attendee.responseStatus === 'tentative' ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-gray-100 text-gray-700'
-                                  }`}>
-                                    {attendee.responseStatus === 'needsAction' ? 'Pending' : attendee.responseStatus}
-                                  </span>
+                                {attendee.email === currentUserEmail && selectedEvent.organizer?.email !== currentUserEmail ? (
+                                  // Show dropdown for current user if it's an invitation
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild disabled={isSubmitting}>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-6 px-2 text-xs gap-1"
+                                      >
+                                        <span className={`flex items-center gap-1 ${
+                                          attendee.responseStatus === 'accepted' ? 'text-green-600' :
+                                          attendee.responseStatus === 'declined' ? 'text-red-600' :
+                                          attendee.responseStatus === 'tentative' ? 'text-yellow-600' :
+                                          'text-gray-600'
+                                        }`}>
+                                          {attendee.responseStatus === 'accepted' && <CheckCircle2 className="h-3 w-3" />}
+                                          {attendee.responseStatus === 'declined' && <XCircle className="h-3 w-3" />}
+                                          {attendee.responseStatus === 'tentative' && <HelpCircle className="h-3 w-3" />}
+                                          {(!attendee.responseStatus || attendee.responseStatus === 'needsAction') && <HelpCircle className="h-3 w-3" />}
+                                          {attendee.responseStatus === 'accepted' ? 'Yes' :
+                                           attendee.responseStatus === 'declined' ? 'No' :
+                                           attendee.responseStatus === 'tentative' ? 'Maybe' :
+                                           'Pending'}
+                                        </span>
+                                        <ChevronDown className="h-3 w-3" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-20">
+                                      <DropdownMenuItem 
+                                        onClick={() => handleRSVPResponse('accepted')}
+                                        className="text-xs cursor-pointer"
+                                      >
+                                        <CheckCircle2 className="h-3 w-3 text-green-600 mr-1" />
+                                        Yes
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem 
+                                        onClick={() => handleRSVPResponse('tentative')}
+                                        className="text-xs cursor-pointer"
+                                      >
+                                        <HelpCircle className="h-3 w-3 text-yellow-600 mr-1" />
+                                        Maybe
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem 
+                                        onClick={() => handleRSVPResponse('declined')}
+                                        className="text-xs cursor-pointer"
+                                      >
+                                        <XCircle className="h-3 w-3 text-red-600 mr-1" />
+                                        No
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                ) : (
+                                  // Show status badge for other attendees or non-invitations
+                                  attendee.responseStatus && (
+                                    <span className={`px-1.5 py-0.5 rounded-xs text-xs ${
+                                      attendee.responseStatus === 'accepted' ? 'bg-green-100 text-green-700' :
+                                      attendee.responseStatus === 'declined' ? 'bg-red-100 text-red-700' :
+                                      attendee.responseStatus === 'tentative' ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-gray-100 text-gray-700'
+                                    }`}>
+                                      {attendee.responseStatus === 'needsAction' ? 'Pending' : attendee.responseStatus}
+                                    </span>
+                                  )
                                 )}
                               </div>
                             ))}
@@ -805,6 +1296,7 @@ export default function BigCalendar() {
             </div>
           )}
           
+
           <div className="flex justify-end gap-3 pt-6 mt-6 border-t">
             {!isEditing ? (
               <>
@@ -815,23 +1307,28 @@ export default function BigCalendar() {
                 >
                   Close
                 </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={startEditMode}
-                  className="border-blue text-blue hover:bg-blue/10"
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleDeleteEvent}
-                  disabled={isSubmitting}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  {isSubmitting ? 'Deleting...' : 'Delete'}
-                </Button>
+                {/* Only show Edit and Delete for events the user owns */}
+                {selectedEvent && (!selectedEvent.organizer || !currentUserEmail || selectedEvent.organizer.email === currentUserEmail) && (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      onClick={startEditMode}
+                      className="border-blue text-blue hover:bg-blue/10"
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      onClick={handleDeleteEvent}
+                      disabled={isSubmitting}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      {isSubmitting ? 'Deleting...' : 'Delete'}
+                    </Button>
+                  </>
+                )}
               </>
             ) : (
               <>
