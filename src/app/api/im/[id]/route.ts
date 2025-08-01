@@ -78,6 +78,16 @@ export async function PUT(
       status
     } = body
 
+    // Convert status if provided
+    let prismaStatus = undefined
+    if (status) {
+      if (status === 'active') {
+        prismaStatus = 'ACTIVE'
+      } else if (status === 'inactive') {
+        prismaStatus = 'INACTIVE'
+      }
+    }
+
     const updatedIM = await prisma.iM.update({
       where: {
         id: params.id
@@ -101,7 +111,7 @@ export async function PUT(
         authorizedReceiver,
         fbLink,
         imFilesLink,
-        status
+        ...(prismaStatus && { status: prismaStatus })
       },
       include: {
         registeredByUser: {
