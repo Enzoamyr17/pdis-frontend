@@ -308,16 +308,10 @@ export default function BigCalendar() {
         startDateTime = eventFormData.startDate;
         endDateTime = eventFormData.endDate;
       } else {
-        // Create date objects and convert to UTC+8
-        const startDateLocal = new Date(`${eventFormData.startDate}T${eventFormData.startTime}:00`);
-        const endDateLocal = new Date(`${eventFormData.endDate}T${eventFormData.endTime}:00`);
-        
-        // Convert to UTC+8 by adding 8 hours to the local time
-        const startDateUTC8 = new Date(startDateLocal.getTime() + (8 * 60 * 60 * 1000));
-        const endDateUTC8 = new Date(endDateLocal.getTime() + (8 * 60 * 60 * 1000));
-        
-        startDateTime = startDateUTC8.toISOString();
-        endDateTime = endDateUTC8.toISOString();
+        // Use the datetime as intended by the user without timezone conversion
+        // The backend will handle timezone properly with 'Asia/Manila'
+        startDateTime = `${eventFormData.startDate}T${eventFormData.startTime}:00`;
+        endDateTime = `${eventFormData.endDate}T${eventFormData.endTime}:00`;
       }
 
       const attendeesList = eventFormData.attendees.filter(email => email.trim());
@@ -397,16 +391,10 @@ export default function BigCalendar() {
         startDateTime = eventFormData.startDate;
         endDateTime = eventFormData.endDate;
       } else {
-        // Create date objects and convert to UTC+8
-        const startDateLocal = new Date(`${eventFormData.startDate}T${eventFormData.startTime}:00`);
-        const endDateLocal = new Date(`${eventFormData.endDate}T${eventFormData.endTime}:00`);
-        
-        // Convert to UTC+8 by adding 8 hours to the local time
-        const startDateUTC8 = new Date(startDateLocal.getTime() + (8 * 60 * 60 * 1000));
-        const endDateUTC8 = new Date(endDateLocal.getTime() + (8 * 60 * 60 * 1000));
-        
-        startDateTime = startDateUTC8.toISOString();
-        endDateTime = endDateUTC8.toISOString();
+        // Use the datetime as intended by the user without timezone conversion
+        // The backend will handle timezone properly with 'Asia/Manila'
+        startDateTime = `${eventFormData.startDate}T${eventFormData.startTime}:00`;
+        endDateTime = `${eventFormData.endDate}T${eventFormData.endTime}:00`;
       }
 
       const attendeesList = eventFormData.attendees.filter(email => email.trim());
