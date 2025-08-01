@@ -11,6 +11,7 @@ interface IMClearanceFormData {
   clearanceRequestor: string
   department: string
   dateOfRequest: string
+  targetReleaseDate: string
   coverageFromDate: string
   coverageToDate: string
   clearanceRequestorRemarks: string
@@ -37,6 +38,7 @@ interface IMPersonnel {
   ownGcash: string
   authGcash: string
   authGcashAccName: string
+  isSaved: boolean
 }
 
 
@@ -57,6 +59,7 @@ export default function IMClearanceFormModule() {
     clearanceRequestor: '',
     department: '',
     dateOfRequest: new Date().toISOString().split('T')[0],
+    targetReleaseDate: '',
     coverageFromDate: '',
     coverageToDate: '',
     clearanceRequestorRemarks: '',
@@ -83,7 +86,8 @@ export default function IMClearanceFormModule() {
       },
       ownGcash: '',
       authGcash: '',
-      authGcashAccName: ''
+      authGcashAccName: '',
+      isSaved: false
     }
   ])
 
@@ -144,6 +148,13 @@ export default function IMClearanceFormModule() {
   }
 
   const addPersonnel = () => {
+    // Check if all existing personnel are saved
+    const hasUnsavedPersonnel = personnelList.some(person => !person.isSaved)
+    if (hasUnsavedPersonnel) {
+      alert('Please save all existing IM entries before adding a new one.')
+      return
+    }
+
     const newPersonnel: IMPersonnel = {
       id: Date.now().toString(),
       registeredName: '',
@@ -161,7 +172,8 @@ export default function IMClearanceFormModule() {
       },
       ownGcash: '',
       authGcash: '',
-      authGcashAccName: ''
+      authGcashAccName: '',
+      isSaved: false
     }
     setPersonnelList(prev => [...prev, newPersonnel])
   }
@@ -170,6 +182,29 @@ export default function IMClearanceFormModule() {
     if (personnelList.length > 1) {
       setPersonnelList(prev => prev.filter(person => person.id !== id))
     }
+  }
+
+  const savePersonnel = (id: string) => {
+    const person = personnelList.find(p => p.id === id)
+    if (!person) return
+
+    // Validate required fields
+    if (!person.registeredName || !person.position || !person.outletVenue) {
+      alert('Please fill in all required fields (Registered Name, Position, Outlet/Venue) before saving.')
+      return
+    }
+
+    // Check if either packaged fee or at least one daily fee is filled
+    const hasFees = person.packagedFee > 0 || Object.values(person.dailyFees).some(fee => fee > 0)
+    if (!hasFees) {
+      alert('Please enter either a packaged fee or daily fees before saving.')
+      return
+    }
+
+    setPersonnelList(prev => prev.map(p => 
+      p.id === id ? { ...p, isSaved: true } : p
+    ))
+    alert(`IM #${personnelList.findIndex(p => p.id === id) + 1} saved successfully!`)
   }
 
 
@@ -263,6 +298,18 @@ export default function IMClearanceFormModule() {
               </div>
               
               <div className="w-[30%] min-w-[18rem] flex-grow-1">
+                <label className={labelClasses}>Target Release Date</label>
+                <input
+                  type="date"
+                  name="targetReleaseDate"
+                  value={formData.targetReleaseDate}
+                  onChange={handleInputChange}
+                  className={inputClasses}
+                  required
+                />
+              </div>
+              
+              <div className="w-[30%] min-w-[18rem] flex-grow-1">
                 <label className={labelClasses}>Project Name / Budget Code</label>
                 <select
                   name="projectName"
@@ -277,8 +324,10 @@ export default function IMClearanceFormModule() {
                   ))}
                 </select>
               </div>
-              
-              <div className="w-[30%] min-w-[18rem] flex-grow-1">
+            </div>
+            
+            <div className="flex flex-wrap gap-2 w-full">
+              <div className="w-[46%] min-w-[24rem] flex-grow-1">
                 <label className={labelClasses}>CEPD No.</label>
                 <input
                   type="text"
@@ -350,17 +399,34 @@ export default function IMClearanceFormModule() {
             {personnelList.map((person, index) => (
               <div key={person.id} className="mb-6 p-4 bg-white/70 rounded-lg border-l-4 border-orange shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-blue/90">IM #{index + 1}</h3>
-                  {personnelList.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removePersonnel(person.id)}
-                      className="flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Remove
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-blue/90">IM #{index + 1}</h3>
+                    {person.isSaved && (
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Saved</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!person.isSaved && (
+                      <button
+                        type="button"
+                        onClick={() => savePersonnel(person.id)}
+                        className="flex items-center gap-1 px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                      >
+                        <Save className="w-3 h-3" />
+                        Save IM #{index + 1}
+                      </button>
+                    )}
+                    {personnelList.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removePersonnel(person.id)}
+                        className="flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Remove
+                      </button>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Basic Information */}
@@ -371,8 +437,9 @@ export default function IMClearanceFormModule() {
                       type="text"
                       value={person.registeredName}
                       onChange={(e) => handlePersonnelChange(person.id, 'registeredName', e.target.value)}
-                      className={inputClasses}
+                      className={person.isSaved ? disabledInputClasses : inputClasses}
                       required
+                      disabled={person.isSaved}
                     />
                   </div>
                   
@@ -382,8 +449,9 @@ export default function IMClearanceFormModule() {
                       type="text"
                       value={person.position}
                       onChange={(e) => handlePersonnelChange(person.id, 'position', e.target.value)}
-                      className={inputClasses}
+                      className={person.isSaved ? disabledInputClasses : inputClasses}
                       required
+                      disabled={person.isSaved}
                     />
                   </div>
                   
@@ -393,8 +461,9 @@ export default function IMClearanceFormModule() {
                       type="text"
                       value={person.outletVenue}
                       onChange={(e) => handlePersonnelChange(person.id, 'outletVenue', e.target.value)}
-                      className={inputClasses}
+                      className={person.isSaved ? disabledInputClasses : inputClasses}
                       required
+                      disabled={person.isSaved}
                     />
                   </div>
                   
@@ -420,11 +489,11 @@ export default function IMClearanceFormModule() {
                         }
                         handlePersonnelChange(person.id, 'packagedFee', value)
                       }}
-                      className={Object.values(person.dailyFees).some(fee => fee > 0) ? disabledInputClasses : inputClasses}
+                      className={Object.values(person.dailyFees).some(fee => fee > 0) || person.isSaved ? disabledInputClasses : inputClasses}
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      disabled={Object.values(person.dailyFees).some(fee => fee > 0)}
+                      disabled={Object.values(person.dailyFees).some(fee => fee > 0) || person.isSaved}
                     />
                   </div>
                 </div>
@@ -448,11 +517,11 @@ export default function IMClearanceFormModule() {
                             const newDailyFees = { ...person.dailyFees, [day]: value }
                             handlePersonnelChange(person.id, 'dailyFees', newDailyFees)
                           }}
-                          className={person.packagedFee > 0 ? disabledInputClasses : inputClasses}
+                          className={person.packagedFee > 0 || person.isSaved ? disabledInputClasses : inputClasses}
                           min="0"
                           step="0.01"
                           placeholder="0.00"
-                          disabled={person.packagedFee > 0}
+                          disabled={person.packagedFee > 0 || person.isSaved}
                         />
                       </div>
                     ))}
@@ -469,8 +538,9 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.ownGcash}
                         onChange={(e) => handlePersonnelChange(person.id, 'ownGcash', e.target.value)}
-                        className={inputClasses}
+                        className={person.isSaved ? disabledInputClasses : inputClasses}
                         placeholder="09XX XXX XXXX"
+                        disabled={person.isSaved}
                       />
                     </div>
                     
@@ -480,8 +550,9 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.authGcash}
                         onChange={(e) => handlePersonnelChange(person.id, 'authGcash', e.target.value)}
-                        className={inputClasses}
+                        className={person.isSaved ? disabledInputClasses : inputClasses}
                         placeholder="09XX XXX XXXX"
+                        disabled={person.isSaved}
                       />
                     </div>
                     
@@ -491,8 +562,9 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.authGcashAccName}
                         onChange={(e) => handlePersonnelChange(person.id, 'authGcashAccName', e.target.value)}
-                        className={inputClasses}
+                        className={person.isSaved ? disabledInputClasses : inputClasses}
                         placeholder="Full Name"
+                        disabled={person.isSaved}
                       />
                     </div>
                   </div>

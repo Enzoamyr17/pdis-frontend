@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, IMStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -78,6 +78,16 @@ export async function PUT(
       status
     } = body
 
+    // Convert status if provided
+    let prismaStatus: IMStatus | undefined = undefined
+    if (status) {
+      if (status === 'active') {
+        prismaStatus = IMStatus.ACTIVE
+      } else if (status === 'inactive') {
+        prismaStatus = IMStatus.INACTIVE
+      }
+    }
+
     const updatedIM = await prisma.iM.update({
       where: {
         id: params.id
@@ -101,7 +111,7 @@ export async function PUT(
         authorizedReceiver,
         fbLink,
         imFilesLink,
-        status
+        ...(prismaStatus ? { status: prismaStatus } : {})
       },
       include: {
         registeredByUser: {
