@@ -159,28 +159,6 @@ export default function BigCalendar() {
 
   return (
     <div className="p-4">
-      {/* Debug info - remove this once calendar is working */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mb-4 p-3 bg-blue/10 border border-blue/20 rounded">
-          <div className="text-sm font-medium text-blue mb-2">🔍 Debug Information</div>
-          <div className="text-xs text-blue/80 space-y-1">
-            <div><strong>Events found:</strong> {events.length}</div>
-            {events.length === 0 && (
-              <div className="mt-2 p-2 bg-yellow/10 border border-yellow/30 rounded text-yellow-800">
-                <div className="font-medium">⚠️ No events loaded</div>
-                <div className="mt-1">Check the browser console and server logs for detailed error information.</div>
-                <div className="mt-1">Common issues:</div>
-                <ul className="ml-4 list-disc text-xs">
-                  <li>Google authentication expired - try logging out and back in</li>
-                  <li>Missing calendar permissions in Google account</li>
-                  <li>Server configuration issues</li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-      
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         headerToolbar={{

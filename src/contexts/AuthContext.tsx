@@ -17,7 +17,14 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   return (
-    <SessionProvider>
+    <SessionProvider
+      // Reduce session polling interval from default 4 minutes to 10 minutes
+      refetchInterval={10 * 60} // 10 minutes
+      // Only refetch session when window regains focus after 5 minutes
+      refetchOnWindowFocus={false}
+      // Disable automatic refetch when user comes back online
+      refetchWhenOffline={false}
+    >
       <AuthContext.Provider value={{}}>
         {children}
       </AuthContext.Provider>

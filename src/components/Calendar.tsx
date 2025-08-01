@@ -8,13 +8,28 @@ import { EventClickArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
 
 interface CalendarEvent {
-  title: string
-  date?: string // Make optional
-  backgroundColor?: string
-  borderColor?: string
-  textColor?: string
-  start?: string // For multi-day events
-  end?: string // For multi-day events
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  allDay?: boolean;
+}
+
+// Google Calendar API response types
+interface GoogleCalendarDateTime {
+  dateTime?: string;
+  date?: string;
+  timeZone?: string;
+}
+
+interface GoogleCalendarEvent {
+  id: string;
+  summary: string;
+  description?: string;
+  start: GoogleCalendarDateTime;
+  end: GoogleCalendarDateTime;
+  status?: string;
+  location?: string;
 }
 
 interface CalendarProps {
@@ -24,21 +39,53 @@ interface CalendarProps {
   className?: string
 }
 
+// Helper function to get UTC+8 date string
+const getUTC8DateString = () => {
+  const now = new Date();
+  const utc8Date = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+  return utc8Date.toISOString().split('T')[0];
+};
+
 export default function Calendar({ 
-  events = [],
   onEventClick,
   onDateClick,
   className = ""
 }: CalendarProps) {
   const [isClient, setIsClient] = useState(false)
   const [forceUpdate, setForceUpdate] = useState(0)
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
+  const [loading, setLoading] = useState(true)
+  const [currentDateKey, setCurrentDateKey] = useState(() => getUTC8DateString())
   const calendarRef = useRef<FullCalendar>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Ensure client-side hydration
   useEffect(() => {
     setIsClient(true)
+    fetchTodaysEvents()
   }, [])
+
+  // Check for date changes periodically
+  useEffect(() => {
+    const checkDateChange = () => {
+      const newDateKey = getUTC8DateString()
+      if (newDateKey !== currentDateKey) {
+        console.log('Date changed from', currentDateKey, 'to', newDateKey)
+        setCurrentDateKey(newDateKey)
+        setLoading(true)
+        fetchTodaysEvents()
+        setForceUpdate(prev => prev + 1)
+      }
+    }
+
+    // Check every minute for date changes
+    const interval = setInterval(checkDateChange, 60000)
+    
+    // Also check immediately
+    checkDateChange()
+
+    return () => clearInterval(interval)
+  }, [currentDateKey])
 
   // Handle resize events to force calendar re-render
   useEffect(() => {
@@ -59,95 +106,47 @@ export default function Calendar({
     }
   }, [isClient])
 
-  const today = new Date();
-  const addDays = (days: number) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + days);
-    return d.toISOString();
+  const fetchTodaysEvents = async () => {
+    try {
+      const response = await fetch('/api/calendar/events');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        console.error('Calendar API error:', data.error);
+        setCalendarEvents([]);
+        return;
+      }
+      
+      const todayStr = getUTC8DateString();
+      console.log('Mini calendar - Current date (UTC+8):', todayStr);
+      
+      const todaysEvents = data.events?.filter((event: GoogleCalendarEvent) => {
+        const eventDate = event.start?.dateTime || event.start?.date || '';
+        const eventDateStr = eventDate.split('T')[0];
+        return eventDateStr === todayStr;
+      }).map((event: GoogleCalendarEvent) => ({
+        id: event.id,
+        title: event.summary,
+        start: event.start?.dateTime || event.start?.date || '',
+        end: event.end?.dateTime || event.end?.date || '',
+        allDay: !event.start?.dateTime,
+      })) || [];
+      
+      setCalendarEvents(todaysEvents);
+    } catch (error) {
+      console.error('Failed to fetch today\'s events:', error);
+      setCalendarEvents([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const defaultEvents: CalendarEvent[] = [
-    // Multiple events on the same day (today)
-    {
-      title: 'Morning Standup',
-      date: addDays(0),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#3b82f6',
-      textColor: 'white'
-    },
-    {
-      title: 'Design Review',
-      date: addDays(0),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#f59e42',
-      textColor: 'white'
-    },
-    {
-      title: 'Client Call',
-      date: addDays(0),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#f43f5e',
-      textColor: 'white'
-    },
-    // 2-day event
-    {
-      title: 'Sprint Planning',
-      start: addDays(0),
-      end: addDays(2), // end is exclusive, so this covers 2 days
-      backgroundColor: '#1B2E6E',
-      borderColor: '#10b981',
-      textColor: 'white'
-    },
-    // Long event (4 days)
-    {
-      title: 'Hackathon',
-      start: addDays(4),
-      end: addDays(8), // 4 days
-      backgroundColor: '#1B2E6E',
-      borderColor: '#6366f1',
-      textColor: 'white'
-    },
-    // Other single-day events
-    {
-      title: 'Team Lunch',
-      date: addDays(2),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#eab308',
-      textColor: 'white'
-    },
-    {
-      title: 'Demo Day',
-      date: addDays(3),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#0ea5e9',
-      textColor: 'white'
-    },
-    {
-      title: '1:1 with Manager',
-      date: addDays(5),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#14b8a6',
-      textColor: 'white'
-    },
-    {
-      title: 'Retrospective',
-      date: addDays(7),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#a21caf',
-      textColor: 'white'
-    },
-    {
-      title: 'Sprint Start',
-      date: addDays(9),
-      backgroundColor: '#1B2E6E',
-      borderColor: '#f97316',
-      textColor: 'white'
-    }
-  ];
-
-  const calendarEvents = events.length > 0 ? events : defaultEvents
-
-  if (!isClient) {
+  if (!isClient || loading) {
     return (
       <div className={`h-full minimal-calendar ${className}`}>
         <div className="flex items-center justify-center h-full text-zinc-500 text-sm">
@@ -161,7 +160,7 @@ export default function Calendar({
     <div ref={containerRef} className={`h-full minimal-calendar ${className}`}>
       <FullCalendar
         ref={calendarRef}
-        key={forceUpdate} // Force re-render when size changes
+        key={`${forceUpdate}-${currentDateKey}`} // Force re-render when size changes or date changes
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridDay"
         headerToolbar={{
@@ -172,7 +171,10 @@ export default function Calendar({
         dayHeaderFormat={{ weekday: 'short' }}
         dayHeaders={false}
         height="100%"
-        validRange={{ start: today.toISOString().split('T')[0], end: today.toISOString().split('T')[0] }}
+        validRange={(() => {
+          const dateStr = getUTC8DateString();
+          return { start: dateStr, end: dateStr };
+        })()}
         moreLinkClick="popover"
         eventDisplay="block"
         showNonCurrentDates={false}
@@ -196,14 +198,14 @@ export default function Calendar({
         
         .minimal-calendar .fc-toolbar-title {
           font-size: 14px !important;
-          font-weight: 600;
-          color: #3b82f6;
+          font-weight: 600 !important;
+          color: var(--color-blue) !important;
         }
         
         .minimal-calendar .fc-button {
           background: transparent !important;
           border: 1px solid #e4e4e7 !important;
-          color: #3b82f6 !important;
+          color: var(--color-blue) !important;
           font-size: 11px !important;
           padding: 2px 8px !important;
           height: 24px !important;
@@ -213,7 +215,7 @@ export default function Calendar({
         
         .minimal-calendar .fc-button:hover {
           background: #f1f5f9 !important;
-          border-color: #3b82f6 !important;
+          border-color: var(--color-blue) !important;
         }
         
         .minimal-calendar .fc-button:focus,
@@ -254,12 +256,12 @@ export default function Calendar({
         }
         
         .minimal-calendar .fc-daygrid-day.fc-day-today {
-          background: rgba(59, 130, 246, 0.05);
+          background: color-mix(in srgb, var(--color-blue) 5%, transparent) !important;
         }
         
         .minimal-calendar .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-          color: #3b82f6;
-          font-weight: 600;
+          color: var(--color-blue) !important;
+          font-weight: 600 !important;
         }
         
         .minimal-calendar .fc-event {

@@ -7,6 +7,10 @@ import bcrypt from "bcryptjs"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt", // Use JWT for credentials compatibility
+    maxAge: 24 * 60 * 60, // 24 hours
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -71,10 +75,42 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async session({ session, user }) {
-      if (user && session.user) {
-        session.user.id = user.id
-        session.user.profileCompleted = user.profileCompleted || false
+    async jwt({ token, user, account, trigger }) {
+      // Initial sign in
+      if (account && user) {
+        token.id = user.id
+        token.provider = account.provider
+        
+        // For credentials provider, get profile completion status from database
+        if (account.provider === "credentials") {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { profileCompleted: true }
+          })
+          token.profileCompleted = dbUser?.profileCompleted || false
+        } else {
+          // For OAuth providers, check profile completion
+          token.profileCompleted = user.profileCompleted || false
+        }
+      }
+      
+      // Handle session update trigger (when profile is completed)
+      if (trigger === "update" && token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { profileCompleted: true }
+        })
+        token.profileCompleted = dbUser?.profileCompleted || false
+      }
+      
+      return token
+    },
+    async session({ session, token }) {
+      // Send properties to the client
+      if (token) {
+        session.user.id = token.id as string
+        session.user.profileCompleted = token.profileCompleted as boolean
+        session.user.provider = token.provider as string
       }
       return session
     },
@@ -88,22 +124,24 @@ export const authOptions: NextAuthOptions = {
           userId: user?.id
         });
         
-        // If no refresh token is provided, clean up any existing account
-        // to force a fresh authorization next time
+        // Only worry about refresh token on first-time authorization
         if (!account.refresh_token && user?.id) {
-          console.warn('No refresh token received. Cleaning up existing account to force re-authorization.');
+          console.log('No refresh token received - checking if existing account has one...');
           try {
-            await prisma.account.deleteMany({
+            const existingAccount = await prisma.account.findFirst({
               where: {
                 userId: user.id,
                 provider: "google"
               }
             });
-            console.log('Existing Google account deleted. User will need to re-authorize.');
-            // Return false to prevent storing an account without refresh token
-            return false;
+            
+            if (existingAccount?.refresh_token) {
+              console.log('Existing account has refresh token - allowing sign in');
+            } else {
+              console.warn('No existing refresh token found. User may need to re-authorize for calendar features.');
+            }
           } catch (error) {
-            console.error('Error cleaning up account:', error);
+            console.error('Error checking existing account:', error);
           }
         }
         
@@ -114,7 +152,15 @@ export const authOptions: NextAuthOptions = {
         }
         
         console.log('Google OAuth successful - tokens will be stored by PrismaAdapter');
+        return true
       }
+      
+      // Handle credentials provider sign in
+      if (account?.provider === "credentials") {
+        console.log('Credentials sign in successful for user:', user?.email);
+        return true
+      }
+      
       return true
     }
   },

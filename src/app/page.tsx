@@ -1,11 +1,12 @@
 "use client"
-import { useSession, signIn, getSession } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
+import { useOptimizedSession } from "@/hooks/useOptimizedSession";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useOptimizedSession();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,18 +36,27 @@ export default function Home() {
     setError("");
 
     try {
+      console.log('Attempting credentials login for:', email);
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
+      console.log('Login result:', result);
+
       if (result?.error) {
+        console.error('Login error:', result.error);
         setError("Invalid email or password");
-      } else {
+      } else if (result?.ok) {
+        console.log('Login successful, checking profile...');
         await checkProfileAndRedirect();
+      } else {
+        console.error('Unexpected login result:', result);
+        setError("Login failed. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error('Login exception:', error);
       setError("An error occurred during login");
     } finally {
       setIsLoading(false);

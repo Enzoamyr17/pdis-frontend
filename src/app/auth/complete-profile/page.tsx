@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
+import { useOptimizedSession, clearSessionCache } from "@/hooks/useOptimizedSession"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Image from "next/image"
@@ -48,7 +49,8 @@ const departments = {
 // PSGC data will be loaded dynamically
 
 export default function CompleteProfilePage() {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useOptimizedSession()
+  const { update } = useSession()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -244,7 +246,14 @@ export default function CompleteProfilePage() {
         throw new Error(errorData.error || "Profile completion failed")
       }
 
-      router.push("/dashboard")
+      // Clear session cache and update session to reflect profile completion
+      clearSessionCache()
+      await update()
+      
+      // Small delay to ensure session is updated before navigation
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 100)
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred")
     } finally {

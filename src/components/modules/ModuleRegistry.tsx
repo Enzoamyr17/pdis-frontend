@@ -17,7 +17,7 @@ import BulletinsAdvisoriesModule from './BulletinsAdvisoriesModule'
 import PerformanceManagementModule from './PerformanceManagementModule'
 import UserCreationModule from './UserCreationModule'
 import ClientRegistrationModule from './ClientRegistrationModule'
-import IMRegistrationModule from './IMRegistrationModule'
+import IndependentManpowerModule from './IndependentManpowerModule'
 import CreationOfJOModule from './CreationOfJOModule'
 import CreationOfPEPModule from './CreationOfPEPModule'
 import BigCalendarModule from './BigCalendarModule'
@@ -136,8 +136,8 @@ export const moduleRegistry: Record<string, ModuleData> = {
   },
   'im-registration': {
     id: 'im-registration',
-    title: 'IM Registration',
-    component: IMRegistrationModule
+    title: 'Independent Manpower',
+    component: IndependentManpowerModule
   },
 
   // GenOps Tools modules

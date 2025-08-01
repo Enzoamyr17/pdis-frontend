@@ -9,11 +9,20 @@ declare module "next-auth" {
       email?: string | null
       image?: string | null
       profileCompleted?: boolean
+      provider?: string
     }
   }
 
   interface User {
     profileCompleted?: boolean
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string
+    profileCompleted?: boolean
+    provider?: string
   }
 }
 

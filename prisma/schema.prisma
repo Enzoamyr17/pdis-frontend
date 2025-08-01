@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,17 +13,19 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@index([provider])
+  @@index([expires_at])
 }
 
 model Session {
@@ -38,41 +34,46 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?   // For email/password auth
-  accounts      Account[]
-  sessions      Session[]
-
-  // Employee Vital Records - nullable initially for profile completion flow
+  id               String       @id @default(cuid())
+  name             String?
+  email            String       @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
   lastName         String?
   firstName        String?
   middleName       String?
   position         String?
-  idNumber         String?        @unique
+  idNumber         String?      @unique
   employmentDate   DateTime?
   office           Office?
   group            Group?
   department       Department?
   contactNumber    String?
-  pdEmail          String?        @unique // Main work email
-  personalEmail    String?        @unique // Personal email
+  pdEmail          String?      @unique
+  personalEmail    String?      @unique
   birthdate        DateTime?
   addressId        String?
-  address          Address?       @relation(fields: [addressId], references: [id])
+  profileCompleted Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  accounts         Account[]
+  registeredIMs    IM[]
   permissions      Permission[]
+  sessions         Session[]
+  address          Address?     @relation(fields: [addressId], references: [id])
 
-  // Profile completion status
-  profileCompleted Boolean        @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@index([office])
+  @@index([group])
+  @@index([department])
+  @@index([profileCompleted])
+  @@index([createdAt])
 }
 
 model VerificationToken {
@@ -84,18 +85,17 @@ model VerificationToken {
 }
 
 model Address {
-  id             String  @id @default(cuid())
-  houseNo        String
-  street         String
-  subdivision    String?
-  region         String
-  province       String? // Nullable if Region is NCR
+  id               String   @id @default(cuid())
+  houseNo          String
+  street           String
+  subdivision      String?
+  region           String
+  province         String?
   cityMunicipality String
-  barangay       String
-  users          User[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  barangay         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  users            User[]
 }
 
 model Permission {
@@ -106,6 +106,41 @@ model Permission {
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, module])
+  @@index([module])
+  @@index([modulePermission])
+}
+
+model IM {
+  id                 String    @id @default(cuid())
+  imNumber           String    @unique
+  lastName           String
+  firstName          String
+  middleName         String
+  birthday           DateTime
+  contactNo          String
+  email              String
+  houseNo            String?
+  street             String?
+  subdivision        String?
+  region             String?
+  province           String?
+  cityMunicipality   String?
+  barangay           String?
+  ownGcash           String?
+  authorizedGcash    String?
+  authorizedReceiver String?
+  fbLink             String?
+  imFilesLink        String?
+  status             IMStatus? @default(ACTIVE)
+  registeredBy       String?
+  createdAt          DateTime? @default(now())
+  updatedAt          DateTime? @updatedAt
+  registeredByUser   User?     @relation(fields: [registeredBy], references: [id])
+
+  @@index([imNumber])
+  @@index([status])
+  @@index([registeredBy])
+  @@index([createdAt])
 }
 
 enum Office {
@@ -114,33 +149,31 @@ enum Office {
 }
 
 enum Group {
-  ASG  // Administrative Support Group
-  AFG  // Accounting Finance Group  
-  SOG  // Sales and Operations Group
-  CG   // Creatives Group
+  ASG
+  AFG
+  SOG
+  CG
 }
 
 enum Department {
-  // ASG Departments
-  ASSETS_AND_PROPERTY_MANAGEMENT    // under ASG
-  PEOPLE_MANAGEMENT                 // under ASG
-  
-  // AFG Departments  
-  ACCOUNTS_PAYABLE                  // under AFG
-  ACCOUNTS_RECEIVABLE               // under AFG
-  TREASURY                          // under AFG
-  
-  // SOG Departments
-  BUSINESS_UNIT_1                   // under SOG
-  BUSINESS_UNIT_2                   // under SOG
-  BUSINESS_DEVELOPMENT              // under SOG
-  
-  // CG Departments
-  DESIGN_AND_MULTIMEDIA             // under CG
-  COPY_AND_DIGITAL                  // under CG
+  ASSETS_AND_PROPERTY_MANAGEMENT
+  PEOPLE_MANAGEMENT
+  ACCOUNTS_PAYABLE
+  ACCOUNTS_RECEIVABLE
+  TREASURY
+  BUSINESS_UNIT_1
+  BUSINESS_UNIT_2
+  BUSINESS_DEVELOPMENT
+  DESIGN_AND_MULTIMEDIA
+  COPY_AND_DIGITAL
 }
 
 enum ModulePermission {
   REQUESTOR
   APPROVER
+}
+
+enum IMStatus {
+  ACTIVE
+  INACTIVE
 }

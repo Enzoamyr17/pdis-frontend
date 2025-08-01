@@ -15,7 +15,8 @@ import {
   SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar"
-import { useSession, signOut } from "next-auth/react"
+import { signOut } from "next-auth/react"
+import { useOptimizedSession, clearSessionCache } from "@/hooks/useOptimizedSession"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { 
@@ -140,7 +141,7 @@ const genAdTools = [
     icon: Building,
   },
   {
-    title: "IM Registration",
+    title: "Independent Manpower",
     moduleId: "im-registration",
     icon: IdCard,
   },
@@ -199,7 +200,7 @@ function DashboardContent({
 }) {
   // const pathname = usePathname() // Currently unused
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: session, status } = useOptimizedSession()
   const { activeModule, setActiveModule } = useModule()
   const [isGenAdServicesOpen, setIsGenAdServicesOpen] = useState(false)
   const [isGenAdToolsOpen, setIsGenAdToolsOpen] = useState(false)
@@ -224,6 +225,8 @@ function DashboardContent({
   }, [session, status, router])
 
   const handleLogout = async () => {
+    // Clear session cache before signing out
+    clearSessionCache()
     await signOut({ callbackUrl: "/" })
   }
 
