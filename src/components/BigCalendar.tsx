@@ -5,7 +5,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { DateSelectArg, EventClickArg, EventDropArg, EventResizeDoneArg } from '@fullcalendar/core';
+import { DateSelectArg, EventClickArg, EventDropArg, EventApi } from '@fullcalendar/core';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,6 +77,11 @@ interface EventFormData {
   allDay: boolean;
 }
 
+interface EventResizeInfo {
+  event: EventApi;
+  revert: () => void;
+}
+
 export default function BigCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,11 +105,7 @@ export default function BigCalendar() {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       console.log('Fetching calendar events...');
       
@@ -180,7 +181,7 @@ export default function BigCalendar() {
       }) || [];
       
       console.log('Formatted events:', formattedEvents);
-      console.log('Events with invitations:', formattedEvents.filter(e => e.isInvitation));
+      console.log('Events with invitations:', formattedEvents.filter((e: CalendarEvent) => e.isInvitation));
       setEvents(formattedEvents);
     } catch (error) {
       console.error('Failed to fetch events:', error);
@@ -189,7 +190,11 @@ export default function BigCalendar() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUserEmail]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleDateSelect = useCallback((selectInfo: DateSelectArg) => {
     const startDate = new Date(selectInfo.start);
@@ -251,7 +256,7 @@ export default function BigCalendar() {
     }
   };
 
-  const handleEventResize = async (resizeInfo: EventResizeDoneArg) => {
+  const handleEventResize = async (resizeInfo: EventResizeInfo) => {
     try {
       const eventData = {
         title: resizeInfo.event.title,
@@ -350,7 +355,7 @@ export default function BigCalendar() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [eventFormData, isSubmitting]);
+  }, [eventFormData, isSubmitting, fetchEvents]);
 
   const handleUpdateEvent = useCallback(async () => {
     if (!selectedEvent || !eventFormData.title.trim() || isSubmitting) return;
@@ -415,7 +420,7 @@ export default function BigCalendar() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedEvent, eventFormData, isSubmitting]);
+  }, [selectedEvent, eventFormData, isSubmitting, fetchEvents]);
 
   const addAttendeeField = useCallback(() => {
     setEventFormData(prev => ({
@@ -466,11 +471,6 @@ export default function BigCalendar() {
     setTempValue('');
   }, []);
 
-  const getCurrentUserResponse = useCallback((event: GoogleCalendarEvent) => {
-    if (!event.attendees || !currentUserEmail) return null;
-    const userAttendee = event.attendees.find(attendee => attendee.email === currentUserEmail);
-    return userAttendee?.responseStatus || null;
-  }, [currentUserEmail]);
 
   const handleRSVPResponse = useCallback(async (responseStatus: 'accepted' | 'declined' | 'tentative') => {
     if (!selectedEvent || isSubmitting) return;
@@ -509,11 +509,11 @@ export default function BigCalendar() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedEvent, isSubmitting, currentUserEmail]);
+  }, [selectedEvent, isSubmitting, currentUserEmail, fetchEvents]);
 
   const handleDeleteEvent = useCallback(async () => {
     if (!selectedEvent || isSubmitting) return;
-the 
+
     if (confirm(`Delete event '${selectedEvent.summary}'?`)) {
       setIsSubmitting(true);
       try {
@@ -534,7 +534,7 @@ the
         setIsSubmitting(false);
       }
     }
-  }, [selectedEvent, isSubmitting]);
+  }, [selectedEvent, isSubmitting, fetchEvents]);
 
   const startEditMode = useCallback(() => {
     if (!selectedEvent) return;
