@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { PieChart, Save, Building, Plus, Trash2, FileText, User } from "lucide-react"
+import { toast } from "sonner"
 
 interface OpexBudgetFormData {
   referenceNumber: string
@@ -154,7 +155,7 @@ export default function OpexBudgetModule() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('OPEX Budget Data:', { formData, budgetLines })
-    alert('OPEX Budget request submitted successfully!')
+    toast.success('OPEX Budget request submitted successfully!')
   }
 
   const inputClasses = "w-full px-2 py-1.5 text-sm border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"

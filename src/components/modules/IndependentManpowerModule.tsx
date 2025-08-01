@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { IdCard, Save, MapPin, Phone, Mail, Calendar, User, Home, CreditCard, Facebook, Link, Users, List, Search, Trash2, Eye, RefreshCw, ArrowLeft, ToggleLeft, ToggleRight, Filter, X, Edit, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 interface FormData {
   lastName: string
@@ -257,12 +258,12 @@ export default function IndependentManpowerModule() {
     const hasAuthorizedReceiver = formData.authorizedReceiver.trim() !== ""
 
     if (!hasOwnGcash && !hasAuthorizedGcash) {
-      alert('Please provide either Own Gcash or Authorized Gcash number.')
+      toast.error('Please provide either Own Gcash or Authorized Gcash number.')
       return false
     }
 
     if (hasAuthorizedGcash && !hasAuthorizedReceiver) {
-      alert('Authorized Receiver name is required when providing Authorized Gcash.')
+      toast.error('Authorized Receiver name is required when providing Authorized Gcash.')
       return false
     }
 
@@ -280,16 +281,16 @@ export default function IndependentManpowerModule() {
       })
 
       if (response.ok) {
-        alert('IM record deleted successfully!')
+        toast.success('IM record deleted successfully!')
         handleBackToList() // Go back to list
         loadIMList() // Refresh the list
       } else {
         const errorText = await response.text()
-        alert(`Error deleting IM record: ${errorText}`)
+        toast.error(`Error deleting IM record: ${errorText}`)
       }
     } catch (error) {
       console.error('Error deleting IM record:', error)
-      alert('Error deleting IM record. Please try again.')
+      toast.error('Error deleting IM record. Please try again.')
     }
   }
 
@@ -346,7 +347,7 @@ export default function IndependentManpowerModule() {
         
         // Show success message
         const displayStatus = newPrismaStatus === 'ACTIVE' ? 'Active' : 'Inactive'
-        alert(`IM status changed to ${displayStatus}!`)
+        toast.success(`IM status changed to ${displayStatus}!`)
       } else {
         // Revert optimistic update on error
         const revertUpdate = (items: IMData[]) => 
@@ -360,7 +361,7 @@ export default function IndependentManpowerModule() {
         }
         
         const errorText = await response.text()
-        alert(`Error changing status: ${errorText}`)
+        toast.error(`Error changing status: ${errorText}`)
       }
     } catch (error) {
       // Revert optimistic update on error
@@ -375,7 +376,7 @@ export default function IndependentManpowerModule() {
       }
       
       console.error('Error changing IM status:', error)
-      alert('Error changing status. Please try again.')
+      toast.error('Error changing status. Please try again.')
     } finally {
       setStatusLoading(null)
     }
@@ -428,7 +429,7 @@ export default function IndependentManpowerModule() {
 
       if (response.ok) {
         const updatedIM = await response.json()
-        alert('IM record updated successfully!')
+        toast.success('IM record updated successfully!')
         
         // Update the selected IM with computed fields
         const transformedIM = {
@@ -442,11 +443,11 @@ export default function IndependentManpowerModule() {
         loadIMList() // Refresh the list
       } else {
         const errorText = await response.text()
-        alert(`Error updating IM record: ${errorText}`)
+        toast.error(`Error updating IM record: ${errorText}`)
       }
     } catch (error) {
       console.error('Error updating IM record:', error)
-      alert('Error updating IM record. Please try again.')
+      toast.error('Error updating IM record. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -498,7 +499,7 @@ export default function IndependentManpowerModule() {
 
       if (response.ok) {
         const newIM = await response.json()
-        alert(`IM Registration submitted successfully! IM Number: ${newIM.imNumber}`)
+        toast.success(`IM Registration submitted successfully! IM Number: ${newIM.imNumber}`)
         
         // Reset form
         setFormData({
@@ -533,11 +534,11 @@ export default function IndependentManpowerModule() {
         }
       } else {
         const errorText = await response.text()
-        alert(`Error submitting registration: ${errorText}`)
+        toast.error(`Error submitting registration: ${errorText}`)
       }
     } catch (error) {
       console.error('Error submitting IM registration:', error)
-      alert('Error submitting registration. Please try again.')
+      toast.error('Error submitting registration. Please try again.')
     } finally {
       setIsSubmitting(false)
     }

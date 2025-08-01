@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { UserCheck, User, Calendar, MapPin, Phone, Mail, Building, Shield, Upload, Save } from "lucide-react"
 import UserPermissionsTab from "../UserPermissionsTab"
+import { toast } from "sonner"
 
 interface EmployeeFormData {
   picture: string
@@ -213,7 +214,7 @@ export default function UserCreationModule() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('Employee Data:', formData)
-    alert('Employee data submitted successfully!')
+    toast.success('Employee data submitted successfully!')
   }
 
   const hasProvinces = provinces.length > 0

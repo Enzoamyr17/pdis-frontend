@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Shield, User, Search, CheckCircle, Users, Copy, RotateCcw } from "lucide-react"
 import { moduleRegistry } from "./modules/ModuleRegistry"
+import { toast } from "sonner"
 
 interface UserPermission {
   userId: string
@@ -277,7 +278,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   onClick={() => {
                     if (copyFromUser && selectedUsers.length > 0) {
                       copyPermissionsFromUser(copyFromUser, selectedUsers)
-                      alert(`Copied permissions from ${filteredUsers.find(u => u.id === copyFromUser)?.name} to ${selectedUsers.length} users`)
+                      toast.success(`Copied permissions from ${filteredUsers.find(u => u.id === copyFromUser)?.name} to ${selectedUsers.length} users`)
                     }
                   }}
                   disabled={!copyFromUser || selectedUsers.length === 0}
@@ -290,7 +291,7 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                   onClick={() => {
                     if (selectedUsers.length > 0) {
                       resetPermissions(selectedUsers)
-                      alert(`Reset permissions for ${selectedUsers.length} users`)
+                      toast.success(`Reset permissions for ${selectedUsers.length} users`)
                     }
                   }}
                   disabled={selectedUsers.length === 0}
@@ -542,10 +543,10 @@ export default function UserPermissionsTab({ className = "" }: UserPermissionsTa
                 onClick={() => {
                   if (massEditMode) {
                     console.log('Saving mass permissions:', permissions.filter(p => selectedUsers.includes(p.userId)))
-                    alert(`Permissions saved for ${selectedUsers.length} users successfully!`)
+                    toast.success(`Permissions saved for ${selectedUsers.length} users successfully!`)
                   } else {
                     console.log('Saving permissions:', permissions.filter(p => p.userId === selectedUser))
-                    alert('Permissions saved successfully!')
+                    toast.success('Permissions saved successfully!')
                   }
                 }}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue text-white font-medium rounded-lg hover:bg-blue focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 transition-colors"

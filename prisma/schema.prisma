@@ -68,6 +68,9 @@ model User {
   permissions      Permission[]
   sessions         Session[]
   address          Address?     @relation(fields: [addressId], references: [id])
+  managedProjects  Project[]    @relation("ProjectAccountManager")
+  projectManager   Project[]    @relation("ProjectManager")
+  imcfForms        IMCFForm[]
 
   @@index([office])
   @@index([group])
@@ -176,4 +179,124 @@ enum ModulePermission {
 enum IMStatus {
   ACTIVE
   INACTIVE
+}
+
+model Project {
+  id              String      @id @default(cuid())
+  projectID       String      @unique
+  projectName     String
+  type            ProjectType
+  projectDate     DateTime?
+  projectVenue    String?
+  accountManager  String
+  projectManager  String
+  artist          String?
+  writer          String?
+  others          String?
+  companyName     String?
+  department      String?
+  proponent       String?
+  brand                String?
+  internalBudgetInitial Decimal?
+  internalBudgetCurrent Decimal?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  accountManagerUser User     @relation("ProjectAccountManager", fields: [accountManager], references: [id])
+  projectManagerUser User     @relation("ProjectManager", fields: [projectManager], references: [id])
+  ces             CE[]
+  imcfForms       IMCFForm[]
+
+  @@index([accountManager])
+  @@index([projectManager])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model CE {
+  id          String     @id @default(cuid())
+  ceID        String     @unique
+  projectID   String
+  cepdNumber  String
+  version     String     @default("V1")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  project     Project    @relation(fields: [projectID], references: [id], onDelete: Cascade)
+  imcfForms   IMCFForm[]
+
+  @@index([projectID])
+  @@index([cepdNumber])
+}
+
+model IMCFForm {
+  id                          String              @id @default(cuid())
+  referenceNumber             String              @unique
+  projectID                   String
+  ceID                        String
+  clearanceRequestor          String
+  department                  String
+  group                       String?
+  dateOfRequest               DateTime            @default(now())
+  targetReleaseDate           DateTime?
+  coverageFromDate            DateTime?
+  coverageToDate              DateTime?
+  clearanceRequestorRemarks   String?
+  clearanceReviewerRemarks    String?
+  clearanceApproverRemarks    String?
+  hrdRemarks                  String?
+  status                      IMCFStatus          @default(DRAFT)
+  createdAt                   DateTime            @default(now())
+  updatedAt                   DateTime            @updatedAt
+  project                     Project             @relation(fields: [projectID], references: [id])
+  ce                          CE                  @relation(fields: [ceID], references: [id])
+  requestor                   User                @relation(fields: [clearanceRequestor], references: [id])
+  personnel                   IMCFPersonnel[]
+
+  @@index([projectID])
+  @@index([ceID])
+  @@index([clearanceRequestor])
+  @@index([status])
+  @@index([dateOfRequest])
+}
+
+model IMCFPersonnel {
+  id                String    @id @default(cuid())
+  imcfFormID        String
+  registeredName    String
+  position          String
+  outletVenue       String
+  packagedFee       Decimal   @default(0)
+  mondayFee         Decimal   @default(0)
+  tuesdayFee        Decimal   @default(0)
+  wednesdayFee      Decimal   @default(0)
+  thursdayFee       Decimal   @default(0)
+  fridayFee         Decimal   @default(0)
+  saturdayFee       Decimal   @default(0)
+  sundayFee         Decimal   @default(0)
+  ownGcash          String?
+  authGcash         String?
+  authGcashAccName  String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  imcfForm          IMCFForm  @relation(fields: [imcfFormID], references: [id], onDelete: Cascade)
+
+  @@index([imcfFormID])
+  @@index([registeredName])
+}
+
+enum ProjectType {
+  BTL_ACTIVATION
+  SPECIAL_EVENT_PRODUCT
+  MERCHANDISING
+  MULTIMEDIA_PRODUCTION
+  IN_TRADE_IN_STORE_EXPO_EXHIBITS_CONVENTIONS
+  FABRICATION_SETUP
+  OTHER_SERVICES
+}
+
+enum IMCFStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
 }

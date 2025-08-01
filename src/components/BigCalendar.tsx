@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Calendar, Clock, MapPin, Users, Edit, Trash2, Plus, X, Check, CheckCircle2, XCircle, HelpCircle, User, ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface CalendarEvent {
   id: string;
@@ -186,7 +187,7 @@ export default function BigCalendar() {
     } catch (error) {
       console.error('Failed to fetch events:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      alert(`Failed to load calendar events: ${errorMessage}`);
+      toast.error(`Failed to load calendar events: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -529,11 +530,11 @@ export default function BigCalendar() {
         console.log(`RSVP response ${responseStatus} sent successfully`);
       } else {
         console.error('Failed to send RSVP response:', await response.text());
-        alert('Failed to send RSVP response. Please try again.');
+        toast.error('Failed to send RSVP response. Please try again.');
       }
     } catch (error) {
       console.error('Failed to send RSVP response:', error);
-      alert('Failed to send RSVP response. Please try again.');
+      toast.error('Failed to send RSVP response. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
