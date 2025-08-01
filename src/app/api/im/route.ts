@@ -12,7 +12,7 @@ export async function GET() {
     if (!session?.user?.id) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
-
+ //issue
     const ims = await prisma.iM.findMany({
       include: {
         registeredByUser: {
