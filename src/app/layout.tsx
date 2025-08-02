@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
+import CacheInitializer from "@/components/CacheInitializer";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -26,6 +27,7 @@ export default function RootLayout({
         className={`${montserrat.variable} antialiased overflow-hidden`}
       >
         <AuthProvider>
+          <CacheInitializer />
           {children}
           <Toaster />
         </AuthProvider>

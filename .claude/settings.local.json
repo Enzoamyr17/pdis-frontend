@@ -4,7 +4,8 @@
     "allow": [
       "WebFetch(domain:fullcalendar.io)",
       "Bash(rg:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useCalendarEvents, type GoogleCalendarEvent } from '@/hooks/useCalendarEvents';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -32,39 +33,6 @@ interface CalendarEvent {
   textColor?: string;
 }
 
-interface GoogleCalendarDateTime {
-  dateTime?: string;
-  date?: string;
-  timeZone?: string;
-}
-
-interface GoogleCalendarEvent {
-  id: string;
-  summary: string;
-  description?: string;
-  start: GoogleCalendarDateTime;
-  end: GoogleCalendarDateTime;
-  status?: string;
-  location?: string;
-  attendees?: Array<{
-    email: string;
-    displayName?: string;
-    responseStatus?: 'needsAction' | 'declined' | 'tentative' | 'accepted';
-  }>;
-  organizer?: {
-    email: string;
-    displayName?: string;
-  };
-  conferenceData?: {
-    conferenceSolution: {
-      name: string;
-    };
-    entryPoints: Array<{
-      entryPointType: string;
-      uri: string;
-    }>;
-  };
-}
 
 interface EventFormData {
   title: string;
@@ -84,8 +52,14 @@ interface EventResizeInfo {
 }
 
 export default function BigCalendar() {
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    events: calendarEvents, 
+    loading, 
+    createEvent,
+    updateEvent, 
+    deleteEvent, 
+    refresh: refreshEvents 
+  } = useCalendarEvents();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<GoogleCalendarEvent | null>(null);
@@ -106,96 +80,81 @@ export default function BigCalendar() {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
 
-  const fetchEvents = useCallback(async () => {
-    try {
-      console.log('Fetching calendar events...');
+  // Transform calendar events to the format expected by FullCalendar
+  const events = useCallback(() => {
+    if (!calendarEvents) return [];
+    
+    return calendarEvents.map((event: GoogleCalendarEvent): CalendarEvent => {
+      // Get current user email from session
+      const userEmail = currentUserEmail;
       
-      const response = await fetch('/api/calendar/events');
+      const isOwnEvent = event.creator?.email === userEmail || event.organizer?.email === userEmail;
+      const isInvited = event.attendees?.some((attendee) => attendee.email === userEmail);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      let backgroundColor = '#3b82f6'; // Default blue
+      let borderColor = '#3b82f6';
+      const textColor = '#ffffff';
       
-      const data = await response.json();
-      console.log('Calendar API response:', data);
-      
-      if (data.error) {
-        throw new Error(data.error + (data.details ? `: ${data.details}` : ''));
+      if (!isOwnEvent && isInvited) {
+        const attendee = event.attendees?.find((att) => att.email === userEmail);
+        const responseStatus = attendee?.responseStatus;
+        
+        if (responseStatus === 'accepted') {
+          backgroundColor = '#10b981'; // Green
+          borderColor = '#10b981';
+        } else if (responseStatus === 'declined') {
+          backgroundColor = '#ef4444'; // Red  
+          borderColor = '#ef4444';
+        } else {
+          backgroundColor = '#f59e0b'; // Orange for tentative/needsAction
+          borderColor = '#f59e0b';
+        }
       }
 
-      // Get current user email from API response, session, or use existing
-      let userEmail = data.userEmail || currentUserEmail;
-      
-      // If we still don't have user email, try to get it from session again
-      if (!userEmail) {
-        try {
-          const sessionResponse = await fetch('/api/auth/session');
-          if (sessionResponse.ok) {
-            const sessionData = await sessionResponse.json();
-            if (sessionData?.user?.email) {
-              userEmail = sessionData.user.email;
-              setCurrentUserEmail(userEmail);
-            }
+      const startDateTime = event.start?.dateTime || event.start?.date || '';
+      const endDateTime = event.end?.dateTime || event.end?.date || '';
+      const isAllDay = !event.start?.dateTime; // If no dateTime, it's all-day
+
+      return {
+        id: event.id,
+        title: event.summary || 'Untitled Event',
+        start: startDateTime,
+        end: endDateTime,
+        allDay: isAllDay,
+        description: event.description,
+        location: event.location,
+        attendees: event.attendees?.map((att) => att.email) || [],
+        organizer: event.organizer,
+        isInvitation: !isOwnEvent && isInvited,
+        backgroundColor,
+        borderColor,
+        textColor
+      };
+    });
+  }, [calendarEvents, currentUserEmail]);
+
+  const formattedEvents = events();
+
+  // Get current user email on component mount
+  useEffect(() => {
+    const getCurrentUserEmail = async () => {
+      try {
+        const sessionResponse = await fetch('/api/auth/session');
+        if (sessionResponse.ok) {
+          const sessionData = await sessionResponse.json();
+          if (sessionData?.user?.email) {
+            setCurrentUserEmail(sessionData.user.email);
           }
-        } catch (sessionError) {
-          console.log('Could not fetch session for user email:', sessionError);
         }
+      } catch (error) {
+        console.log('Could not fetch session for user email:', error);
       }
-      
-      // Update state if we got a new email
-      if (userEmail && userEmail !== currentUserEmail) {
-        setCurrentUserEmail(userEmail);
-      }
-      
-      console.log('Current user email:', userEmail);
-      
-      const formattedEvents = data.events?.map((event: GoogleCalendarEvent) => {
-        console.log('Processing event:', event.summary, 'Organizer:', event.organizer?.email, 'User:', userEmail);
-        
-        // Determine if this is an invitation (user is not the organizer)
-        const isInvitation = !!(event.organizer && userEmail && event.organizer.email !== userEmail);
-        
-        console.log('Is invitation?', isInvitation, 'for event:', event.summary);
-        
-        const calendarEvent: CalendarEvent = {
-          id: event.id,
-          title: event.summary,
-          start: event.start?.dateTime || event.start?.date || '',
-          end: event.end?.dateTime || event.end?.date || '',
-          allDay: !event.start?.dateTime,
-          description: event.description,
-          location: event.location,
-          attendees: event.attendees?.map(a => a.email) || [],
-          organizer: event.organizer,
-          isInvitation: isInvitation
-        };
-
-        // Style invitation events with white background and blue border
-        if (isInvitation) {
-          calendarEvent.backgroundColor = '#ffffff';
-          calendarEvent.borderColor = '#1B2E6E';
-          calendarEvent.textColor = '#1B2E6E';
-          console.log('Applied invitation styling to:', event.summary);
-        }
-
-        return calendarEvent;
-      }) || [];
-      
-      console.log('Formatted events:', formattedEvents);
-      console.log('Events with invitations:', formattedEvents.filter((e: CalendarEvent) => e.isInvitation));
-      setEvents(formattedEvents);
-    } catch (error) {
-      console.error('Failed to fetch events:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      toast.error(`Failed to load calendar events: ${errorMessage}`);
-    } finally {
-      setLoading(false);
+    };
+    
+    if (!currentUserEmail) {
+      getCurrentUserEmail();
     }
   }, [currentUserEmail]);
-
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
 
   const handleDateSelect = useCallback((selectInfo: DateSelectArg) => {
     const startDate = new Date(selectInfo.start);
@@ -349,35 +308,29 @@ export default function BigCalendar() {
 
       console.log('Creating event with data:', eventData);
 
-      const response = await fetch('/api/calendar/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData),
+      await createEvent(eventData);
+      
+      setShowCreateModal(false);
+      setEventFormData({
+        title: '',
+        description: '',
+        location: '',
+        startDate: '',
+        startTime: '',
+        endDate: '',
+        endTime: '',
+        attendees: [''],
+        allDay: false
       });
-
-      if (response.ok) {
-        setShowCreateModal(false);
-        await fetchEvents();
-        setEventFormData({
-          title: '',
-          description: '',
-          location: '',
-          startDate: '',
-          startTime: '',
-          endDate: '',
-          endTime: '',
-          attendees: [''],
-          allDay: false
-        });
-      } else {
-        console.error('Failed to create event:', await response.text());
-      }
+      
+      toast.success('Event created successfully!');
     } catch (error) {
       console.error('Failed to create event:', error);
+      toast.error('Failed to create event');
     } finally {
       setIsSubmitting(false);
     }
-  }, [eventFormData, isSubmitting, fetchEvents]);
+  }, [eventFormData, isSubmitting, createEvent]);
 
   const handleUpdateEvent = useCallback(async () => {
     if (!selectedEvent || !eventFormData.title.trim() || isSubmitting) return;
@@ -430,26 +383,19 @@ export default function BigCalendar() {
         eventData.attendees = attendeesList;
       }
 
-      const response = await fetch(`/api/calendar/events/${selectedEvent.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData),
-      });
-
-      if (response.ok) {
-        setShowEventModal(false);
-        setIsEditing(false);
-        setSelectedEvent(null);
-        await fetchEvents();
-      } else {
-        console.error('Failed to update event:', await response.text());
-      }
+      await updateEvent(selectedEvent.id, eventData);
+      
+      setShowEventModal(false);
+      setIsEditing(false);
+      setSelectedEvent(null);
+      toast.success('Event updated successfully!');
     } catch (error) {
       console.error('Failed to update event:', error);
+      toast.error('Failed to update event');
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedEvent, eventFormData, isSubmitting, fetchEvents]);
+  }, [selectedEvent, eventFormData, isSubmitting, updateEvent]);
 
   const addAttendeeField = useCallback(() => {
     setEventFormData(prev => ({
@@ -514,7 +460,7 @@ export default function BigCalendar() {
 
       if (response.ok) {
         // Refresh events to show updated RSVP status
-        await fetchEvents();
+        refreshEvents();
         
         // Update the selectedEvent to reflect the new status
         const updatedEvent = { ...selectedEvent };
@@ -538,7 +484,7 @@ export default function BigCalendar() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedEvent, isSubmitting, currentUserEmail, fetchEvents]);
+  }, [selectedEvent, isSubmitting, currentUserEmail, refreshEvents]);
 
   const handleDeleteEvent = useCallback(async () => {
     if (!selectedEvent || isSubmitting) return;
@@ -546,24 +492,19 @@ export default function BigCalendar() {
     if (confirm(`Delete event '${selectedEvent.summary}'?`)) {
       setIsSubmitting(true);
       try {
-        const response = await fetch(`/api/calendar/events/${selectedEvent.id}`, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          setShowEventModal(false);
-          setSelectedEvent(null);
-          await fetchEvents();
-        } else {
-          console.error('Failed to delete event:', await response.text());
-        }
+        await deleteEvent(selectedEvent.id);
+        
+        setShowEventModal(false);
+        setSelectedEvent(null);
+        toast.success('Event deleted successfully!');
       } catch (error) {
         console.error('Failed to delete event:', error);
+        toast.error('Failed to delete event');
       } finally {
         setIsSubmitting(false);
       }
     }
-  }, [selectedEvent, isSubmitting, fetchEvents]);
+  }, [selectedEvent, isSubmitting, deleteEvent]);
 
   const startEditMode = useCallback(() => {
     if (!selectedEvent) return;
@@ -662,7 +603,7 @@ export default function BigCalendar() {
           selectMirror={true}
           dayMaxEvents={true}
           weekends={true}
-          events={events}
+          events={formattedEvents}
           select={handleDateSelect}
           eventClick={handleEventClick}
           eventDrop={handleEventDrop}
@@ -1333,7 +1274,7 @@ export default function BigCalendar() {
                       {selectedEvent.conferenceData && (
                         <div className="space-y-1">
                           <p className="text-sm font-medium text-gray-700">Meeting Link:</p>
-                          {selectedEvent.conferenceData.entryPoints.map((entry, index) => (
+                          {selectedEvent.conferenceData.entryPoints?.map((entry, index) => (
                             <a
                               key={index}
                               href={entry.uri}

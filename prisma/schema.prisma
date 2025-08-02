@@ -275,6 +275,7 @@ model IMCFPersonnel {
   ownGcash          String?
   authGcash         String?
   authGcashAccName  String?
+  remarks           String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   imcfForm          IMCFForm  @relation(fields: [imcfFormID], references: [id], onDelete: Cascade)

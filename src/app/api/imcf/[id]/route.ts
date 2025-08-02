@@ -24,7 +24,7 @@ interface PersonnelData {
   remarks?: string;
 }
 
-// Helper function to check for duplicate personnel
+// Helper function to check for duplicate personnel (same as in route.ts)
 async function checkForDuplicates(
   personnel: PersonnelData[],
   projectId: string,
@@ -145,8 +145,12 @@ async function checkForDuplicates(
   return duplicateResults
 }
 
-export async function POST(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
+    const params = await context.params
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -156,9 +160,70 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const userId = session.user.id
-    const body = await request.json()
+    const imcfForm = await prisma.iMCFForm.findUnique({
+      where: {
+        id: params.id,
+        clearanceRequestor: session.user.id // Ensure user can only access their own forms
+      },
+      include: {
+        project: {
+          select: {
+            id: true,
+            projectID: true,
+            projectName: true
+          }
+        },
+        ce: {
+          select: {
+            id: true,
+            ceID: true,
+            cepdNumber: true
+          }
+        },
+        requestor: {
+          select: {
+            name: true,
+            department: true,
+            group: true
+          }
+        },
+        personnel: true
+      }
+    })
 
+    if (!imcfForm) {
+      return NextResponse.json(
+        { error: 'IMCF form not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json(imcfForm)
+  } catch (error) {
+    console.error('Error fetching IMCF form:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch IMCF form' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const params = await context.params
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const body = await request.json()
     const {
       projectId,
       ceId,
@@ -170,13 +235,37 @@ export async function POST(request: NextRequest) {
       isDraft = false
     } = body
 
+    // Check if the form exists and belongs to the user
+    const existingForm = await prisma.iMCFForm.findUnique({
+      where: {
+        id: params.id,
+        clearanceRequestor: session.user.id
+      }
+    })
+
+    if (!existingForm) {
+      return NextResponse.json(
+        { error: 'IMCF form not found' },
+        { status: 404 }
+      )
+    }
+
+    // Only allow editing if the form is in DRAFT status
+    if (existingForm.status !== 'DRAFT') {
+      return NextResponse.json(
+        { error: 'Only draft forms can be edited' },
+        { status: 400 }
+      )
+    }
+
     // Check for duplicate personnel for both drafts and submissions
     if (personnel && personnel.length > 0 && projectId && coverageFromDate && coverageToDate) {
       const duplicateResults = await checkForDuplicates(
         personnel,
         projectId,
         coverageFromDate,
-        coverageToDate
+        coverageToDate,
+        params.id // Exclude current form from duplicate check
       )
 
       if (duplicateResults.length > 0) {
@@ -214,43 +303,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Get user details for auto-population
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        name: true,
-        department: true,
-        group: true
-      }
-    })
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
-
-    // Generate reference number
-    const year = new Date().getFullYear().toString().slice(-2)
-    const randomNum = Math.floor(Math.random() * 9999) + 1
-    const referenceNumber = `IMCF ${year}-${String(randomNum).padStart(4, '0')}`
-
-    // Create IMCF form
-    const imcfForm = await prisma.iMCFForm.create({
+    // Update IMCF form
+    const updatedForm = await prisma.iMCFForm.update({
+      where: {
+        id: params.id
+      },
       data: {
-        referenceNumber,
         projectID: projectId,
         ceID: ceId,
-        clearanceRequestor: userId,
-        department: user.department || '',
-        group: user.group || undefined,
         targetReleaseDate: targetReleaseDate ? new Date(targetReleaseDate) : undefined,
         coverageFromDate: coverageFromDate ? new Date(coverageFromDate) : undefined,
         coverageToDate: coverageToDate ? new Date(coverageToDate) : undefined,
         clearanceRequestorRemarks,
         status: isDraft ? 'DRAFT' : 'SUBMITTED',
         personnel: {
+          deleteMany: {}, // Remove existing personnel
           create: personnel?.map((person: PersonnelData) => ({
             registeredName: person.registeredName,
             position: person.position,
@@ -294,30 +361,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      imcfForm: {
-        id: imcfForm.id,
-        referenceNumber: imcfForm.referenceNumber,
-        status: imcfForm.status,
-        project: imcfForm.project,
-        ce: imcfForm.ce,
-        requestor: imcfForm.requestor,
-        personnel: imcfForm.personnel,
-        createdAt: imcfForm.createdAt
-      },
-      message: isDraft ? 'Draft saved successfully' : 'IMCF submitted successfully'
+      imcfForm: updatedForm,
+      message: isDraft ? 'Draft updated successfully' : 'IMCF updated and submitted successfully'
     })
 
   } catch (error) {
-    console.error('Error saving IMCF:', error)
+    console.error('Error updating IMCF:', error)
     return NextResponse.json(
-      { error: 'Failed to save IMCF form' },
+      { error: 'Failed to update IMCF form' },
       { status: 500 }
     )
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
+    const params = await context.params
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -327,69 +389,45 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const userId = session.user.id
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const skip = (page - 1) * limit
-
-    const whereClause: {
-      clearanceRequestor: string;
-      status?: 'DRAFT' | 'SUBMITTED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED';
-    } = {
-      clearanceRequestor: userId
-    }
-
-    if (status && status !== 'all') {
-      const upperStatus = status.toUpperCase()
-      if (['DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'REJECTED'].includes(upperStatus)) {
-        whereClause.status = upperStatus as 'DRAFT' | 'SUBMITTED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED'
-      }
-    }
-
-    const [imcfForms, total] = await Promise.all([
-      prisma.iMCFForm.findMany({
-        where: whereClause,
-        include: {
-          project: {
-            select: {
-              projectName: true,
-              projectID: true
-            }
-          },
-          ce: {
-            select: {
-              cepdNumber: true
-            }
-          },
-          personnel: true
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        skip,
-        take: limit
-      }),
-      prisma.iMCFForm.count({
-        where: whereClause
-      })
-    ])
-
-    return NextResponse.json({
-      imcfForms,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
+    // Check if the form exists and belongs to the user
+    const existingForm = await prisma.iMCFForm.findUnique({
+      where: {
+        id: params.id,
+        clearanceRequestor: session.user.id
       }
     })
 
+    if (!existingForm) {
+      return NextResponse.json(
+        { error: 'IMCF form not found' },
+        { status: 404 }
+      )
+    }
+
+    // Only allow deleting if the form is in DRAFT status
+    if (existingForm.status !== 'DRAFT') {
+      return NextResponse.json(
+        { error: 'Only draft forms can be deleted' },
+        { status: 400 }
+      )
+    }
+
+    // Delete the IMCF form (personnel will be deleted automatically due to cascade)
+    await prisma.iMCFForm.delete({
+      where: {
+        id: params.id
+      }
+    })
+
+    return NextResponse.json({
+      success: true,
+      message: 'Draft deleted successfully'
+    })
+
   } catch (error) {
-    console.error('Error fetching IMCF forms:', error)
+    console.error('Error deleting IMCF:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch IMCF forms' },
+      { error: 'Failed to delete IMCF form' },
       { status: 500 }
     )
   }
