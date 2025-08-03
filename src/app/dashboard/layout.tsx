@@ -30,7 +30,6 @@ import {
   Instagram,
   Users,
   Database,
-  Package,
   Car,
   FileText,
   DoorOpen,
@@ -45,7 +44,10 @@ import {
   UserCheck,
   Building,
   IdCard,
-  Clipboard
+  Clipboard,
+  Palette,
+  BookOpen,
+  Building2
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
@@ -56,108 +58,169 @@ import { useModule, ModuleProvider } from "@/contexts/ModuleContext"
 import { moduleRegistry } from "@/components/modules/ModuleRegistry"
 // Menu items for the sidebar
 
-const genAdServices = [
+const serviceCenterItems = [
   {
-    title: "Supplies Requisition",
-    moduleId: "supplies-requisition",
-    icon: Package,
-  },
-  {
-    title: "Vehicle Requisition",
-    moduleId: "vehicle-requisition",
-    icon: Car,
-  },
-  {
-    title: "IM Clearance Form (Independent Manpowers)",
-    moduleId: "im-clearance-form",
-    icon: FileText,
-  },
-  {
-    title: "Gate Pass In / Gate Pass Out",
-    moduleId: "gate-pass",
-    icon: DoorOpen,
-  },
-  {
-    title: "Equipment Rental",
-    moduleId: "equipment-rental",
-    icon: Wrench,
-  },
-  {
-    title: "Fabrication / Refurbishing Request",
-    moduleId: "fabrication-request",
-    icon: Hammer,
-  },
-  {
-    title: "Flight Booking Requisition",
-    moduleId: "flight-booking",
-    icon: Plane,
-  },
-  {
-    title: "JO for Messengerial Service (JOMS)",
-    moduleId: "joms",
-    icon: MessageSquare,
-  },
-  {
-    title: "Purchase Request (with SAP Tracker)",
+    title: "Request to Pay",
     moduleId: "purchase-request",
     icon: ShoppingCart,
+    disabled: false,
   },
   {
     title: "Cash Advance",
     moduleId: "br-cash-advance",
     icon: PhilippinePeso,
+    disabled: false,
   },
   {
     title: "Reimbursement",
     moduleId: "br-reimbursement",
     icon: PhilippinePeso,
+    disabled: false,
+  },
+  {
+    title: "IM Clearance Form",
+    moduleId: "im-clearance-form",
+    icon: FileText,
+    disabled: false,
+  },
+  {
+    title: "JO for Messengerial Service",
+    moduleId: "joms",
+    icon: MessageSquare,
+    disabled: false,
+  },
+  {
+    title: "Vehicle Req",
+    moduleId: "vehicle-requisition",
+    icon: Car,
+    disabled: false,
+  },
+  {
+    title: "Flight Booking",
+    moduleId: "flight-booking",
+    icon: Plane,
+    disabled: false,
+  },
+  {
+    title: "Gate Pass In out",
+    moduleId: "gate-pass",
+    icon: DoorOpen,
+    disabled: true,
+  },
+  {
+    title: "Equipment Rental",
+    moduleId: "equipment-rental",
+    icon: Wrench,
+    disabled: true,
+  },
+  {
+    title: "Fabrication",
+    moduleId: "fabrication-request",
+    icon: Hammer,
+    disabled: true,
   },
 ]
 
 const genAdTools = [
   {
-    title: "OPEX Budget (GenAd PEP)",
+    title: "GenAd PEP",
     moduleId: "opex-budget",
     icon: PieChart,
+    disabled: false,
   },
   {
-    title: "Bulletins, Advisories, Policies",
+    title: "PD Bulletins",
     moduleId: "bulletins-advisories",
     icon: Megaphone,
+    disabled: false,
+  },
+  {
+    title: "User Management",
+    moduleId: "user-creation",
+    icon: UserCheck,
+    disabled: false,
+  },
+  {
+    title: "IM Management",
+    moduleId: "im-registration",
+    icon: IdCard,
+    disabled: false,
+  },
+  {
+    title: "Client Management",
+    moduleId: "client-registration",
+    icon: Building,
+    disabled: false,
+  },
+  {
+    title: "Vendor Management",
+    moduleId: "vendor-management",
+    icon: Building2,
+    disabled: false,
   },
   {
     title: "Performance Management",
     moduleId: "performance-management",
     icon: Target,
-  },
-  {
-    title: "User Creation (Org Chart)",
-    moduleId: "user-creation",
-    icon: UserCheck,
-  },
-  {
-    title: "Client Registration",
-    moduleId: "client-registration",
-    icon: Building,
-  },
-  {
-    title: "Independent Manpower",
-    moduleId: "im-registration",
-    icon: IdCard,
+    disabled: true,
   },
 ]
 
 const genOpsTools = [
   {
-    title: "Creation of JO",
-    moduleId: "creation-of-jo",
-    icon: FileText,
+    title: "Client Management",
+    moduleId: "genops-client-management",
+    icon: Building,
+    disabled: false,
   },
   {
-    title: "Creation of PEP",
+    title: "GenOps PEP",
     moduleId: "creation-of-pep",
     icon: Clipboard,
-  }
+    disabled: false,
+  },
+  {
+    title: "Creatives JO",
+    moduleId: "creation-of-jo",
+    icon: Palette,
+    disabled: true,
+  },
+]
+
+const pdDirectoryItems = [
+  {
+    title: "Client",
+    moduleId: "pd-directory-client",
+    icon: Building,
+    disabled: false,
+  },
+  {
+    title: "Vendor",
+    moduleId: "pd-directory-vendor",
+    icon: Building2,
+    disabled: false,
+  },
+  {
+    title: "User",
+    moduleId: "pd-directory-user",
+    icon: Users,
+    disabled: false,
+  },
+  {
+    title: "IM",
+    moduleId: "pd-directory-im",
+    icon: IdCard,
+    disabled: false,
+  },
+]
+
+const reportsItems = [
+  {
+    title: "System Reports",
+    moduleId: "system-reports",
+    icon: FileBarChart,
+    disabled: false,
+  },
 ]
 
 const quickLinks = [
@@ -197,10 +260,10 @@ function DashboardContent({
   const router = useRouter()
   const { data: session, status } = useOptimizedSession()
   const { activeModule, setActiveModule } = useModule()
-  const [isGenAdServicesOpen, setIsGenAdServicesOpen] = useState(false)
+  const [isServiceCenterOpen, setIsServiceCenterOpen] = useState(false)
   const [isGenAdToolsOpen, setIsGenAdToolsOpen] = useState(false)
   const [isGenOpsToolsOpen, setIsGenOpsToolsOpen] = useState(false)
-  const [isReportsOpen, setIsReportsOpen] = useState(false)
+  const [isPdDirectoryOpen, setIsPdDirectoryOpen] = useState(false)
   const [isQuickLinksOpen, setIsQuickLinksOpen] = useState(false)
   const { state } = useSidebar()
   const isCollapsed = state === "collapsed"
@@ -267,10 +330,10 @@ function DashboardContent({
                       {isCollapsed ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => {setIsGenAdServicesOpen(!isGenAdServicesOpen);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdServicesOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                            <button onClick={() => {setIsServiceCenterOpen(!isServiceCenterOpen);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false);setIsPdDirectoryOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isServiceCenterOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
                               <Cog className="w-5 h-5" />
                               <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Service Center</h1>
-                              <ChevronDown className={`w-5 h-5 ${isGenAdServicesOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                              <ChevronDown className={`w-5 h-5 ${isServiceCenterOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
                             </button>
                           </TooltipTrigger>
                           <TooltipContent side="right" className="max-w-[300px]">
@@ -278,24 +341,26 @@ function DashboardContent({
                           </TooltipContent>
                         </Tooltip>
                       ) : (
-                        <button onClick={() => {setIsGenAdServicesOpen(!isGenAdServicesOpen);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdServicesOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                        <button onClick={() => {setIsServiceCenterOpen(!isServiceCenterOpen);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false);setIsPdDirectoryOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isServiceCenterOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
                           <Cog className="w-5 h-5" />
                           <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Service Center</h1>
-                          <ChevronDown className={`w-5 h-5 ${isGenAdServicesOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                          <ChevronDown className={`w-5 h-5 ${isServiceCenterOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
                         </button>
                       )}
-                      <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenAdServicesOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
-                        {genAdServices.map((item) => {
+                      <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isServiceCenterOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
+                        {serviceCenterItems.map((item) => {
                           const IconComponent = item.icon;
                           return (
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
                                 <SidebarMenuButton 
-                                  onClick={() => handleModuleClick(item.moduleId)} 
-                                  className={`font-medium cursor-pointer transition-all duration-200 ${
-                                    activeModule?.id === item.moduleId 
-                                      ? "bg-blue/20 text-blue border-l-4 border-blue" 
-                                      : "text-blue/80 hover:bg-blue/10"
+                                  onClick={() => !item.disabled && handleModuleClick(item.moduleId)} 
+                                  className={`font-medium transition-all duration-200 ${
+                                    item.disabled 
+                                      ? "text-gray-400 cursor-not-allowed" 
+                                      : activeModule?.id === item.moduleId 
+                                        ? "bg-blue/20 text-blue border-l-4 border-blue cursor-pointer" 
+                                        : "text-blue/80 hover:bg-blue/10 cursor-pointer"
                                   }`}
                                 >
                                   {isCollapsed && <IconComponent className="w-4 h-4" />}
@@ -314,7 +379,7 @@ function DashboardContent({
                       {isCollapsed ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => {setIsGenAdToolsOpen(!isGenAdToolsOpen);setIsGenAdServicesOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                            <button onClick={() => {setIsGenAdToolsOpen(!isGenAdToolsOpen);setIsServiceCenterOpen(false);setIsGenOpsToolsOpen(false);setIsPdDirectoryOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
                               <Wrench className="w-5 h-5" />
                               <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenAd Tools</h1>
                               <ChevronDown className={`w-5 h-5 ${isGenAdToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
@@ -325,7 +390,7 @@ function DashboardContent({
                           </TooltipContent>
                         </Tooltip>
                       ) : (
-                        <button onClick={() => {setIsGenAdToolsOpen(!isGenAdToolsOpen);setIsGenAdServicesOpen(false);setIsGenOpsToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                        <button onClick={() => {setIsGenAdToolsOpen(!isGenAdToolsOpen);setIsServiceCenterOpen(false);setIsGenOpsToolsOpen(false);setIsPdDirectoryOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenAdToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
                           <Wrench className="w-5 h-5" />
                           <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenAd Tools</h1>
                           <ChevronDown className={`w-5 h-5 ${isGenAdToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
@@ -338,11 +403,13 @@ function DashboardContent({
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
                                 <SidebarMenuButton 
-                                  onClick={() => handleModuleClick(item.moduleId)} 
-                                  className={`font-medium cursor-pointer transition-all duration-200 ${
-                                    activeModule?.id === item.moduleId 
-                                      ? "bg-blue/20 text-blue border-l-4 border-blue" 
-                                      : "text-blue/80 hover:bg-blue/10"
+                                  onClick={() => !item.disabled && handleModuleClick(item.moduleId)} 
+                                  className={`font-medium transition-all duration-200 ${
+                                    item.disabled 
+                                      ? "text-gray-400 cursor-not-allowed" 
+                                      : activeModule?.id === item.moduleId 
+                                        ? "bg-blue/20 text-blue border-l-4 border-blue cursor-pointer" 
+                                        : "text-blue/80 hover:bg-blue/10 cursor-pointer"
                                   }`}
                                 >
                                   {isCollapsed && <IconComponent className="w-4 h-4" />}
@@ -361,7 +428,7 @@ function DashboardContent({
                       {isCollapsed ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => {setIsGenOpsToolsOpen(!isGenOpsToolsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenOpsToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                            <button onClick={() => {setIsGenOpsToolsOpen(!isGenOpsToolsOpen);setIsServiceCenterOpen(false);setIsGenAdToolsOpen(false);setIsPdDirectoryOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenOpsToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
                               <Wrench className="w-5 h-5" />
                               <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenOps Tools</h1>
                               <ChevronDown className={`w-5 h-5 ${isGenOpsToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
@@ -372,7 +439,7 @@ function DashboardContent({
                           </TooltipContent>
                         </Tooltip>
                       ) : (
-                        <button onClick={() => {setIsGenOpsToolsOpen(!isGenOpsToolsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsReportsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenOpsToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                        <button onClick={() => {setIsGenOpsToolsOpen(!isGenOpsToolsOpen);setIsServiceCenterOpen(false);setIsGenAdToolsOpen(false);setIsPdDirectoryOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isGenOpsToolsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
                           <Wrench className="w-5 h-5" />
                           <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>GenOps Tools</h1>
                           <ChevronDown className={`w-5 h-5 ${isGenOpsToolsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
@@ -385,11 +452,13 @@ function DashboardContent({
                             <Tooltip key={item.title}>
                               <TooltipTrigger asChild>
                                 <SidebarMenuButton 
-                                  onClick={() => handleModuleClick(item.moduleId)} 
-                                  className={`font-medium cursor-pointer transition-all duration-200 ${
-                                    activeModule?.id === item.moduleId 
-                                      ? "bg-blue/20 text-blue border-l-4 border-blue" 
-                                      : "text-blue/80 hover:bg-blue/10"
+                                  onClick={() => !item.disabled && handleModuleClick(item.moduleId)} 
+                                  className={`font-medium transition-all duration-200 ${
+                                    item.disabled 
+                                      ? "text-gray-400 cursor-not-allowed" 
+                                      : activeModule?.id === item.moduleId 
+                                        ? "bg-blue/20 text-blue border-l-4 border-blue cursor-pointer" 
+                                        : "text-blue/80 hover:bg-blue/10 cursor-pointer"
                                   }`}
                                 >
                                   {isCollapsed && <IconComponent className="w-4 h-4" />}
@@ -402,31 +471,82 @@ function DashboardContent({
                             </Tooltip>
                           );
                         })}
+                        <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isGenOpsToolsOpen ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
+                          {reportsItems.map((item) => {
+                            const IconComponent = item.icon;
+                            return (
+                              <Tooltip key={item.title}>
+                                <TooltipTrigger asChild>
+                                  <SidebarMenuButton 
+                                    onClick={() => !item.disabled && handleModuleClick(item.moduleId)} 
+                                    className={`font-medium transition-all duration-200 ${
+                                      item.disabled 
+                                        ? "text-gray-400 cursor-not-allowed" 
+                                        : activeModule?.id === item.moduleId 
+                                          ? "bg-blue/20 text-blue border-l-4 border-blue cursor-pointer" 
+                                          : "text-blue/80 hover:bg-blue/10 cursor-pointer"
+                                    }`}
+                                  >
+                                    {isCollapsed && <IconComponent className="w-4 h-4" />}
+                                    <span className={`${isCollapsed ? "hidden" : "block"}`}>{item.title}</span>
+                                  </SidebarMenuButton>
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-[300px]">
+                                  <p>{item.title}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
                       </div>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="flex flex-col">
                       {isCollapsed ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => {setIsReportsOpen(!isReportsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isReportsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
-                              <FileBarChart className="w-5 h-5" />
-                              <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Reports</h1>
-                              <ChevronDown className={`w-5 h-5 ${isReportsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                            <button onClick={() => {setIsPdDirectoryOpen(!isPdDirectoryOpen);setIsServiceCenterOpen(false);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isPdDirectoryOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                              <BookOpen className="w-5 h-5" />
+                              <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>PD Directory</h1>
+                              <ChevronDown className={`w-5 h-5 ${isPdDirectoryOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
                             </button>
                           </TooltipTrigger>
                           <TooltipContent side="right" className="max-w-[300px]">
-                            <p>Reports - Generate and view various system reports</p>
+                            <p>PD Directory - Client, Vendor, User, and IM directories</p>
                           </TooltipContent>
                         </Tooltip>
                       ) : (
-                        <button onClick={() => {setIsReportsOpen(!isReportsOpen);setIsGenAdServicesOpen(false);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isReportsOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
-                          <FileBarChart className="w-5 h-5" />
-                          <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>Reports</h1>
-                          <ChevronDown className={`w-5 h-5 ${isReportsOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
+                        <button onClick={() => {setIsPdDirectoryOpen(!isPdDirectoryOpen);setIsServiceCenterOpen(false);setIsGenAdToolsOpen(false);setIsGenOpsToolsOpen(false)}} className={`flex items-center justify-between overflow-hidden ${isPdDirectoryOpen ? "bg-orange/80" : "bg-orange/0"} hover:bg-blue/80 text-blue hover:text-white p-2 rounded-lg cursor-pointer transition-all duration-300`}>
+                          <BookOpen className="w-5 h-5" />
+                          <h1 className={`text-medium ${isCollapsed ? "hidden" : "block"} transition-all duration-500`}>PD Directory</h1>
+                          <ChevronDown className={`w-5 h-5 ${isPdDirectoryOpen ? "-rotate-180" : "rotate-0"} transition-all duration-500 ${isCollapsed ? "hidden" : "block"} transition-all duration-500`} />
                         </button>
                       )}
-                      <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isReportsOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
-                        {/* Reports content will be added here later */}
+                      <div className={`flex flex-col gap-0 h-auto overflow-hidden ${isPdDirectoryOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-500`}>
+                        {pdDirectoryItems.map((item) => {
+                          const IconComponent = item.icon;
+                          return (
+                            <Tooltip key={item.title}>
+                              <TooltipTrigger asChild>
+                                <SidebarMenuButton 
+                                  onClick={() => !item.disabled && handleModuleClick(item.moduleId)} 
+                                  className={`font-medium transition-all duration-200 ${
+                                    item.disabled 
+                                      ? "text-gray-400 cursor-not-allowed" 
+                                      : activeModule?.id === item.moduleId 
+                                        ? "bg-blue/20 text-blue border-l-4 border-blue cursor-pointer" 
+                                        : "text-blue/80 hover:bg-blue/10 cursor-pointer"
+                                  }`}
+                                >
+                                  {isCollapsed && <IconComponent className="w-4 h-4" />}
+                                  <span className={`${isCollapsed ? "hidden" : "block"}`}>{item.title}</span>
+                                </SidebarMenuButton>
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-[300px]">
+                                <p>{item.title}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          );
+                        })}
                       </div>
                     </SidebarMenuItem>
                   </SidebarMenu>

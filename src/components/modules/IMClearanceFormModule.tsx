@@ -54,6 +54,7 @@ interface IMPersonnel {
   authGcashAccName: string
   isSaved: boolean
   duplicateRemark?: string
+  remarks?: string
 }
 
 interface IMSearchResult {
@@ -174,7 +175,8 @@ export default function IMClearanceFormModule() {
       ownGcash: '',
       authGcash: '',
       authGcashAccName: '',
-      isSaved: false
+      isSaved: false,
+      remarks: ''
     }
   ])
 
@@ -191,6 +193,7 @@ export default function IMClearanceFormModule() {
   const [activeTab, setActiveTab] = useState<'form' | 'list'>('form')
   const [imcfForms, setImcfForms] = useState<IMCFFormListItem[]>([])
   const [isLoadingForms, setIsLoadingForms] = useState(false)
+  const [isLoadingEditForm, setIsLoadingEditForm] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -473,7 +476,8 @@ export default function IMClearanceFormModule() {
       ownGcash: '',
       authGcash: '',
       authGcashAccName: '',
-      isSaved: false
+      isSaved: false,
+      remarks: ''
     }
     setPersonnelList(prev => [...prev, newPersonnel])
   }
@@ -495,8 +499,9 @@ export default function IMClearanceFormModule() {
     }
 
     // Final duplicate check before saving
-    if (checkForDuplicateIM(person.registeredName, id)) {
-      toast.error(`"${person.registeredName}" is already added to this form. Please enter a different name before saving.`)
+    const duplicateCheck = checkForDuplicateIM(person.registeredName, id)
+    if (duplicateCheck.isDuplicate) {
+      toast.error(`"${person.registeredName}" is already added to this form as IM #${duplicateCheck.duplicateIndex}. Please enter a different name before saving.`)
       return
     }
 
@@ -610,15 +615,25 @@ export default function IMClearanceFormModule() {
     }
   }, [searchCache])
 
-  const checkForDuplicateIM = useCallback((newName: string, currentPersonnelId: string): boolean => {
+  const checkForDuplicateIM = useCallback((newName: string, currentPersonnelId: string): { isDuplicate: boolean; duplicatePerson?: IMPersonnel; duplicateIndex?: number } => {
     // Normalize names for comparison (remove extra spaces, convert to lowercase)
     const normalizedNewName = newName.toLowerCase().trim().replace(/\s+/g, ' ')
     
-    return personnelList.some(person => {
+    const duplicateIndex = personnelList.findIndex(person => {
       if (person.id === currentPersonnelId) return false // Don't compare with self
       const normalizedExistingName = person.registeredName.toLowerCase().trim().replace(/\s+/g, ' ')
       return normalizedExistingName === normalizedNewName && normalizedExistingName !== ''
     })
+    
+    if (duplicateIndex !== -1) {
+      return {
+        isDuplicate: true,
+        duplicatePerson: personnelList[duplicateIndex],
+        duplicateIndex: duplicateIndex + 1 // Add 1 for human-readable IM number
+      }
+    }
+    
+    return { isDuplicate: false }
   }, [personnelList])
 
 
@@ -636,12 +651,16 @@ export default function IMClearanceFormModule() {
       searchIM(value, personnelId)
       
       // Also check for duplicates when typing manually (with longer delay)
-      if (value.trim() && checkForDuplicateIM(value, personnelId)) {
-        setTimeout(() => {
-          if (checkForDuplicateIM(value, personnelId)) {
-            toast.error(`"${value}" is already added to this form. Please enter a different name.`)
-          }
-        }, 300) // Additional delay for duplicate check
+      if (value.trim()) {
+        const duplicateCheck = checkForDuplicateIM(value, personnelId)
+        if (duplicateCheck.isDuplicate) {
+          setTimeout(() => {
+            const recheck = checkForDuplicateIM(value, personnelId)
+            if (recheck.isDuplicate) {
+              toast.error(`"${value}" is already added to this form as IM #${recheck.duplicateIndex}. Please enter a different name.`)
+            }
+          }, 300) // Additional delay for duplicate check
+        }
       }
     }, 150) // Reduced from 300ms to 150ms for faster response
 
@@ -650,8 +669,9 @@ export default function IMClearanceFormModule() {
 
   const selectIM = useCallback((personnelId: string, im: IMSearchResult) => {
     // Check for duplicates before adding
-    if (checkForDuplicateIM(im.fullName, personnelId)) {
-      toast.error(`"${im.fullName}" is already added to this form. Please select a different IM personnel.`)
+    const duplicateCheck = checkForDuplicateIM(im.fullName, personnelId)
+    if (duplicateCheck.isDuplicate) {
+      toast.error(`"${im.fullName}" is already added to this form as IM #${duplicateCheck.duplicateIndex}. Please select a different IM personnel.`)
       return
     }
 
@@ -792,6 +812,7 @@ export default function IMClearanceFormModule() {
 
   // Load existing IMCF form for editing
   const loadIMCFForEdit = async (formId: string) => {
+    setIsLoadingEditForm(true)
     try {
       const response = await fetch(`/api/imcf/${formId}`)
       if (response.ok) {
@@ -843,6 +864,7 @@ export default function IMClearanceFormModule() {
           ownGcash: string;
           authGcash: string;
           authGcashAccName: string;
+          remarks?: string;
         }, index: number) => ({
           id: person.id || (index + 1).toString(),
           registeredName: person.registeredName,
@@ -861,7 +883,8 @@ export default function IMClearanceFormModule() {
           ownGcash: person.ownGcash || '',
           authGcash: person.authGcash || '',
           authGcashAccName: person.authGcashAccName || '',
-          isSaved: true
+          isSaved: true,
+          remarks: person.remarks || ''
         }))
 
         setPersonnelList(loadedPersonnel.length > 0 ? loadedPersonnel : [
@@ -878,7 +901,8 @@ export default function IMClearanceFormModule() {
             ownGcash: '',
             authGcash: '',
             authGcashAccName: '',
-            isSaved: false
+            isSaved: false,
+            remarks: ''
           }
         ])
 
@@ -891,6 +915,8 @@ export default function IMClearanceFormModule() {
     } catch (error) {
       console.error('Error loading form:', error)
       toast.error('Error loading form')
+    } finally {
+      setIsLoadingEditForm(false)
     }
   }
 
@@ -928,7 +954,8 @@ export default function IMClearanceFormModule() {
       ownGcash: '',
       authGcash: '',
       authGcashAccName: '',
-      isSaved: false
+      isSaved: false,
+      remarks: ''
     }])
     
     setSelectedProject(null)
@@ -1011,7 +1038,9 @@ export default function IMClearanceFormModule() {
             dailyFees: person.dailyFees,
             ownGcash: person.ownGcash,
             authGcash: person.authGcash,
-            authGcashAccName: person.authGcashAccName
+            authGcashAccName: person.authGcashAccName,
+            duplicateRemark: person.duplicateRemark,
+            remarks: person.remarks
           })),
           isDraft: false
         })
@@ -1034,7 +1063,9 @@ export default function IMClearanceFormModule() {
         // Reset form or redirect as needed
         // You might want to redirect to a success page or reset the form
       } else {
-        toast.error(result.error || 'Failed to submit IMCF form')
+        // Check if there's a detailed message for duplicates
+        const errorMessage = result.message || result.error || 'Failed to submit IMCF form'
+        toast.error(errorMessage)
       }
     } catch (error) {
       console.error('Error submitting IMCF:', error)
@@ -1069,7 +1100,9 @@ export default function IMClearanceFormModule() {
               dailyFees: person.dailyFees,
               ownGcash: person.ownGcash,
               authGcash: person.authGcash,
-              authGcashAccName: person.authGcashAccName
+              authGcashAccName: person.authGcashAccName,
+              duplicateRemark: person.duplicateRemark,
+              remarks: person.remarks
             })),
           isDraft: true
         })
@@ -1088,7 +1121,9 @@ export default function IMClearanceFormModule() {
         setLastSavedTime(new Date())
         toast.success('Draft saved successfully!')
       } else {
-        toast.error(result.error || 'Failed to save draft')
+        // Check if there's a detailed message for duplicates
+        const errorMessage = result.message || result.error || 'Failed to save draft'
+        toast.error(errorMessage)
       }
     } catch (error) {
       console.error('Error saving draft:', error)
@@ -1174,6 +1209,18 @@ export default function IMClearanceFormModule() {
 
       {activeTab === 'form' && (
         <div className="relative">
+          {/* Loading Overlay */}
+          {isLoadingEditForm && (
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-3 p-6 bg-white rounded-lg shadow-lg border">
+                <RefreshCw className="w-8 h-8 text-blue animate-spin" />
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-blue/90">Loading Form for Editing</p>
+                  <p className="text-sm text-blue/70">Please wait while we load the form data...</p>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Sticky Budget Header */}
           <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm rounded-lg">
             <div className="p-4">
@@ -1531,11 +1578,14 @@ export default function IMClearanceFormModule() {
                           }}
                           onBlur={() => {
                             // Final duplicate check when user leaves the field
-                            if (person.registeredName.trim() && checkForDuplicateIM(person.registeredName, person.id)) {
-                              toast.error(`"${person.registeredName}" is already added to this form. Please enter a different name.`)
+                            if (person.registeredName.trim()) {
+                              const duplicateCheck = checkForDuplicateIM(person.registeredName, person.id)
+                              if (duplicateCheck.isDuplicate) {
+                                toast.error(`"${person.registeredName}" is already added to this form as IM #${duplicateCheck.duplicateIndex}. Please enter a different name.`)
+                              }
                             }
                           }}
-                          className={person.isSaved ? disabledInputClasses : `${inputClasses} pr-8 ${checkForDuplicateIM(person.registeredName, person.id) ? 'border-red-500 focus:ring-red-500' : ''}`}
+                          className={person.isSaved ? disabledInputClasses : `${inputClasses} pr-8 ${checkForDuplicateIM(person.registeredName, person.id).isDuplicate ? 'border-red-500 focus:ring-red-500' : ''}`}
                           placeholder="Search IM by name..."
                           required
                           disabled={person.isSaved}
@@ -1555,7 +1605,7 @@ export default function IMClearanceFormModule() {
                       {showDropdown[person.id] && searchResults[person.id]?.length > 0 && !person.isSaved && (
                         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
                           {searchResults[person.id].slice(0, 10).map((im) => {
-                            const isDuplicate = checkForDuplicateIM(im.fullName, person.id)
+                            const isDuplicate = checkForDuplicateIM(im.fullName, person.id).isDuplicate
                             return (
                               <div
                                 key={im.id}
@@ -1589,14 +1639,19 @@ export default function IMClearanceFormModule() {
                       )}
                       
                       {/* Duplicate warning */}
-                      {person.registeredName.trim() && checkForDuplicateIM(person.registeredName, person.id) && !person.isSaved && (
-                        <div className="absolute z-40 w-full mt-1 p-2 bg-red-50 border border-red-200 rounded-md text-xs text-red-600">
-                          <div className="flex items-center gap-1">
-                            <X className="w-3 h-3" />
-                            This person is already added to the form
+                      {(() => {
+                        if (!person.registeredName.trim() || person.isSaved) return null;
+                        const duplicateCheck = checkForDuplicateIM(person.registeredName, person.id);
+                        if (!duplicateCheck.isDuplicate) return null;
+                        return (
+                          <div className="absolute z-40 w-full mt-1 p-2 bg-red-50 border border-red-200 rounded-md text-xs text-red-600">
+                            <div className="flex items-center gap-1">
+                              <X className="w-3 h-3" />
+                              This person is already added as IM #{duplicateCheck.duplicateIndex}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </div>
                   </div>
                   
@@ -1726,6 +1781,27 @@ export default function IMClearanceFormModule() {
                     </div>
                   </div>
                 </div>
+                
+                {/* Remarks Section */}
+                {(person.remarks || person.duplicateRemark) && (
+                  <div>
+                    <label className="block text-sm font-medium text-blue/90 mb-3">Remarks</label>
+                    <div className="w-full">
+                      <textarea
+                        value={person.remarks || ''}
+                        onChange={(e) => handlePersonnelChange(person.id, 'remarks', e.target.value)}
+                        className={person.isSaved ? `${disabledInputClasses} h-20 resize-none` : `${inputClasses} h-20 resize-none`}
+                        placeholder="Enter remarks about this IM personnel..."
+                        disabled={person.isSaved}
+                      />
+                      {person.duplicateRemark && (
+                        <p className="text-xs text-orange mt-1">
+                          <strong>Duplicate Remark:</strong> {person.duplicateRemark}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
                 ))}
               </div>
@@ -1742,6 +1818,7 @@ export default function IMClearanceFormModule() {
                       <th className="text-left p-2 font-semibold text-blue/90">Package Fee</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Daily Fees</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Own GCash</th>
+                      <th className="text-left p-2 font-semibold text-blue/90">Remarks</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Status</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Actions</th>
                     </tr>
@@ -1769,11 +1846,14 @@ export default function IMClearanceFormModule() {
                                     }
                                   }}
                                   onBlur={() => {
-                                    if (person.registeredName.trim() && checkForDuplicateIM(person.registeredName, person.id)) {
-                                      toast.error(`"${person.registeredName}" is already added to this form.`)
+                                    if (person.registeredName.trim()) {
+                                      const duplicateCheck = checkForDuplicateIM(person.registeredName, person.id)
+                                      if (duplicateCheck.isDuplicate) {
+                                        toast.error(`"${person.registeredName}" is already added to this form as IM #${duplicateCheck.duplicateIndex}.`)
+                                      }
                                     }
                                   }}
-                                  className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : `w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 pr-6 ${checkForDuplicateIM(person.registeredName, person.id) ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                  className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : `w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 pr-6 ${checkForDuplicateIM(person.registeredName, person.id).isDuplicate ? 'border-red-500 focus:ring-red-500' : ''}`}
                                   placeholder="Search IM..."
                                   required
                                   disabled={person.isSaved}
@@ -1793,7 +1873,7 @@ export default function IMClearanceFormModule() {
                               {showDropdown[person.id] && searchResults[person.id]?.length > 0 && !person.isSaved && (
                                 <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-32 overflow-y-auto">
                                   {searchResults[person.id].slice(0, 5).map((im) => {
-                                    const isDuplicate = checkForDuplicateIM(im.fullName, person.id)
+                                    const isDuplicate = checkForDuplicateIM(im.fullName, person.id).isDuplicate
                                     return (
                                       <div
                                         key={im.id}
@@ -1895,6 +1975,24 @@ export default function IMClearanceFormModule() {
                               placeholder="09XX XXX XXXX"
                               disabled={person.isSaved}
                             />
+                          </td>
+                          <td className="p-2">
+                            {(person.remarks || person.duplicateRemark) ? (
+                              <div className="text-xs">
+                                {person.remarks && (
+                                  <div className="mb-1 text-blue truncate max-w-[120px]" title={person.remarks}>
+                                    {person.remarks}
+                                  </div>
+                                )}
+                                {person.duplicateRemark && (
+                                  <div className="text-orange truncate max-w-[120px]" title={`Duplicate: ${person.duplicateRemark}`}>
+                                    Dup: {person.duplicateRemark}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
                           </td>
                           <td className="p-2">
                             {person.isSaved ? (
@@ -2205,11 +2303,20 @@ export default function IMClearanceFormModule() {
                               <>
                                 <button
                                   onClick={() => loadIMCFForEdit(form.id)}
-                                  className="flex items-center gap-1 px-2 py-1 text-xs bg-blue text-white rounded hover:bg-blue/80"
-                                  title="Edit Draft"
+                                  disabled={isLoadingEditForm}
+                                  className={`flex items-center gap-1 px-2 py-1 text-xs rounded ${
+                                    isLoadingEditForm 
+                                      ? 'bg-gray-400 text-white cursor-not-allowed' 
+                                      : 'bg-blue text-white hover:bg-blue/80'
+                                  }`}
+                                  title={isLoadingEditForm ? "Loading..." : "Edit Draft"}
                                 >
-                                  <Edit className="w-3 h-3" />
-                                  Edit
+                                  {isLoadingEditForm ? (
+                                    <RefreshCw className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    <Edit className="w-3 h-3" />
+                                  )}
+                                  {isLoadingEditForm ? 'Loading...' : 'Edit'}
                                 </button>
                                 <button
                                   onClick={() => setShowDeleteConfirm(form.id)}

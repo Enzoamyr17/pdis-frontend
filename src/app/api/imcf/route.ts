@@ -22,6 +22,7 @@ interface PersonnelData {
   authGcash: string;
   authGcashAccName: string;
   remarks?: string;
+  duplicateRemark?: string;
 }
 
 // Helper function to check for duplicate personnel
@@ -123,7 +124,17 @@ async function checkForDuplicates(
         reason = 'Same project: daily fees overlap with existing packaged fee'
       }
       
+      // Check if duplicate should be allowed based on remarks
       if (isDuplicate) {
+        const hasCurrentRemark = person.duplicateRemark && person.duplicateRemark.trim() !== ''
+        const hasExistingRemark = existingPerson.remarks && existingPerson.remarks.trim() !== ''
+        
+        // Allow duplicate if either the current person has a remark OR the existing person already has remarks
+        if (hasCurrentRemark || hasExistingRemark) {
+          // Skip adding to duplicates - this is allowed
+          continue
+        }
+        
         duplicates.push({
           formId: form.id,
           referenceNumber: form.referenceNumber,
@@ -266,7 +277,7 @@ export async function POST(request: NextRequest) {
             ownGcash: person.ownGcash,
             authGcash: person.authGcash,
             authGcashAccName: person.authGcashAccName,
-            remarks: person.remarks || null
+            remarks: person.duplicateRemark || person.remarks || null
           })) || []
         }
       },

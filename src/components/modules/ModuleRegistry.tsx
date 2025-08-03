@@ -21,6 +21,10 @@ import IndependentManpowerModule from './IndependentManpowerModule'
 import CreationOfJOModule from './CreationOfJOModule'
 import CreationOfPEPModule from './CreationOfPEPModule'
 import BigCalendarModule from './BigCalendarModule'
+import VendorManagementModule from './VendorManagementModule'
+import GenOpsClientManagementModule from './GenOpsClientManagementModule'
+import SystemReportsModule from './SystemReportsModule'
+import PDDirectoryModule from './PDDirectoryModule'
 
 // Generic placeholder component for modules not yet implemented
 // Currently unused but kept for future module implementations
@@ -140,16 +144,57 @@ export const moduleRegistry: Record<string, ModuleData> = {
     component: IndependentManpowerModule
   },
 
+  // GenAd Tools modules - new
+  'vendor-management': {
+    id: 'vendor-management',
+    title: 'Vendor Management',
+    component: VendorManagementModule
+  },
+
   // GenOps Tools modules
+  'genops-client-management': {
+    id: 'genops-client-management',
+    title: 'GenOps Client Management',
+    component: GenOpsClientManagementModule
+  },
   'creation-of-jo': {
     id: 'creation-of-jo',
-    title: 'Creation of JO',
+    title: 'Creatives JO',
     component: CreationOfJOModule
   },
   'creation-of-pep': {
     id: 'creation-of-pep',
-    title: 'Creation of PEP',
+    title: 'GenOps PEP',
     component: CreationOfPEPModule
+  },
+
+  // Reports modules
+  'system-reports': {
+    id: 'system-reports',
+    title: 'System Reports',
+    component: SystemReportsModule
+  },
+
+  // PD Directory modules
+  'pd-directory-client': {
+    id: 'pd-directory-client',
+    title: 'PD Directory - Client',
+    component: PDDirectoryModule
+  },
+  'pd-directory-vendor': {
+    id: 'pd-directory-vendor',
+    title: 'PD Directory - Vendor',
+    component: PDDirectoryModule
+  },
+  'pd-directory-user': {
+    id: 'pd-directory-user',
+    title: 'PD Directory - User',
+    component: PDDirectoryModule
+  },
+  'pd-directory-im': {
+    id: 'pd-directory-im',
+    title: 'PD Directory - IM',
+    component: PDDirectoryModule
   },
 
   // Additional Tools

@@ -228,4 +228,10 @@ RootLayout (AuthProvider)
 - **UI updates**: Use existing Tailwind classes and Radix components
 - **API development**: Follow RESTful patterns with proper error handling
 
+**Remember to not reset database always when migrating, find ways to migrate without resetting our database data.
+
+**We have a CHANGES.md file in this file whenever i prompt (generate CHANGES) you will insert the changes that we have done in this session, there’s gonna be a separate section for Frontend, Backend and Database make sure to put it in the right section accordingly. Keep it concise, as small as possible and clear.
+
+Additionally, before doing so, you will need to ask me the current date and time to include that information in the CHANGES.md
+
 The system is production-ready with comprehensive authentication, database integration, Google Calendar functionality, and a modular architecture supporting 21 business modules.
