@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { Modal } from "@/components/ui/modal"
 import { useProjects, type Project } from "@/hooks/useProjects"
+import FormStatus from "../ui/FormStatus"
 
 interface IMClearanceFormData {
   referenceNumber: string
@@ -1170,6 +1171,20 @@ export default function IMClearanceFormModule() {
     }
   }
 
+  const dateToday = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
+
+  const IMCF = [
+    { id: 1, name: "Clearance Requestor", date: dateToday, status: 'ongoing' },
+    { id: 2, name: "Clearance Receiver" },
+    { id: 3, name: "Clearance Approver" },
+    { id: 4, name: "AFG Validator" },
+    { id: 5, name: "AFG Authorizer" },
+    { id: 6, name: "Treasury Requestor" },
+    { id: 7, name: "Treasury Approver" },
+    { id: 8, name: "GCash Disbursement Requestor" },
+    { id: 9, name: "GCash Disbursement Approver" }
+  ];
+
   return (
     <div className="h-full p-4 overflow-auto min-w-[32rem]">
       <div className="flex items-center gap-3 mb-6">
@@ -1274,6 +1289,8 @@ export default function IMClearanceFormModule() {
             )}
           
           <form onSubmit={handleSubmit} className="p-4 space-y-4">
+
+          <FormStatus request="Request" costCenter="Cost Center" status={IMCF}/> 
           
           {/* Reference and Project Information */}
           <div className="flex flex-col gap-2 p-3 bg-white/50 rounded border">

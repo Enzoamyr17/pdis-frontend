@@ -4,7 +4,7 @@ export default function ApprovalCenterModule() {
   return (
     <div className="rounded-xl p-4 h-full border border-zinc-500/10 shadow-sm bg-gradient-to-t from-orange/10 to-light-orange/45 overflow-hidden">
       <h2 className="text-lg font-semibold mb-4 text-orange-600">Approval Center</h2>
-      <div className="flex items-center justify-center h-full overflow-hidden">
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="mb-3">
             <svg className="w-12 h-12 text-blue-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
