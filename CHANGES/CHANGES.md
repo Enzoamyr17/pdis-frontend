@@ -30,10 +30,6 @@
   - Implemented remarks display in both card and table views with proper visual distinction
   - Added dedicated remarks section in card view with textarea input for editing
   - Created remarks column in table view showing both regular remarks (blue) and duplicate remarks (orange)
-- **IMCF Duplicate Logic Backend Integration**: Updated backend duplicate checking to allow forms with remarks
-  - Modified duplicate checking logic to allow duplicates when current person has `duplicateRemark` OR existing person has `remarks`
-  - Updated personnel creation/update to save `duplicateRemark` as `remarks` field in database
-  - Enhanced form submission error handling to show detailed backend duplicate messages instead of generic errors
 - **IMCF Form Loading States**: Added comprehensive loading indicators for form editing
   - Implemented `isLoadingEditForm` state with full-screen loading overlay during form data fetching
   - Added loading states to edit buttons with spinner icons and disabled states
@@ -52,4 +48,13 @@
 
 ## Backend
 
+### August 4, 2025 - 12:38 AM
+- **IMCF Duplicate Logic Backend Integration**: Updated backend duplicate checking to allow forms with remarks
+  - Modified duplicate checking logic to allow duplicates when current person has `duplicateRemark` OR existing person has `remarks`
+  - Updated personnel creation/update to save `duplicateRemark` as `remarks` field in database
+  - Enhanced form submission error handling to show detailed backend duplicate messages instead of generic errors
+
 ## Database
+
+### August 4, 2025 - 12:38 AM
+- **IMCF Remarks Field**: Added `remarks` field support for storing duplicate remarks and general notes for IM personnel entries
