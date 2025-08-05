@@ -105,6 +105,35 @@ export default function CompleteProfilePage() {
       return
     }
     
+    // Check if user is authorized to complete profile
+    const checkUserAuthorization = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch("/api/auth/check-employee", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: session.user.email }),
+          })
+
+          if (!response.ok) {
+            // User not found in employee database
+            setError("Hello!\n\nCan't wait to serve you! Please contact the People Management Department to retrieve your access!\n\n-PDIS Administrator")
+            setTimeout(() => {
+              router.push("/")
+            }, 5000) // Redirect after 5 seconds
+            return
+          }
+        } catch (error) {
+          console.error("Authorization check error:", error)
+          setError("An error occurred while verifying your access. Please try again.")
+        }
+      }
+    }
+
+    checkUserAuthorization()
+    
     // Set PD email to user's login email when session loads
     if (session?.user?.email && !formData.pdEmail) {
       setFormData(prev => ({
@@ -282,12 +311,26 @@ export default function CompleteProfilePage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
+        {error && error.includes("PDIS Administrator") ? (
+          <div className="text-center space-y-4">
+            <div className="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg">
+              <div className="whitespace-pre-line text-lg font-medium">
+                {error}
+              </div>
+              <div className="mt-6">
+                <p className="text-sm text-blue-600">
+                  Redirecting to login page in a few seconds...
+                </p>
+              </div>
             </div>
-          )}
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
 
           {/* Personal Information */}
           <div className="space-y-4">
@@ -549,6 +592,7 @@ export default function CompleteProfilePage() {
             {isLoading ? "Completing Profile..." : "Complete Profile"}
           </Button>
         </form>
+        )}
       </div>
     </div>
   )
