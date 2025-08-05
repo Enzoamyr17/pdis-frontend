@@ -189,23 +189,22 @@ export default function BigCalendar() {
     setShowCreateModal(true);
   }, []);
 
-  const handleEventClick = useCallback(async (clickInfo: EventClickArg) => {
-    try {
-      const response = await fetch(`/api/calendar/events/${clickInfo.event.id}`);
-      if (response.ok) {
-        const eventData = await response.json();
-        setSelectedEvent(eventData);
-        setIsEditing(false);
-        setShowEventModal(true);
-      } else {
-        console.error('Failed to fetch event:', await response.text());
-      }
-    } catch (error) {
-      console.error('Failed to fetch event details:', error);
+  const handleEventClick = useCallback((clickInfo: EventClickArg) => {
+    // Find the event in the already loaded calendar events
+    const eventData = calendarEvents?.find(event => event.id === clickInfo.event.id);
+    
+    if (eventData) {
+      setSelectedEvent(eventData);
+      setIsEditing(false);
+      setShowEventModal(true);
+    } else {
+      console.error('Event not found in loaded data:', clickInfo.event.id);
     }
-  }, []);
+  }, [calendarEvents]);
 
   const handleEventDrop = async (dropInfo: EventDropArg) => {
+    const loadingToast = toast.loading('Updating event...');
+    
     try {
       const eventData = {
         title: dropInfo.event.title,
@@ -222,15 +221,21 @@ export default function BigCalendar() {
 
       if (!response.ok) {
         dropInfo.revert();
+        toast.error('Failed to update event', { id: loadingToast });
         console.error('Failed to update event');
+      } else {
+        toast.success('Event updated successfully!', { id: loadingToast });
       }
     } catch (error) {
       dropInfo.revert();
+      toast.error('Failed to update event', { id: loadingToast });
       console.error('Failed to update event:', error);
     }
   };
 
   const handleEventResize = async (resizeInfo: EventResizeInfo) => {
+    const loadingToast = toast.loading('Resizing event...');
+    
     try {
       const eventData = {
         title: resizeInfo.event.title,
@@ -247,10 +252,14 @@ export default function BigCalendar() {
 
       if (!response.ok) {
         resizeInfo.revert();
+        toast.error('Failed to resize event', { id: loadingToast });
         console.error('Failed to update event');
+      } else {
+        toast.success('Event resized successfully!', { id: loadingToast });
       }
     } catch (error) {
       resizeInfo.revert();
+      toast.error('Failed to resize event', { id: loadingToast });
       console.error('Failed to update event:', error);
     }
   };
@@ -496,7 +505,7 @@ export default function BigCalendar() {
         
         setShowEventModal(false);
         setSelectedEvent(null);
-        toast.success('Event deleted successfully!');
+        toast.info('Event deleted successfully!');
       } catch (error) {
         console.error('Failed to delete event:', error);
         toast.error('Failed to delete event');
@@ -597,7 +606,7 @@ export default function BigCalendar() {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
           }}
-          initialView="timeGridDay"
+          initialView="dayGridMonth"
           editable={true}
           selectable={true}
           selectMirror={true}

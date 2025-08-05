@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
+import "sonner/dist/styles.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import CacheInitializer from "@/components/CacheInitializer";
@@ -29,7 +30,7 @@ export default function RootLayout({
         <AuthProvider>
           <CacheInitializer />
           {children}
-          <Toaster />
+          <Toaster position="bottom-right" richColors expand={true} />
         </AuthProvider>
       </body>
     </html>

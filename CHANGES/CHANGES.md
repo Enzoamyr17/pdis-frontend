@@ -2,6 +2,37 @@
 
 ## Frontend
 
+### August 5, 2025 - 10:20 AM
+- **IMCF UI Enhancement**: Implemented conditional visibility for Package Fee and Daily Fees sections/columns
+  - Package Fee field/column now hides when any Daily Fees have values in both card and table views
+  - Daily Fees section/column now hides when Package Fee has a value in both card and table views
+  - Improved user experience by displaying only one fee type at a time to prevent confusion
+  - Maintained all existing functionality and validation logic for fee calculations
+
+### August 5, 2025 - 9:30 AM
+- **Toast Notification System**: Enhanced UserTodoList with Sonner toast notifications for all user actions
+  - Added success toasts for task addition, completion/incompletion, and deletion
+  - Positioned toasts in bottom-right corner with custom brand color styling
+  - Integrated with global Toaster configuration for consistent UI experience
+- **BigCalendar Performance Optimization**: Improved event handling to eliminate unnecessary API calls
+  - Modified `handleEventClick` to use initially loaded events data instead of making individual API requests
+  - Enhanced event interaction performance by leveraging cached calendar events
+  - Maintained data consistency while reducing server load
+- **Calendar Widget Management**: Implemented smart widget visibility control in dashboard
+  - Calendar widget automatically hides when BigCalendar module is active to prevent UI duplication
+  - Maintains clean interface by showing only relevant calendar components
+  - Preserves normal widget functionality when other modules are active
+- **Event Interaction Feedback**: Added real-time loading toasts for calendar event operations
+  - Drag operations show "Updating event..." with success/error feedback
+  - Resize operations show "Resizing event..." with appropriate status updates
+  - Removed unnecessary refresh button from BigCalendar header for cleaner UI
+- **Toast Theme Integration**: Customized Sonner toast styling to match application brand colors
+  - Success toasts: Light green backgrounds with brand green borders
+  - Error toasts: Light red backgrounds with brand red borders  
+  - Info toasts: Light blue backgrounds with brand blue borders
+  - Warning toasts: Light orange backgrounds with brand orange borders
+  - Added dark mode support with appropriate color adjustments
+
 ### August 4, 2025 - 1:20 PM
 - **WorkflowStatus Component Enhancements**: Major refactoring of stage status system and interaction patterns
   - Updated interface to use `status` field instead of `isCompleted` boolean with 4 status types: completed (green + check), ongoing (yellow + clock), re-validation (orange + arrow left), cancelled (red + X)

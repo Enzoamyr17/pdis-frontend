@@ -16,7 +16,7 @@ import { moduleRegistry } from '@/components/modules/ModuleRegistry'
 
 export default function Dashboard() {
   const [resizeTrigger, setResizeTrigger] = useState(0)
-  const { setActiveModule } = useModule()
+  const { activeModule, setActiveModule } = useModule()
 
   const handleCalendarClick = () => {
     const bigCalendarModule = moduleRegistry['big-calendar']
@@ -48,15 +48,18 @@ export default function Dashboard() {
             
             {/* Scrollable widgets below */}
             <div className="no-scrollbar flex flex-col gap-2 flex-1 overflow-y-auto scrollbar-left min-h-0">
-              <div 
-                className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-2 flex-shrink-0 cursor-pointer hover:bg-gradient-to-t hover:from-blue/20 hover:to-light-blue/55 transition-all duration-200"
-                onClick={handleCalendarClick}
-              >
-                <h2 className="text-lg font-semibold mb-2 pl-1 text-blue">Calendar</h2>
-                <div className="h-40 overflow-hidden">
-                  <Calendar resizeTrigger={resizeTrigger} />  
+              {/* Hide Calendar widget when BigCalendar module is active */}
+              {activeModule?.id !== 'big-calendar' && (
+                <div 
+                  className="border border-zinc-500/10 shadow-sm bg-gradient-to-t from-blue/10 to-light-blue/45 rounded-xl p-2 flex-shrink-0 cursor-pointer hover:bg-gradient-to-t hover:from-blue/20 hover:to-light-blue/55 transition-all duration-200"
+                  onClick={handleCalendarClick}
+                >
+                  <h2 className="text-lg font-semibold mb-2 pl-1 text-blue">Calendar</h2>
+                  <div className="h-40 overflow-hidden">
+                    <Calendar resizeTrigger={resizeTrigger} />  
+                  </div>
                 </div>
-              </div>
+              )}
               <TodaysNews />
               <BulletinBoard />
             </div>

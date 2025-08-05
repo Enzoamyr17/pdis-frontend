@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { toast } from "sonner"
 import {
   DndContext, 
   closestCenter,
@@ -134,9 +135,12 @@ export default function UserTodoList() {
   )
 
   const toggleTask = (id: number) => {
+    const task = tasks.find(t => t.id === id)
+    const newStatus = !task?.completed
     setTasks(tasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
     ))
+    toast.success(newStatus ? "Task completed!" : "Task marked as incomplete")
   }
 
   const addTask = () => {
@@ -150,11 +154,13 @@ export default function UserTodoList() {
         order: newOrder
       }])
       setNewTask("")
+      toast.info("Task added successfully!")
     }
   }
 
   const deleteTask = (id: number) => {
     setTasks(tasks.filter(task => task.id !== id))
+    toast.info("Task deleted successfully!")
   }
 
   const handleDragEnd = (event: DragEndEvent) => {

@@ -1,7 +1,6 @@
 "use client"
 
 import { Check, ArrowLeft, X, Clock } from "lucide-react"
-import { useState } from "react"
 
 interface WorkflowStage {
   id: number

@@ -1696,66 +1696,70 @@ export default function IMClearanceFormModule() {
                     />
                   </div>
                   
-                  <div className="w-[23%] min-w-[14rem] flex-grow-1">
-                    <label className={labelClasses}>Packaged Fee (₱)</label>
-                    <input
-                      type="number"
-                      value={person.packagedFee === 0 ? '' : person.packagedFee}
-                      onChange={(e) => {
-                        const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
-                        if (value > 0) {
-                          // Clear all daily fees when packaged fee is entered
-                          const clearedDailyFees = {
-                            monday: 0,
-                            tuesday: 0,
-                            wednesday: 0,
-                            thursday: 0,
-                            friday: 0,
-                            saturday: 0,
-                            sunday: 0
+                  {!Object.values(person.dailyFees).some(fee => fee > 0) && (
+                    <div className="w-[23%] min-w-[14rem] flex-grow-1">
+                      <label className={labelClasses}>Packaged Fee (₱)</label>
+                      <input
+                        type="number"
+                        value={person.packagedFee === 0 ? '' : person.packagedFee}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
+                          if (value > 0) {
+                            // Clear all daily fees when packaged fee is entered
+                            const clearedDailyFees = {
+                              monday: 0,
+                              tuesday: 0,
+                              wednesday: 0,
+                              thursday: 0,
+                              friday: 0,
+                              saturday: 0,
+                              sunday: 0
+                            }
+                            handlePersonnelChange(person.id, 'dailyFees', clearedDailyFees)
                           }
-                          handlePersonnelChange(person.id, 'dailyFees', clearedDailyFees)
-                        }
-                        handlePersonnelChange(person.id, 'packagedFee', value)
-                      }}
-                      className={Object.values(person.dailyFees).some(fee => fee > 0) || person.isSaved ? disabledInputClasses : inputClasses}
-                      min="0"
-                      step="0.01"
-                      placeholder="0.00"
-                      disabled={Object.values(person.dailyFees).some(fee => fee > 0) || person.isSaved}
-                    />
-                  </div>
+                          handlePersonnelChange(person.id, 'packagedFee', value)
+                        }}
+                        className={person.isSaved ? disabledInputClasses : inputClasses}
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        disabled={person.isSaved}
+                      />
+                    </div>
+                  )}
                 </div>
                 
                 {/* Daily Fees */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-blue/90 mb-3">Daily Fees (₱)</label>
-                  <div className="flex flex-wrap justify-center gap-2 w-full mb-4">
-                    {Object.entries(person.dailyFees).map(([day, fee]) => (
-                      <div key={day} className="flex-grow-1 max-w-[12rem]">
-                        <label className={labelClasses}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
-                        <input
-                          type="number"
-                          value={fee === 0 ? '' : fee}
-                          onChange={(e) => {
-                            const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
-                            if (value > 0) {
-                              // Clear packaged fee when daily fee is entered
-                              handlePersonnelChange(person.id, 'packagedFee', 0)
-                            }
-                            const newDailyFees = { ...person.dailyFees, [day]: value }
-                            handlePersonnelChange(person.id, 'dailyFees', newDailyFees)
-                          }}
-                          className={person.packagedFee > 0 || person.isSaved ? disabledInputClasses : inputClasses}
-                          min="0"
-                          step="0.01"
-                          placeholder="0.00"
-                          disabled={person.packagedFee > 0 || person.isSaved}
-                        />
-                      </div>
-                    ))}
+                {person.packagedFee === 0 && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-blue/90 mb-3">Daily Fees (₱)</label>
+                    <div className="flex flex-wrap justify-center gap-2 w-full mb-4">
+                      {Object.entries(person.dailyFees).map(([day, fee]) => (
+                        <div key={day} className="flex-grow-1 max-w-[12rem]">
+                          <label className={labelClasses}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
+                          <input
+                            type="number"
+                            value={fee === 0 ? '' : fee}
+                            onChange={(e) => {
+                              const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
+                              if (value > 0) {
+                                // Clear packaged fee when daily fee is entered
+                                handlePersonnelChange(person.id, 'packagedFee', 0)
+                              }
+                              const newDailyFees = { ...person.dailyFees, [day]: value }
+                              handlePersonnelChange(person.id, 'dailyFees', newDailyFees)
+                            }}
+                            className={person.isSaved ? disabledInputClasses : inputClasses}
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            disabled={person.isSaved}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* GCash Information */}
                 <div>
@@ -1832,8 +1836,12 @@ export default function IMClearanceFormModule() {
                       <th className="text-left p-2 font-semibold text-blue/90 min-w-[200px]">Name</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Position</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Venue</th>
-                      <th className="text-left p-2 font-semibold text-blue/90">Package Fee</th>
-                      <th className="text-left p-2 font-semibold text-blue/90">Daily Fees</th>
+                      {!personnelList.some(person => Object.values(person.dailyFees).some(fee => fee > 0)) && (
+                        <th className="text-left p-2 font-semibold text-blue/90">Package Fee</th>
+                      )}
+                      {!personnelList.some(person => person.packagedFee > 0) && (
+                        <th className="text-left p-2 font-semibold text-blue/90">Daily Fees</th>
+                      )}
                       <th className="text-left p-2 font-semibold text-blue/90">Own GCash</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Remarks</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Status</th>
@@ -1930,59 +1938,63 @@ export default function IMClearanceFormModule() {
                               disabled={person.isSaved}
                             />
                           </td>
-                          <td className="p-2">
-                            <input
-                              type="number"
-                              value={person.packagedFee === 0 ? '' : person.packagedFee}
-                              onChange={(e) => {
-                                const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
-                                if (value > 0) {
-                                  const clearedDailyFees = {
-                                    monday: 0, tuesday: 0, wednesday: 0, thursday: 0,
-                                    friday: 0, saturday: 0, sunday: 0
-                                  }
-                                  handlePersonnelChange(person.id, 'dailyFees', clearedDailyFees)
-                                }
-                                handlePersonnelChange(person.id, 'packagedFee', value)
-                              }}
-                              className={Object.values(person.dailyFees).some(fee => fee > 0) || person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"}
-                              min="0"
-                              step="0.01"
-                              placeholder="0.00"
-                              disabled={Object.values(person.dailyFees).some(fee => fee > 0) || person.isSaved}
-                            />
-                          </td>
-                          <td className="p-2">
-                            {hasDailyFees ? (
-                              <div className="text-xs text-blue">
-                                {Object.entries(person.dailyFees)
-                                  .filter(([, fee]) => fee > 0)
-                                  .map(([day, fee]) => (
-                                    <div key={day}>{day.charAt(0).toUpperCase() + day.slice(1)}: ₱{fee}</div>
-                                  ))
-                                }
-                              </div>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  // Switch to card view for detailed daily fee editing
-                                  setPersonnelViewMode('card')
-                                  // Focus on this person's daily fees section
-                                  setTimeout(() => {
-                                    const element = document.querySelector(`[data-personnel-id="${person.id}"]`)
-                                    if (element) {
-                                      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                          {!personnelList.some(person => Object.values(person.dailyFees).some(fee => fee > 0)) && (
+                            <td className="p-2">
+                              <input
+                                type="number"
+                                value={person.packagedFee === 0 ? '' : person.packagedFee}
+                                onChange={(e) => {
+                                  const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
+                                  if (value > 0) {
+                                    const clearedDailyFees = {
+                                      monday: 0, tuesday: 0, wednesday: 0, thursday: 0,
+                                      friday: 0, saturday: 0, sunday: 0
                                     }
-                                  }, 100)
+                                    handlePersonnelChange(person.id, 'dailyFees', clearedDailyFees)
+                                  }
+                                  handlePersonnelChange(person.id, 'packagedFee', value)
                                 }}
-                                className="text-xs text-blue hover:text-blue/80 underline"
-                                disabled={person.packagedFee > 0 || person.isSaved}
-                              >
-                                Edit Daily Fees
-                              </button>
-                            )}
-                          </td>
+                                className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"}
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                disabled={person.isSaved}
+                              />
+                            </td>
+                          )}
+                          {!personnelList.some(person => person.packagedFee > 0) && (
+                            <td className="p-2">
+                              {hasDailyFees ? (
+                                <div className="text-xs text-blue">
+                                  {Object.entries(person.dailyFees)
+                                    .filter(([, fee]) => fee > 0)
+                                    .map(([day, fee]) => (
+                                      <div key={day}>{day.charAt(0).toUpperCase() + day.slice(1)}: ₱{fee}</div>
+                                    ))
+                                  }
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    // Switch to card view for detailed daily fee editing
+                                    setPersonnelViewMode('card')
+                                    // Focus on this person's daily fees section
+                                    setTimeout(() => {
+                                      const element = document.querySelector(`[data-personnel-id="${person.id}"]`)
+                                      if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                      }
+                                    }, 100)
+                                  }}
+                                  className="text-xs text-blue hover:text-blue/80 underline"
+                                  disabled={person.isSaved}
+                                >
+                                  Edit Daily Fees
+                                </button>
+                              )}
+                            </td>
+                          )}
                           <td className="p-2">
                             <input
                               type="text"
