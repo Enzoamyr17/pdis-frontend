@@ -124,14 +124,6 @@ export default function ServiceRequestTrackerModule() {
   const [sortBy, setSortBy] = useState<string>("dateNeeded")
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
 
-  const getOverallStatus = (stages: Array<{ status?: string }>) => {
-    if (stages.some(stage => stage.status === 'cancelled')) return 'cancelled'
-    if (stages.some(stage => stage.status === 'ongoing')) return 'ongoing'
-    if (stages.some(stage => stage.status === 'user')) return 'user'
-    if (stages.every(stage => stage.status === 'completed')) return 'completed'
-    return 'pending'
-  }
-
   const parseDateString = (dateStr: string) => {
     const [day, month, year] = dateStr.split('/').map(Number)
     return new Date(year, month - 1, day)
@@ -170,7 +162,6 @@ export default function ServiceRequestTrackerModule() {
       )
     }
 
-    const currentDate = new Date()
     
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
