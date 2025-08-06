@@ -90,7 +90,7 @@ const serviceCenterItems = [
     disabled: false,
   },
   {
-    title: "Vehicle Req",
+    title: "Vehicle Requisition",
     moduleId: "vehicle-requisition",
     icon: Car,
     disabled: false,
