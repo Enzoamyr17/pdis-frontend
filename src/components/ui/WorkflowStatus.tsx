@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, ArrowLeft, X, Clock } from "lucide-react"
+import { Check, ArrowLeft, X, Clock, User } from "lucide-react"
 import { useState } from "react"
 
 interface WorkflowStage {
@@ -14,6 +14,7 @@ interface WorkflowStatusProps {
   request: string
   costCenter: string
   status: WorkflowStage[]
+  dateNeeded?: string
 }
 
 const getStatusStyles = (status: string) => {
@@ -46,6 +47,13 @@ const getStatusStyles = (status: string) => {
         borderColor: 'border-red',
         icon: X
       }
+    case 'user':
+      return {
+        bgColor: 'bg-light-blue',
+        textColor: 'text-white',
+        borderColor: 'border-light-blue',
+        icon: User
+      }
     default:
       return {
         bgColor: 'bg-greyed',
@@ -56,7 +64,7 @@ const getStatusStyles = (status: string) => {
   }
 }
 
-export default function WorkflowStatus({ request, costCenter, status }: WorkflowStatusProps) {
+export default function WorkflowStatus({ request, costCenter, status, dateNeeded = "" }: WorkflowStatusProps) {
   const [expandedStage, setExpandedStage] = useState<number | null>(null)
 
   const handleStageClick = (stageId: number) => {
@@ -67,14 +75,38 @@ export default function WorkflowStatus({ request, costCenter, status }: Workflow
     setExpandedStage(null)
   }
 
+  const parseDateString = (dateStr: string) => {
+    const [day, month, year] = dateStr.split('/').map(Number)
+    return new Date(year, month - 1, day)
+  }
+
+  const getBorderStyle = () => {
+    if (!dateNeeded) return 'border-none'
+    
+    const requestDate = parseDateString(dateNeeded)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    requestDate.setHours(0, 0, 0, 0)
+    
+    const isDueToday = requestDate.getTime() === today.getTime()
+    const isOverdue = requestDate < today
+    
+    if (isDueToday) return 'border-2 border-yellow/40'
+    if (isOverdue) return 'border-2 border-red/40'
+    return 'border-none'
+  }
+
   return (
     <div 
-      className="group/main flex flex-col gap-1 bg-white p-1 pt-2 hover:p-2 h-auto w-full rounded-2xl transition-all duration-400 transition-delay-1000 overflow-hidden"
+      className={`group/main flex flex-col gap-1 bg-white p-1 pt-2 hover:p-2 h-auto w-full rounded-2xl transition-all duration-400 transition-delay-1000 overflow-hidden shadow ${getBorderStyle()}`}
       onMouseLeave={handleMouseOut}
     >
-      <h1 className="my-auto text-nowrap text-sm font-bold pl-2 group-hover/main:text-lg duration-400">{request} | {costCenter}</h1>
+      <div className="flex justify-between">
+        <h1 className="my-auto text-nowrap text-sm font-bold pl-2 group-hover/main:text-lg duration-400">{request} | {costCenter}</h1>
+        <h1 className="my-auto text-nowrap text-sm font-bold pr-2 group-hover/main:text-lg duration-400">{dateNeeded}</h1>
+      </div>
       {/* Status */}
-      <div className="m-auto flex gap-2 flex-wrap justify-between bg-light-bg p-1 group-hover/main:p-2 w-full rounded-2xl transition-all overflow-hidden duration-400 overflow-x-auto"
+      <div className="m-auto flex gap-2 flex-wrap justify-evenly bg-light-bg p-1 group-hover/main:p-2 w-full rounded-2xl transition-all overflow-hidden duration-400 overflow-x-auto"
       >
         {status.map((stage) => {
           const statusStyles = getStatusStyles(stage.status || '')

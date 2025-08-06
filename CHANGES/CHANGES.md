@@ -2,6 +2,38 @@
 
 ## Frontend
 
+### August 6, 2025 - 3:00 PM
+- **IMCF List View Field Enhancement**: Added missing Auth GCash and Auth GCash Name fields to table view
+  - Added Auth GCash and Auth GCash Name columns to match Card view functionality
+  - Applied consistent min-width styling to all input forms in List view for better UX
+  - Enhanced form usability with proper field sizing across different screen sizes
+- **IMCF Fee Column Logic Fix**: Resolved Package Fee and Daily Fees visibility issues in table view
+  - Fixed logic to show both columns when personnel have empty fees (allowing choice of fee type)
+  - Changed from global visibility to per-row logic - each person can independently choose fee type
+  - Maintained mutual exclusivity per person while allowing mixed fee types across different personnel
+  - Resolved issue where saved personnel with package fees would hide daily fees option for new personnel
+- **IMCF View Switching Auto-Scroll**: Implemented automatic scrolling to current work when switching between views
+  - Added smart personnel detection to identify currently edited (unsaved) personnel
+  - Auto-scroll targets most recently added unsaved personnel for better workflow continuity
+  - Added data-personnel-id attributes to table rows for consistent targeting across both views
+  - Enhanced UX by maintaining context when switching between Card and Table views
+
+### August 6, 2025 - 2:26 PM
+- **Service Request Tracker Search & Filter System**: Comprehensive search and sort functionality implementation
+  - Added real-time search with suggestions dropdown supporting both startsWith and includes matching
+  - Implemented priority-based suggestions (exact matches first, then partial matches) limited to 5 results
+  - Created sort functionality with Date Needed (Closest First), Request (ascending), and Requestor Name (ascending)
+  - Enhanced date parsing to handle DD/MM/YYYY format with proper chronological sorting
+- **Service Request Tracker Data Enhancement**: Expanded sample data for comprehensive testing
+  - Added multiple VRF, IMCF, SRF, and PRF request types with varied workflow statuses
+  - Included diverse requestor names and date ranges to showcase search and sort capabilities
+  - Created different workflow status combinations (completed, ongoing, cancelled, user, pending)
+- **Service Request Tracker Visual Status Indicators**: Implemented date-based border styling system
+  - Added red borders with 40% opacity for overdue requests (past dateNeeded)
+  - Implemented yellow borders with 40% opacity for requests due today
+  - Enhanced WorkflowStatus component with internal date calculation logic for self-contained styling
+  - Added shadow effects to improve visual hierarchy and component distinction
+
 ### August 5, 2025 - 10:20 AM
 - **IMCF UI Enhancement**: Implemented conditional visibility for Package Fee and Daily Fees sections/columns
   - Package Fee field/column now hides when any Daily Fees have values in both card and table views

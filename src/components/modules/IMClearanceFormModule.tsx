@@ -215,6 +215,22 @@ export default function IMClearanceFormModule() {
   const [showScrollToBottom, setShowScrollToBottom] = useState(false)
   const [showStickyActions, setShowStickyActions] = useState(false)
   const personnelContainerRef = useRef<HTMLDivElement>(null)
+
+  // Function to scroll to the most recently added unsaved (being edited) personnel
+  const scrollToFirstUnsavedPersonnel = () => {
+    // Find all unsaved personnel
+    const unsavedPersonnel = personnelList.filter(person => !person.isSaved)
+    if (unsavedPersonnel.length > 0) {
+      // Get the last one (most recently added)
+      const targetPersonnel = unsavedPersonnel[unsavedPersonnel.length - 1]
+      setTimeout(() => {
+        const element = document.querySelector(`[data-personnel-id="${targetPersonnel.id}"]`)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 100)
+    }
+  }
   const actionButtonsRef = useRef<HTMLDivElement>(null)
 
   // Remove unused handler
@@ -1471,8 +1487,8 @@ export default function IMClearanceFormModule() {
           </div>
 
           {/* Personnel Details */}
-          <div ref={personnelContainerRef} className="p-3 bg-white/50 rounded border">
-            <div className="flex items-center justify-between mb-3">
+          <div ref={personnelContainerRef} className="p-0 bg-white/50 rounded border">
+            <div className="sticky top-24 bg-white rounded-md shadow border border-gray-300/20 z-50 flex items-center justify-between mb-3 p-3">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-blue" />
                 <h2 className="text-sm font-semibold text-blue/90">Clearance and Service Fee Details</h2>
@@ -1482,7 +1498,10 @@ export default function IMClearanceFormModule() {
                 <div className="flex items-center border border-gray-300 rounded overflow-hidden">
                   <button
                     type="button"
-                    onClick={() => setPersonnelViewMode('card')}
+                    onClick={() => {
+                      setPersonnelViewMode('card')
+                      scrollToFirstUnsavedPersonnel()
+                    }}
                     className={`px-2 py-1 text-xs flex items-center gap-1 transition-colors ${
                       personnelViewMode === 'card' 
                         ? 'bg-blue text-white' 
@@ -1495,7 +1514,10 @@ export default function IMClearanceFormModule() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPersonnelViewMode('table')}
+                    onClick={() => {
+                      setPersonnelViewMode('table')
+                      scrollToFirstUnsavedPersonnel()
+                    }}
                     className={`px-2 py-1 text-xs flex items-center gap-1 transition-colors ${
                       personnelViewMode === 'table' 
                         ? 'bg-blue text-white' 
@@ -1520,7 +1542,7 @@ export default function IMClearanceFormModule() {
             
             {personnelViewMode === 'card' ? (
               // Card View
-              <div className="space-y-6">
+              <div className="space-y-6 p-3">
                 {personnelList.map((person, index) => (
               <div key={person.id} data-personnel-id={person.id} className="mb-6 p-4 bg-white/70 rounded-lg border-l-4 border-orange shadow-sm">
                 <div className="flex items-center justify-between mb-4">
@@ -1836,13 +1858,11 @@ export default function IMClearanceFormModule() {
                       <th className="text-left p-2 font-semibold text-blue/90 min-w-[200px]">Name</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Position</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Venue</th>
-                      {!personnelList.some(person => Object.values(person.dailyFees).some(fee => fee > 0)) && (
-                        <th className="text-left p-2 font-semibold text-blue/90">Package Fee</th>
-                      )}
-                      {!personnelList.some(person => person.packagedFee > 0) && (
-                        <th className="text-left p-2 font-semibold text-blue/90">Daily Fees</th>
-                      )}
+                      <th className="text-left p-2 font-semibold text-blue/90">Package Fee</th>
+                      <th className="text-left p-2 font-semibold text-blue/90">Daily Fees</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Own GCash</th>
+                      <th className="text-left p-2 font-semibold text-blue/90">Auth GCash</th>
+                      <th className="text-left p-2 font-semibold text-blue/90">Auth GCash Name</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Remarks</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Status</th>
                       <th className="text-left p-2 font-semibold text-blue/90">Actions</th>
@@ -1853,7 +1873,7 @@ export default function IMClearanceFormModule() {
                       const dailyTotal = Object.values(person.dailyFees).reduce((sum, fee) => sum + fee, 0)
                       const hasDailyFees = dailyTotal > 0
                       return (
-                        <tr key={person.id} className="border-b border-gray-100 hover:bg-gray-50">
+                        <tr key={person.id} data-personnel-id={person.id} className="border-b border-gray-100 hover:bg-gray-50">
                           <td className="p-2 font-medium">{index + 1}</td>
                           <td className="p-2">
                             <div className="relative" ref={el => { dropdownRefs.current[person.id] = el }}>
@@ -1878,7 +1898,7 @@ export default function IMClearanceFormModule() {
                                       }
                                     }
                                   }}
-                                  className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : `w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 pr-6 ${checkForDuplicateIM(person.registeredName, person.id).isDuplicate ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                  className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed min-w-[200px]" : `w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 pr-6 min-w-[200px] ${checkForDuplicateIM(person.registeredName, person.id).isDuplicate ? 'border-red-500 focus:ring-red-500' : ''}`}
                                   placeholder="Search IM..."
                                   required
                                   disabled={person.isSaved}
@@ -1923,7 +1943,7 @@ export default function IMClearanceFormModule() {
                               type="text"
                               value={person.position}
                               onChange={(e) => handlePersonnelChange(person.id, 'position', e.target.value)}
-                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"}
+                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed min-w-[120px]" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 min-w-[120px]"}
                               required
                               disabled={person.isSaved}
                             />
@@ -1933,13 +1953,14 @@ export default function IMClearanceFormModule() {
                               type="text"
                               value={person.outletVenue}
                               onChange={(e) => handlePersonnelChange(person.id, 'outletVenue', e.target.value)}
-                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"}
+                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed min-w-[120px]" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 min-w-[120px]"}
                               required
                               disabled={person.isSaved}
                             />
                           </td>
-                          {!personnelList.some(person => Object.values(person.dailyFees).some(fee => fee > 0)) && (
-                            <td className="p-2">
+                          <td className="p-2">
+                            {/* Show Package Fee input only if this person has no daily fees */}
+                            {!Object.values(person.dailyFees).some(fee => fee > 0) ? (
                               <input
                                 type="number"
                                 value={person.packagedFee === 0 ? '' : person.packagedFee}
@@ -1954,17 +1975,20 @@ export default function IMClearanceFormModule() {
                                   }
                                   handlePersonnelChange(person.id, 'packagedFee', value)
                                 }}
-                                className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"}
+                                className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed min-w-[100px]" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 min-w-[100px]"}
                                 min="0"
                                 step="0.01"
                                 placeholder="0.00"
                                 disabled={person.isSaved}
                               />
-                            </td>
-                          )}
-                          {!personnelList.some(person => person.packagedFee > 0) && (
-                            <td className="p-2">
-                              {hasDailyFees ? (
+                            ) : (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="p-2">
+                            {/* Show Daily Fees only if this person has no package fee */}
+                            {person.packagedFee === 0 ? (
+                              hasDailyFees ? (
                                 <div className="text-xs text-blue">
                                   {Object.entries(person.dailyFees)
                                     .filter(([, fee]) => fee > 0)
@@ -1992,16 +2016,38 @@ export default function IMClearanceFormModule() {
                                 >
                                   Edit Daily Fees
                                 </button>
-                              )}
-                            </td>
-                          )}
+                              )
+                            ) : (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
+                          </td>
                           <td className="p-2">
                             <input
                               type="text"
                               value={person.ownGcash}
                               onChange={(e) => handlePersonnelChange(person.id, 'ownGcash', e.target.value)}
-                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90"}
+                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed min-w-[120px]" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 min-w-[120px]"}
                               placeholder="09XX XXX XXXX"
+                              disabled={person.isSaved}
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              type="text"
+                              value={person.authGcash}
+                              onChange={(e) => handlePersonnelChange(person.id, 'authGcash', e.target.value)}
+                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed min-w-[120px]" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 min-w-[120px]"}
+                              placeholder="09XX XXX XXXX"
+                              disabled={person.isSaved}
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              type="text"
+                              value={person.authGcashAccName}
+                              onChange={(e) => handlePersonnelChange(person.id, 'authGcashAccName', e.target.value)}
+                              className={person.isSaved ? "w-full px-2 py-1 text-xs border border-zinc-200 rounded bg-zinc-100 text-zinc-500 cursor-not-allowed min-w-[150px]" : "w-full px-2 py-1 text-xs border border-zinc-300 rounded focus:outline-none focus:ring-1 focus:ring-orange focus:border-transparent bg-white/90 min-w-[150px]"}
+                              placeholder="Account Name"
                               disabled={person.isSaved}
                             />
                           </td>
