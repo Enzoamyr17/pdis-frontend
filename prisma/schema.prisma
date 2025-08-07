@@ -139,6 +139,7 @@ model IM {
   createdAt          DateTime? @default(now())
   updatedAt          DateTime? @updatedAt
   registeredByUser   User?     @relation(fields: [registeredBy], references: [id])
+  imcfPersonnel      IMCFPersonnel[]
 
   @@index([imNumber])
   @@index([status])
@@ -261,7 +262,8 @@ model IMCFForm {
 model IMCFPersonnel {
   id                String    @id @default(cuid())
   imcfFormID        String
-  registeredName    String
+  imID              String?   // Reference to IM table
+  registeredName    String?   // Optional, will use IM data when imID is present
   position          String
   outletVenue       String
   packagedFee       Decimal   @default(0)
@@ -272,15 +274,17 @@ model IMCFPersonnel {
   fridayFee         Decimal   @default(0)
   saturdayFee       Decimal   @default(0)
   sundayFee         Decimal   @default(0)
-  ownGcash          String?
-  authGcash         String?
-  authGcashAccName  String?
+  ownGcash          String?   // Optional, will use IM data when imID is present
+  authGcash         String?   // Optional, will use IM data when imID is present
+  authGcashAccName  String?   // Optional, will use IM data when imID is present
   remarks           String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   imcfForm          IMCFForm  @relation(fields: [imcfFormID], references: [id], onDelete: Cascade)
+  im                IM?       @relation(fields: [imID], references: [id], onDelete: Restrict)
 
   @@index([imcfFormID])
+  @@index([imID])
   @@index([registeredName])
 }
 

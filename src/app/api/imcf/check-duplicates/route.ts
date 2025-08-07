@@ -73,9 +73,35 @@ export async function POST(request: NextRequest) {
         },
         personnel: {
           where: {
-            registeredName: {
-              equals: personnelName,
-              mode: 'insensitive' as const
+            OR: [
+              {
+                registeredName: {
+                  equals: personnelName,
+                  mode: 'insensitive' as const
+                }
+              },
+              {
+                // Also check IM personnel by constructing full name from IM data
+                im: {
+                  OR: [
+                    {
+                      AND: [
+                        { lastName: { contains: personnelName.split(',')[0]?.trim() || '', mode: 'insensitive' as const } },
+                        { firstName: { contains: personnelName.split(',')[1]?.trim().split(' ')[0] || '', mode: 'insensitive' as const } }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          include: {
+            im: {
+              select: {
+                firstName: true,
+                middleName: true,
+                lastName: true
+              }
             }
           }
         }
@@ -86,9 +112,18 @@ export async function POST(request: NextRequest) {
     const duplicates = []
 
     for (const form of existingForms) {
-      const person = form.personnel.find(p => 
-        p.registeredName.toLowerCase() === personnelName.toLowerCase()
-      )
+      const person = form.personnel.find(p => {
+        // Check by registered name if available
+        if (p.registeredName) {
+          return p.registeredName.toLowerCase() === personnelName.toLowerCase()
+        }
+        // Check by IM full name if IM data is available
+        if (p.im) {
+          const fullName = `${p.im.lastName}, ${p.im.firstName} ${p.im.middleName || ''}`.trim()
+          return fullName.toLowerCase() === personnelName.toLowerCase()
+        }
+        return false
+      })
       
       if (!person) continue // Skip if person not found
       

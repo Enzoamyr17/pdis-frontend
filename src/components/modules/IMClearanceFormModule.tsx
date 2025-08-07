@@ -37,6 +37,7 @@ interface CE {
 
 interface IMPersonnel {
   id: string
+  imId?: string  // Reference to IM database record
   registeredName: string
   position: string
   outletVenue: string
@@ -88,7 +89,8 @@ interface IMCFFormListItem {
   } | null
   personnel: Array<{
     id: string
-    registeredName: string
+    imID?: string
+    registeredName?: string
     position: string
     packagedFee: number
     mondayFee: number
@@ -98,6 +100,12 @@ interface IMCFFormListItem {
     fridayFee: number
     saturdayFee: number
     sundayFee: number
+    im?: {
+      id: string
+      firstName: string
+      middleName?: string
+      lastName: string
+    }
   }>
 }
 
@@ -699,6 +707,7 @@ export default function IMClearanceFormModule() {
     setPersonnelList(prev => prev.map(person => 
       person.id === personnelId ? {
         ...person,
+        imId: im.id,  // Store IM reference ID
         registeredName: im.fullName,
         ownGcash: im.ownGcash || '',
         authGcash: im.authorizedGcash || '',
@@ -871,7 +880,8 @@ export default function IMClearanceFormModule() {
         // Populate personnel data
         const loadedPersonnel: IMPersonnel[] = imcfData.personnel.map((person: {
           id: string;
-          registeredName: string;
+          imID?: string;
+          registeredName?: string;
           position: string;
           outletVenue: string;
           packagedFee: number;
@@ -882,13 +892,26 @@ export default function IMClearanceFormModule() {
           fridayFee: number;
           saturdayFee: number;
           sundayFee: number;
-          ownGcash: string;
-          authGcash: string;
-          authGcashAccName: string;
+          ownGcash?: string;
+          authGcash?: string;
+          authGcashAccName?: string;
           remarks?: string;
+          im?: {
+            id: string;
+            imNumber: string;
+            firstName: string;
+            middleName?: string;
+            lastName: string;
+            ownGcash?: string;
+            authorizedGcash?: string;
+            authorizedReceiver?: string;
+          };
         }, index: number) => ({
           id: person.id || (index + 1).toString(),
-          registeredName: person.registeredName,
+          imId: person.imID || undefined,
+          registeredName: person.im 
+            ? `${person.im.lastName}, ${person.im.firstName} ${person.im.middleName || ''}`.trim()
+            : (person.registeredName || ''),
           position: person.position,
           outletVenue: person.outletVenue,
           packagedFee: Number(person.packagedFee) || 0,
@@ -901,9 +924,9 @@ export default function IMClearanceFormModule() {
             saturday: Number(person.saturdayFee) || 0,
             sunday: Number(person.sundayFee) || 0
           },
-          ownGcash: person.ownGcash || '',
-          authGcash: person.authGcash || '',
-          authGcashAccName: person.authGcashAccName || '',
+          ownGcash: person.im ? (person.im.ownGcash || '') : (person.ownGcash || ''),
+          authGcash: person.im ? (person.im.authorizedGcash || '') : (person.authGcash || ''),
+          authGcashAccName: person.im ? (person.im.authorizedReceiver || '') : (person.authGcashAccName || ''),
           isSaved: true,
           remarks: person.remarks || ''
         }))
@@ -1052,6 +1075,7 @@ export default function IMClearanceFormModule() {
           coverageToDate: formData.coverageToDate,
           clearanceRequestorRemarks: formData.clearanceRequestorRemarks,
           personnel: personnelList.map(person => ({
+            imId: person.imId,  // Include IM reference ID
             registeredName: person.registeredName,
             position: person.position,
             outletVenue: person.outletVenue,
@@ -1114,6 +1138,7 @@ export default function IMClearanceFormModule() {
           personnel: personnelList
             .filter(person => person.registeredName || person.position || person.outletVenue)
             .map(person => ({
+              imId: person.imId,  // Include IM reference ID
               registeredName: person.registeredName,
               position: person.position,
               outletVenue: person.outletVenue,
@@ -1789,7 +1814,14 @@ export default function IMClearanceFormModule() {
                 
                 {/* GCash Information */}
                 <div>
-                  <label className="block text-sm font-medium text-blue/90 mb-3">GCash Information</label>
+                  <label className="block text-sm font-medium text-blue/90 mb-3">
+                    GCash Information
+                    {person.imId && (
+                      <span className="text-xs text-green-600 font-normal ml-2">
+                        (Synced from IM Database)
+                      </span>
+                    )}
+                  </label>
                   <div className="flex flex-wrap gap-2 w-full mb-4">
                     <div className="w-[30%] min-w-[20rem] flex-grow-1">
                       <label className={labelClasses}>Own Gcash</label>
@@ -1797,9 +1829,10 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.ownGcash}
                         onChange={(e) => handlePersonnelChange(person.id, 'ownGcash', e.target.value)}
-                        className={person.isSaved ? disabledInputClasses : inputClasses}
+                        className={person.isSaved || person.imId ? disabledInputClasses : inputClasses}
                         placeholder="09XX XXX XXXX"
-                        disabled={person.isSaved}
+                        disabled={person.isSaved || Boolean(person.imId)}
+                        readOnly={Boolean(person.imId)}
                       />
                     </div>
                     
@@ -1809,9 +1842,10 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.authGcash}
                         onChange={(e) => handlePersonnelChange(person.id, 'authGcash', e.target.value)}
-                        className={person.isSaved ? disabledInputClasses : inputClasses}
+                        className={person.isSaved || person.imId ? disabledInputClasses : inputClasses}
                         placeholder="09XX XXX XXXX"
-                        disabled={person.isSaved}
+                        disabled={person.isSaved || Boolean(person.imId)}
+                        readOnly={Boolean(person.imId)}
                       />
                     </div>
                     
@@ -1821,9 +1855,10 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.authGcashAccName}
                         onChange={(e) => handlePersonnelChange(person.id, 'authGcashAccName', e.target.value)}
-                        className={person.isSaved ? disabledInputClasses : inputClasses}
+                        className={person.isSaved || person.imId ? disabledInputClasses : inputClasses}
                         placeholder="Full Name"
-                        disabled={person.isSaved}
+                        disabled={person.isSaved || Boolean(person.imId)}
+                        readOnly={Boolean(person.imId)}
                       />
                     </div>
                   </div>

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { IMCFStatus } from '@prisma/client'
 
 interface PersonnelData {
+  imId?: string;  // IM reference ID
   registeredName: string;
   position: string;
   outletVenue: string;
@@ -44,7 +45,11 @@ async function checkForDuplicates(
     // Find existing IMCF forms with the same personnel AND same project
     const whereClause = {
       personnel: {
-        some: {
+        some: person.imId ? {
+          // If IM reference exists, check by IM ID
+          imID: person.imId
+        } : {
+          // Otherwise, check by registered name
           registeredName: {
             equals: person.registeredName,
             mode: 'insensitive' as const
@@ -84,7 +89,9 @@ async function checkForDuplicates(
           }
         },
         personnel: {
-          where: {
+          where: person.imId ? {
+            imID: person.imId
+          } : {
             registeredName: {
               equals: person.registeredName,
               mode: 'insensitive' as const
@@ -97,9 +104,13 @@ async function checkForDuplicates(
     // Check if there are any duplicates
     const duplicates = []
     for (const form of existingForms) {
-      const existingPerson = form.personnel.find(p => 
-        p.registeredName.toLowerCase() === person.registeredName.toLowerCase()
-      )
+      const existingPerson = form.personnel.find(p => {
+        if (person.imId) {
+          return p.imID === person.imId
+        } else {
+          return p.registeredName?.toLowerCase() === person.registeredName.toLowerCase()
+        }
+      })
       
       if (!existingPerson) continue
       
@@ -263,7 +274,8 @@ export async function POST(request: NextRequest) {
         status: isDraft ? 'DRAFT' : 'SUBMITTED',
         personnel: {
           create: personnel?.map((person: PersonnelData) => ({
-            registeredName: person.registeredName,
+            imID: person.imId || null,  // Reference to IM table if available
+            registeredName: person.imId ? null : person.registeredName,  // Only store name if no IM reference
             position: person.position,
             outletVenue: person.outletVenue,
             packagedFee: parseFloat(String(person.packagedFee)) || 0,
@@ -274,9 +286,9 @@ export async function POST(request: NextRequest) {
             fridayFee: parseFloat(String(person.dailyFees?.friday)) || 0,
             saturdayFee: parseFloat(String(person.dailyFees?.saturday)) || 0,
             sundayFee: parseFloat(String(person.dailyFees?.sunday)) || 0,
-            ownGcash: person.ownGcash,
-            authGcash: person.authGcash,
-            authGcashAccName: person.authGcashAccName,
+            ownGcash: person.imId ? null : person.ownGcash,  // Only store if no IM reference
+            authGcash: person.imId ? null : person.authGcash,  // Only store if no IM reference
+            authGcashAccName: person.imId ? null : person.authGcashAccName,  // Only store if no IM reference
             remarks: person.duplicateRemark || person.remarks || null
           })) || []
         }
@@ -299,7 +311,22 @@ export async function POST(request: NextRequest) {
             email: true
           }
         },
-        personnel: true
+        personnel: {
+          include: {
+            im: {
+              select: {
+                id: true,
+                imNumber: true,
+                firstName: true,
+                middleName: true,
+                lastName: true,
+                ownGcash: true,
+                authorizedGcash: true,
+                authorizedReceiver: true
+              }
+            }
+          }
+        }
       }
     })
 
@@ -374,7 +401,22 @@ export async function GET(request: NextRequest) {
               cepdNumber: true
             }
           },
-          personnel: true
+          personnel: {
+            include: {
+              im: {
+                select: {
+                  id: true,
+                  imNumber: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                  ownGcash: true,
+                  authorizedGcash: true,
+                  authorizedReceiver: true
+                }
+              }
+            }
+          }
         },
         orderBy: {
           createdAt: 'desc'
