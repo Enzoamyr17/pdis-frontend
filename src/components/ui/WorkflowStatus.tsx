@@ -24,42 +24,49 @@ const getStatusStyles = (status: string) => {
         bgColor: 'bg-green',
         textColor: 'text-white',
         borderColor: 'border-green',
-        icon: Check
+        icon: Check,
+        opacity: 'opacity-100',
+        bg: 'status-bg'
       }
     case 'ongoing':
       return {
         bgColor: 'bg-yellow',
         textColor: 'text-white',
         borderColor: 'border-yellow',
-        icon: Clock
+        icon: Clock,
+        bg: 'status-bg'
       }
     case 're-validation':
       return {
         bgColor: 'bg-orange',
         textColor: 'text-white',
         borderColor: 'border-orange',
-        icon: ArrowLeft
+        icon: ArrowLeft,
+        bg: 'status-bg filter grayscale-90'
       }
     case 'cancelled':
       return {
         bgColor: 'bg-red',
         textColor: 'text-white',
         borderColor: 'border-red',
-        icon: X
+        icon: X,
+        bg: 'status-bg filter grayscale-90'
       }
     case 'user':
       return {
         bgColor: 'bg-light-blue',
         textColor: 'text-white',
         borderColor: 'border-light-blue',
-        icon: User
+        icon: User,
+        bg: 'status-bg filter grayscale-90'
       }
     default:
       return {
         bgColor: 'bg-greyed',
         textColor: 'text-greyed',
         borderColor: 'border-greyed',
-        icon: Clock
+        icon: Clock,
+        bg: 'status-bg filter grayscale-90'
       }
   }
 }
@@ -98,40 +105,44 @@ export default function WorkflowStatus({ request, costCenter, status, dateNeeded
 
   return (
     <div 
-      className={`group/main flex flex-col gap-1 bg-white p-1 pt-2 hover:p-2 h-auto w-full rounded-2xl transition-all duration-400 transition-delay-1000 overflow-hidden shadow ${getBorderStyle()}`}
+      className={`flex gap-1 p-1 h-auto w-full rounded-2xl transition-all duration-400 transition-delay-1000 overflow-hidden shadow ${getBorderStyle()}`}
       onMouseLeave={handleMouseOut}
+      
     >
-      <div className="flex justify-between">
-        <h1 className="my-auto text-nowrap text-sm font-bold pl-2 group-hover/main:text-lg duration-400">{request} | {costCenter}</h1>
-        <h1 className="my-auto text-nowrap text-sm font-bold pr-2 group-hover/main:text-lg duration-400">{dateNeeded}</h1>
+      <div className="flex w-1/3 justify-start overflow-hidden">
+        <h1 className="my-auto text-nowrap line-clamp-1 text-clip text-sm font-bold pl-2 duration-400">{request} | {costCenter}</h1>
       </div>
+      
       {/* Status */}
-      <div className="m-auto flex gap-2 flex-wrap justify-evenly bg-light-bg p-1 group-hover/main:p-2 w-full rounded-2xl transition-all overflow-hidden duration-400 overflow-x-auto"
+      <div className="m-auto w-2/3  max-w- flex gap-2 flex-wrap justify-evenly p-1 rounded-2xl bg-light-bg transition-all overflow-hidden duration-400 overflow-x-auto" 
       >
         {status.map((stage) => {
           const statusStyles = getStatusStyles(stage.status || '')
-          const IconComponent = statusStyles.icon
           const isExpanded = expandedStage === stage.id
           
           return (
             <div 
               key={stage.id}
-              className={`cursor-pointer flex shrink-1 group-hover/main:basis-auto p-1 rounded-xl items-center gap-2 bg-white border duration-400 ${statusStyles.borderColor} ${
-                isExpanded ? 'py-1 pl-1 pr-4 gap-1' : ''
+              className={`cursor-pointer flex shrink-1 p-0 w-auto h-8 min-w-8 items-center border duration-400 ${statusStyles.borderColor} ${
+                isExpanded ? 'pr-4 gap-1 max-w-44 rounded-lg bg-white' : `${statusStyles.bg} status-bg max-w-8 rounded-full`
               }`}
               onClick={() => handleStageClick(stage.id)}
             >
-              <div className={`size-6 group-hover/main:size-8 p-1 rounded-lg ${statusStyles.bgColor} flex items-center justify-center duration-400`}>
-                <IconComponent 
-                  className={`size-4 group-hover/main:size-6 ${statusStyles.textColor} duration-400`}
-                  strokeWidth={3} 
-                />
-              </div>
-              <p className={`m-auto text-md group-hover/main:text-lg font-bold overflow-hidden duration-500 ${
-                isExpanded ? 'opacity-0 max-h-0' : ''
-              }`}>
-                {stage.id}
-              </p>
+              {stage.status === 'completed' ? (
+                <Check className={`m-auto h-6 w-6 p-1 text-white ${statusStyles.bgColor} overflow-hidden duration-500 rounded-full ${
+                  isExpanded ? 'opacity-0 max-h-0' : ''
+                }`} />
+              ) : stage.status === 'ongoing' ? (
+                <Clock className={`m-auto h-6 w-6 p-1 text-white ${statusStyles.bgColor} overflow-hidden duration-500 rounded-full ${
+                  isExpanded ? 'opacity-0 max-h-0' : ''
+                }`} />
+              ) : (
+                <p className={`m-auto text-md font-bold overflow-hidden duration-500 ${
+                  isExpanded ? 'opacity-0 max-h-0' : ''
+                }`}>
+                  {stage.id}
+                </p>
+              )}
               <div className={`w-auto font-semibold text-sm text-nowrap overflow-hidden duration-500 ${
                 isExpanded ? 'max-h-12 max-w-84' : 'max-w-0 max-h-0'
               }`}>
@@ -141,6 +152,10 @@ export default function WorkflowStatus({ request, costCenter, status, dateNeeded
             </div>
           )
         })}
+      </div>
+
+      <div className="flex w-1/6 justify-end overflow-hidden">
+        <h1 className="my-auto text-nowrap text-sm font-bold pr-2 duration-400">{dateNeeded}</h1>
       </div>
     </div>
   )
