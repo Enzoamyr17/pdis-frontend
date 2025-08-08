@@ -252,10 +252,10 @@ export default function IndependentManpowerModule() {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const validateGcashFields = () => {
-    const hasOwnGcash = formData.ownGcash.trim() !== ""
-    const hasAuthorizedGcash = formData.authorizedGcash.trim() !== ""
-    const hasAuthorizedReceiver = formData.authorizedReceiver.trim() !== ""
+  const validateGcashFields = (data = formData) => {
+    const hasOwnGcash = data.ownGcash.trim() !== ""
+    const hasAuthorizedGcash = data.authorizedGcash.trim() !== ""
+    const hasAuthorizedReceiver = data.authorizedReceiver.trim() !== ""
 
     if (!hasOwnGcash && !hasAuthorizedGcash) {
       toast.error('Please provide either Own Gcash or Authorized Gcash number.')
@@ -412,7 +412,7 @@ export default function IndependentManpowerModule() {
     
     if (!selectedIM || !editData) return
     
-    if (!validateGcashFields()) {
+    if (!validateGcashFields(editData)) {
       return
     }
 

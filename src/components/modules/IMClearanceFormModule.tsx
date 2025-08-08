@@ -37,6 +37,7 @@ interface CE {
 
 interface IMPersonnel {
   id: string
+  imId?: string  // Reference to IM database record
   registeredName: string
   position: string
   outletVenue: string
@@ -88,7 +89,8 @@ interface IMCFFormListItem {
   } | null
   personnel: Array<{
     id: string
-    registeredName: string
+    imID?: string
+    registeredName?: string
     position: string
     packagedFee: number
     mondayFee: number
@@ -98,6 +100,12 @@ interface IMCFFormListItem {
     fridayFee: number
     saturdayFee: number
     sundayFee: number
+    im?: {
+      id: string
+      firstName: string
+      middleName?: string
+      lastName: string
+    }
   }>
 }
 
@@ -215,6 +223,10 @@ export default function IMClearanceFormModule() {
   const [showScrollToBottom, setShowScrollToBottom] = useState(false)
   const [showStickyActions, setShowStickyActions] = useState(false)
   const personnelContainerRef = useRef<HTMLDivElement>(null)
+
+  // Daily fees modal states
+  const [showDailyFeesModal, setShowDailyFeesModal] = useState(false)
+  const [editingDailyFeesPersonId, setEditingDailyFeesPersonId] = useState<string | null>(null)
 
   // Function to scroll to the most recently added unsaved (being edited) personnel
   const scrollToFirstUnsavedPersonnel = () => {
@@ -695,6 +707,7 @@ export default function IMClearanceFormModule() {
     setPersonnelList(prev => prev.map(person => 
       person.id === personnelId ? {
         ...person,
+        imId: im.id,  // Store IM reference ID
         registeredName: im.fullName,
         ownGcash: im.ownGcash || '',
         authGcash: im.authorizedGcash || '',
@@ -867,7 +880,8 @@ export default function IMClearanceFormModule() {
         // Populate personnel data
         const loadedPersonnel: IMPersonnel[] = imcfData.personnel.map((person: {
           id: string;
-          registeredName: string;
+          imID?: string;
+          registeredName?: string;
           position: string;
           outletVenue: string;
           packagedFee: number;
@@ -878,13 +892,26 @@ export default function IMClearanceFormModule() {
           fridayFee: number;
           saturdayFee: number;
           sundayFee: number;
-          ownGcash: string;
-          authGcash: string;
-          authGcashAccName: string;
+          ownGcash?: string;
+          authGcash?: string;
+          authGcashAccName?: string;
           remarks?: string;
+          im?: {
+            id: string;
+            imNumber: string;
+            firstName: string;
+            middleName?: string;
+            lastName: string;
+            ownGcash?: string;
+            authorizedGcash?: string;
+            authorizedReceiver?: string;
+          };
         }, index: number) => ({
           id: person.id || (index + 1).toString(),
-          registeredName: person.registeredName,
+          imId: person.imID || undefined,
+          registeredName: person.im 
+            ? `${person.im.lastName}, ${person.im.firstName} ${person.im.middleName || ''}`.trim()
+            : (person.registeredName || ''),
           position: person.position,
           outletVenue: person.outletVenue,
           packagedFee: Number(person.packagedFee) || 0,
@@ -897,9 +924,9 @@ export default function IMClearanceFormModule() {
             saturday: Number(person.saturdayFee) || 0,
             sunday: Number(person.sundayFee) || 0
           },
-          ownGcash: person.ownGcash || '',
-          authGcash: person.authGcash || '',
-          authGcashAccName: person.authGcashAccName || '',
+          ownGcash: person.im ? (person.im.ownGcash || '') : (person.ownGcash || ''),
+          authGcash: person.im ? (person.im.authorizedGcash || '') : (person.authGcash || ''),
+          authGcashAccName: person.im ? (person.im.authorizedReceiver || '') : (person.authGcashAccName || ''),
           isSaved: true,
           remarks: person.remarks || ''
         }))
@@ -1048,6 +1075,7 @@ export default function IMClearanceFormModule() {
           coverageToDate: formData.coverageToDate,
           clearanceRequestorRemarks: formData.clearanceRequestorRemarks,
           personnel: personnelList.map(person => ({
+            imId: person.imId,  // Include IM reference ID
             registeredName: person.registeredName,
             position: person.position,
             outletVenue: person.outletVenue,
@@ -1110,6 +1138,7 @@ export default function IMClearanceFormModule() {
           personnel: personnelList
             .filter(person => person.registeredName || person.position || person.outletVenue)
             .map(person => ({
+              imId: person.imId,  // Include IM reference ID
               registeredName: person.registeredName,
               position: person.position,
               outletVenue: person.outletVenue,
@@ -1785,7 +1814,14 @@ export default function IMClearanceFormModule() {
                 
                 {/* GCash Information */}
                 <div>
-                  <label className="block text-sm font-medium text-blue/90 mb-3">GCash Information</label>
+                  <label className="block text-sm font-medium text-blue/90 mb-3">
+                    GCash Information
+                    {person.imId && (
+                      <span className="text-xs text-green-600 font-normal ml-2">
+                        (Synced from IM Database)
+                      </span>
+                    )}
+                  </label>
                   <div className="flex flex-wrap gap-2 w-full mb-4">
                     <div className="w-[30%] min-w-[20rem] flex-grow-1">
                       <label className={labelClasses}>Own Gcash</label>
@@ -1793,9 +1829,10 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.ownGcash}
                         onChange={(e) => handlePersonnelChange(person.id, 'ownGcash', e.target.value)}
-                        className={person.isSaved ? disabledInputClasses : inputClasses}
+                        className={person.isSaved || person.imId ? disabledInputClasses : inputClasses}
                         placeholder="09XX XXX XXXX"
-                        disabled={person.isSaved}
+                        disabled={person.isSaved || Boolean(person.imId)}
+                        readOnly={Boolean(person.imId)}
                       />
                     </div>
                     
@@ -1805,9 +1842,10 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.authGcash}
                         onChange={(e) => handlePersonnelChange(person.id, 'authGcash', e.target.value)}
-                        className={person.isSaved ? disabledInputClasses : inputClasses}
+                        className={person.isSaved || person.imId ? disabledInputClasses : inputClasses}
                         placeholder="09XX XXX XXXX"
-                        disabled={person.isSaved}
+                        disabled={person.isSaved || Boolean(person.imId)}
+                        readOnly={Boolean(person.imId)}
                       />
                     </div>
                     
@@ -1817,9 +1855,10 @@ export default function IMClearanceFormModule() {
                         type="text"
                         value={person.authGcashAccName}
                         onChange={(e) => handlePersonnelChange(person.id, 'authGcashAccName', e.target.value)}
-                        className={person.isSaved ? disabledInputClasses : inputClasses}
+                        className={person.isSaved || person.imId ? disabledInputClasses : inputClasses}
                         placeholder="Full Name"
-                        disabled={person.isSaved}
+                        disabled={person.isSaved || Boolean(person.imId)}
+                        readOnly={Boolean(person.imId)}
                       />
                     </div>
                   </div>
@@ -1988,35 +2027,39 @@ export default function IMClearanceFormModule() {
                           <td className="p-2">
                             {/* Show Daily Fees only if this person has no package fee */}
                             {person.packagedFee === 0 ? (
-                              hasDailyFees ? (
-                                <div className="text-xs text-blue">
-                                  {Object.entries(person.dailyFees)
-                                    .filter(([, fee]) => fee > 0)
-                                    .map(([day, fee]) => (
-                                      <div key={day}>{day.charAt(0).toUpperCase() + day.slice(1)}: ₱{fee}</div>
-                                    ))
-                                  }
-                                </div>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    // Switch to card view for detailed daily fee editing
-                                    setPersonnelViewMode('card')
-                                    // Focus on this person's daily fees section
-                                    setTimeout(() => {
-                                      const element = document.querySelector(`[data-personnel-id="${person.id}"]`)
-                                      if (element) {
-                                        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                                      }
-                                    }, 100)
-                                  }}
-                                  className="text-xs text-blue hover:text-blue/80 underline"
-                                  disabled={person.isSaved}
-                                >
-                                  Edit Daily Fees
-                                </button>
-                              )
+                              <div className="min-w-[140px]">
+                                {hasDailyFees ? (
+                                  <div className="flex flex-wrap gap-1 mb-1">
+                                    {Object.entries(person.dailyFees)
+                                      .filter(([, fee]) => fee > 0)
+                                      .map(([day, fee]) => {
+                                        const dayAbbr = day.slice(0, 3).charAt(0).toUpperCase() + day.slice(1, 3)
+                                        return (
+                                          <span 
+                                            key={day} 
+                                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue/10 text-blue border border-blue/20"
+                                            title={`${day.charAt(0).toUpperCase() + day.slice(1)}: ₱${fee}`}
+                                          >
+                                            {dayAbbr}: ₱{fee}
+                                          </span>
+                                        )
+                                      })
+                                    }
+                                  </div>
+                                ) : null}
+                                {!person.isSaved && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingDailyFeesPersonId(person.id)
+                                      setShowDailyFeesModal(true)
+                                    }}
+                                    className="text-xs text-blue hover:text-blue/80 underline font-medium"
+                                  >
+                                    {hasDailyFees ? '✏️ Edit' : '+ Add Daily Fees'}
+                                  </button>
+                                )}
+                              </div>
                             ) : (
                               <span className="text-xs text-gray-400">-</span>
                             )}
@@ -2630,6 +2673,73 @@ export default function IMClearanceFormModule() {
             </button>
           </div>
         </div>
+      </Modal>
+
+      {/* Daily Fees Modal */}
+      <Modal isOpen={showDailyFeesModal} onClose={() => {
+        setShowDailyFeesModal(false)
+        setEditingDailyFeesPersonId(null)
+      }}>
+        {editingDailyFeesPersonId && (() => {
+          const person = personnelList.find(p => p.id === editingDailyFeesPersonId)
+          const personIndex = personnelList.findIndex(p => p.id === editingDailyFeesPersonId)
+          if (!person) return null
+          
+          return (
+            <div className="bg-white rounded-lg p-6 max-w-2xl mx-4 shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-blue/10 flex items-center justify-center">
+                  <User className="w-5 h-5 text-blue" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Edit Daily Fees</h3>
+                  <p className="text-sm text-gray-600">IM #{personIndex + 1}: {person.registeredName}</p>
+                </div>
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-blue/90 mb-3">Daily Fees (₱)</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(person.dailyFees).map(([day, fee]) => (
+                    <div key={day}>
+                      <label className={labelClasses}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
+                      <input
+                        type="number"
+                        value={fee === 0 ? '' : fee}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
+                          if (value > 0) {
+                            // Clear packaged fee when daily fee is entered
+                            handlePersonnelChange(person.id, 'packagedFee', 0)
+                          }
+                          const newDailyFees = { ...person.dailyFees, [day]: value }
+                          handlePersonnelChange(person.id, 'dailyFees', newDailyFees)
+                        }}
+                        className={inputClasses}
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        disabled={person.isSaved}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowDailyFeesModal(false)
+                    setEditingDailyFeesPersonId(null)
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )
+        })()}
       </Modal>
 
       {/* Delete Confirmation Dialog */}

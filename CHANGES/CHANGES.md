@@ -2,6 +2,21 @@
 
 ## Frontend
 
+### August 7, 2025 - 11:35 AM
+- **IMCF IM Reference System Frontend**: Implemented frontend components for IM database reference system
+  - Updated IMPersonnel interface to include `imId` reference field for linking to IM database records
+  - Modified selectIM function to store IM reference ID instead of duplicating data
+  - Enhanced form submission and saving to include IM references in API calls
+  - Updated form loading logic to handle synced IM data and populate fields from referenced records
+- **IMCF GCash Auto-Sync UI**: Implemented user interface for automatic GCash synchronization
+  - Added visual indicators showing "(Synced from IM Database)" for referenced personnel
+  - Made GCash fields read-only when personnel is linked to IM database record
+  - Enhanced data loading to prioritize IM database values over stored duplicates
+- **IMCF Data Interface Enhancement**: Updated frontend interfaces to support new IM reference system
+  - Modified IMCFFormListItem interface to handle optional IM references and nested IM data
+  - Enhanced loadIMCFForEdit function to properly construct full names from IM database records
+  - Updated personnel data mapping to use IM database values when available, fallback to stored values
+
 ### August 6, 2025 - 3:00 PM
 - **IMCF List View Field Enhancement**: Added missing Auth GCash and Auth GCash Name fields to table view
   - Added Auth GCash and Auth GCash Name columns to match Card view functionality
@@ -111,6 +126,17 @@
 
 ## Backend
 
+### August 7, 2025 - 11:35 AM
+- **IMCF IM Reference System Backend**: Implemented backend API support for IM database reference system
+  - Updated PersonnelData interface to include `imId` field for IM database references
+  - Modified IMCF creation and update endpoints to handle IM references in data storage
+  - Enhanced personnel creation logic to use IM references when available, storing minimal duplicate data
+  - Updated data retrieval to include IM data via database joins for automatic synchronization
+- **IMCF Duplicate Detection with IM References**: Enhanced duplicate checking system for IM references
+  - Modified duplicate checking logic to work with both IM references and traditional name-based checking
+  - Updated duplicate detection queries to handle IM ID-based comparisons for more accurate results
+  - Enhanced existing form exclusion logic to work properly with new reference system
+
 ### August 4, 2025 - 12:38 AM
 - **IMCF Duplicate Logic Backend Integration**: Updated backend duplicate checking to allow forms with remarks
   - Modified duplicate checking logic to allow duplicates when current person has `duplicateRemark` OR existing person has `remarks`
@@ -118,6 +144,17 @@
   - Enhanced form submission error handling to show detailed backend duplicate messages instead of generic errors
 
 ## Database
+
+### August 7, 2025 - 11:35 AM
+- **IMCF Personnel IM Reference Schema**: Added IM database reference system to IMCFPersonnel table
+  - Added `imID` reference field to IMCFPersonnel table linking to IM table
+  - Made `registeredName`, `ownGcash`, `authGcash`, and `authGcashAccName` fields optional when IM reference exists
+  - Added foreign key constraint with RESTRICT deletion to maintain data integrity
+  - Created database index on `imID` field for improved query performance
+- **IM Table Relation Enhancement**: Extended IM model to support IMCF personnel references
+  - Added `imcfPersonnel` relation array to IM model for bidirectional relationship
+  - Applied database schema changes using Prisma db push without data loss
+  - Maintained backward compatibility with existing IMCF records
 
 ### August 4, 2025 - 12:38 AM
 - **IMCF Remarks Field**: Added `remarks` field support for storing duplicate remarks and general notes for IM personnel entries
