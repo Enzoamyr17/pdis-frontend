@@ -5,9 +5,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import ServiceRequestTracker from './ServiceRequestTracker'
 import UserTodoList from './UserTodoList'
 import { useModule } from '@/contexts/ModuleContext'
+import ServiceRequestTrackerModule from './ServiceRequestTrackerModule'
+import ApprovalCenterModule from './ApprovalCenterModule'
 
 export default function WorkingArea() {
   const { activeModule } = useModule()
@@ -24,8 +25,14 @@ export default function WorkingArea() {
   return (
     <div className="h-full">
       <ResizablePanelGroup direction="vertical">
-        <ResizablePanel className="min-h-40" defaultSize={50}>
-          <ServiceRequestTracker />
+        <ResizablePanel className="p-2 min-h-18" defaultSize={50}>
+          <ServiceRequestTrackerModule />
+
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel className="p-2 min-h-18" defaultSize={50}>
+          <ApprovalCenterModule />
+        
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel className="p-2 min-h-18" defaultSize={50}>

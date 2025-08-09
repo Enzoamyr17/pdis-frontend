@@ -2,6 +2,21 @@
 
 ## Frontend
 
+### August 9, 2025 - 4:47 PM
+- **WorkflowStatus Component Refactoring**: Replaced requestorName with costCenter throughout workflow system
+  - Updated ServiceRequest interface to use `costCenter` instead of `requestorName` 
+  - Modified all search, filter, and sorting logic to work with cost center data
+  - Updated UI labels and placeholder text to reflect cost center terminology
+- **WorkflowStatus Visual Enhancements**: Implemented horizontal dashed lines between workflow stages
+  - Added dashed connecting lines between all workflow stages for better visual flow
+  - Fixed spacing issues to ensure even distribution with proper edge positioning
+  - Enhanced stage layout with conditional flex classes to eliminate unnecessary whitespace
+- **WorkflowStatus Tooltip System**: Replaced expand-on-click with professional tooltip functionality
+  - Removed complex expansion animations and replaced with clean Radix UI tooltip integration
+  - Implemented click-to-show tooltip behavior displaying stage name and date information
+  - Added controlled tooltip state management with proper toggle functionality (click same stage to close)
+  - Enhanced user experience with professional tooltip positioning and styling
+
 ### August 7, 2025 - 11:35 AM
 - **IMCF IM Reference System Frontend**: Implemented frontend components for IM database reference system
   - Updated IMPersonnel interface to include `imId` reference field for linking to IM database records

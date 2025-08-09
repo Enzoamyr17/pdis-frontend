@@ -7,7 +7,7 @@ import WorkflowStatus from "./ui/WorkflowStatus"
 interface ServiceRequest {
   id: string
   request: string
-  requestorName: string
+  costCenter: string
   status: Array<{ id: number; name: string; date?: string; status?: string }>
   dateNeeded: string
 }
@@ -80,42 +80,42 @@ export default function ServiceRequestTrackerModule() {
     {
       id: "1",
       request: "VRF - 0001",
-      requestorName: "Maria Santos",
+      costCenter: "Cost-Center",
       status: VRF1,
       dateNeeded: "06/08/2025"
     },
     {
       id: "2", 
       request: "VRF - 0002",
-      requestorName: "Juan Dela Cruz",
+      costCenter: "Cost-Center",
       status: VRF2,
       dateNeeded: "26/08/2025"
     },
     {
       id: "3", 
       request: "VRF - 0003",
-      requestorName: "Cynthia De Leon",
+      costCenter: "ENFA_SUMMITNOV2025",
       status: VRF3,
       dateNeeded: "26/07/2025"
     },
     {
       id: "4",
       request: "IMCF - 0001", 
-      requestorName: "Ana Rodriguezz",
+      costCenter: "Cost-Center",
       status: IMCF1,
       dateNeeded: "12/08/2025"
     },
     {
       id: "5",
       request: "IMCF - 0002",
-      requestorName: "John Doe",
+      costCenter: "Cost-Center",
       status: IMCF2,
       dateNeeded: "12/08/2025"
     },
     {
       id: "6",
       request: "IMCF - 0003",
-      requestorName: "Jane Doe",
+      costCenter: "ENFA_SUMMITNOV2025",
       status: IMCF3,
       dateNeeded: "12/08/2025"
     }
@@ -132,8 +132,8 @@ export default function ServiceRequestTrackerModule() {
 
   const allSuggestions = useMemo(() => {
     const requests = serviceRequests.map(req => req.request)
-    const requestors = serviceRequests.map(req => req.requestorName)
-    return [...new Set([...requests, ...requestors])]
+    const costCenters = serviceRequests.map(req => req.costCenter)
+    return [...new Set([...requests, ...costCenters])]
   }, [serviceRequests])
 
   const filteredSuggestions = useMemo(() => {
@@ -159,7 +159,7 @@ export default function ServiceRequestTrackerModule() {
     if (searchQuery.trim() !== "") {
       filtered = serviceRequests.filter(req => 
         req.request.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        req.requestorName.toLowerCase().includes(searchQuery.toLowerCase())
+        req.costCenter.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
@@ -172,8 +172,8 @@ export default function ServiceRequestTrackerModule() {
           return dateA.getTime() - dateB.getTime()
         case "request":
           return a.request.localeCompare(b.request)
-        case "requestorName":
-          return a.requestorName.localeCompare(b.requestorName)
+        case "costCenter":
+          return a.costCenter.localeCompare(b.costCenter)
         default:
           return 0
       }
@@ -191,7 +191,7 @@ export default function ServiceRequestTrackerModule() {
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue" />
             <input 
               type="text"
-              placeholder="Search requests or requestors..."
+              placeholder="Search requests or cost centers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setShowSuggestions(true)}
@@ -224,7 +224,7 @@ export default function ServiceRequestTrackerModule() {
             >
               <option value="dateNeeded">Date Needed (Closest First)</option>
               <option value="request">Request (ascending)</option>
-              <option value="requestorName">Requestor Name (ascending)</option>
+              <option value="costCenter">Cost Center (ascending)</option>
             </select>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function ServiceRequestTrackerModule() {
           <WorkflowStatus 
             key={req.id}
             request={req.request}
-            costCenter={req.requestorName}
+            costCenter={req.costCenter}
             status={req.status}
             dateNeeded={req.dateNeeded}
           />

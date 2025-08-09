@@ -2,6 +2,7 @@
 
 import { Check, ArrowLeft, X, Clock, User } from "lucide-react"
 import { useState } from "react"
+import { Tooltip, TooltipTrigger, TooltipContent } from "./tooltip"
 
 interface WorkflowStage {
   id: number
@@ -72,15 +73,7 @@ const getStatusStyles = (status: string) => {
 }
 
 export default function WorkflowStatus({ request, costCenter, status, dateNeeded = "" }: WorkflowStatusProps) {
-  const [expandedStage, setExpandedStage] = useState<number | null>(null)
-
-  const handleStageClick = (stageId: number) => {
-    setExpandedStage(expandedStage === stageId ? null : stageId)
-  }
-
-  const handleMouseOut = () => {
-    setExpandedStage(null)
-  }
+  const [openTooltip, setOpenTooltip] = useState<number | null>(null)
 
   const parseDateString = (dateStr: string) => {
     const [day, month, year] = dateStr.split('/').map(Number)
@@ -106,55 +99,56 @@ export default function WorkflowStatus({ request, costCenter, status, dateNeeded
   return (
     <div 
       className={`flex gap-1 p-1 h-auto w-full rounded-2xl transition-all duration-400 transition-delay-1000 overflow-hidden shadow ${getBorderStyle()}`}
-      onMouseLeave={handleMouseOut}
       
     >
-      <div className="flex w-1/3 justify-start overflow-hidden">
-        <h1 className="my-auto text-nowrap line-clamp-1 text-clip text-sm font-bold pl-2 duration-400">{request} | {costCenter}</h1>
+      <div className="flex flex-col w-3/8 justify-start overflow-hidden">
+        <h1 className="my-auto text-nowrap line-clamp-1 text-clip text-xs font-bold pl-2 duration-400">{request}</h1>
+        <h1 className="my-auto text-nowrap line-clamp-1 text-clip text-xs font-bold pl-2 duration-400">{costCenter}</h1>
       </div>
       
       {/* Status */}
-      <div className="m-auto w-2/3  max-w- flex gap-2 flex-wrap justify-evenly p-1 rounded-2xl bg-light-bg transition-all overflow-hidden duration-400 overflow-x-auto" 
+      <div className="m-auto w-full flex items-center justify-between p-1 rounded-2xl bg-light-bg transition-all overflow-hidden duration-400 overflow-x-auto" 
       >
-        {status.map((stage) => {
+        {status.map((stage, index) => {
           const statusStyles = getStatusStyles(stage.status || '')
-          const isExpanded = expandedStage === stage.id
           
           return (
-            <div 
-              key={stage.id}
-              className={`cursor-pointer flex shrink-1 p-0 w-auto h-8 min-w-8 items-center border duration-400 ${statusStyles.borderColor} ${
-                isExpanded ? 'pr-4 gap-1 max-w-44 rounded-lg bg-white' : `${statusStyles.bg} status-bg max-w-8 rounded-full`
-              }`}
-              onClick={() => handleStageClick(stage.id)}
-            >
-              {stage.status === 'completed' ? (
-                <Check className={`m-auto h-6 w-6 p-1 text-white ${statusStyles.bgColor} overflow-hidden duration-500 rounded-full ${
-                  isExpanded ? 'opacity-0 max-h-0' : ''
-                }`} />
-              ) : stage.status === 'ongoing' ? (
-                <Clock className={`m-auto h-6 w-6 p-1 text-white ${statusStyles.bgColor} overflow-hidden duration-500 rounded-full ${
-                  isExpanded ? 'opacity-0 max-h-0' : ''
-                }`} />
-              ) : (
-                <p className={`m-auto text-md font-bold overflow-hidden duration-500 ${
-                  isExpanded ? 'opacity-0 max-h-0' : ''
-                }`}>
-                  {stage.id}
-                </p>
+            <div key={stage.id} className={`flex items-center ${index < status.length - 1 ? 'flex-1' : ''}`}>
+              <Tooltip 
+                open={openTooltip === stage.id}
+                onOpenChange={(open) => setOpenTooltip(open ? stage.id : null)}
+              >
+                <TooltipTrigger asChild>
+                  <div 
+                    className={`cursor-pointer flex shrink-0 p-0 w-auto h-8 min-w-8 items-center border duration-400 ${statusStyles.borderColor} ${statusStyles.bg} status-bg max-w-8 rounded-full`}
+                    onClick={() => setOpenTooltip(openTooltip === stage.id ? null : stage.id)}
+                  >
+                    {stage.status === 'completed' ? (
+                      <Check className={`m-auto h-6 w-6 p-1 text-white ${statusStyles.bgColor} rounded-full`} />
+                    ) : stage.status === 'ongoing' ? (
+                      <Clock className={`m-auto h-6 w-6 p-1 text-white ${statusStyles.bgColor} rounded-full`} />
+                    ) : (
+                      <p className={`m-auto text-md font-bold`}>
+                        {stage.id}
+                      </p>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="bg-white text-gray-800 border border-gray-300">
+                  <div className="text-sm font-semibold">{stage.name}</div>
+                  {stage.date && <div className="text-xs text-gray-600 mt-1">{stage.date}</div>}
+                </TooltipContent>
+              </Tooltip>
+              
+              {index < status.length - 1 && (
+                <div className="flex-1 h-0 border-t-3 border-dashed border-gray-600 mx-1"></div>
               )}
-              <div className={`w-auto font-semibold text-sm text-nowrap overflow-hidden duration-500 ${
-                isExpanded ? 'max-h-12 max-w-84' : 'max-w-0 max-h-0'
-              }`}>
-                <h1 className="leading-none">{stage.name}</h1>
-                {stage.date && <h1 className="leading-none">{stage.date}</h1>}
-              </div>
             </div>
           )
         })}
       </div>
 
-      <div className="flex w-1/6 justify-end overflow-hidden">
+      <div className="flex w-1/4 justify-end overflow-hidden">
         <h1 className="my-auto text-nowrap text-sm font-bold pr-2 duration-400">{dateNeeded}</h1>
       </div>
     </div>
